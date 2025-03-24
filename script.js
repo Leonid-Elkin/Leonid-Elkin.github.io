@@ -1,6 +1,6 @@
 const projects = [
   {
-    title: "Investigating neural scaling laws in a multilayer perceptron",
+    title: "EPQ project: investigating neural scaling laws in a multilayer perceptron",
     description:
       "Creating my own AI model from scratch to see how the accuracy of it scales with different hyperparameters.",
     image: "Images/neurons.png",
