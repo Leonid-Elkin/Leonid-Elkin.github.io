@@ -85,9 +85,7 @@ const projects = [
     image: "Images/2fort.png",
     files: [
       { name: "My brother's website", url: "https://alexeyelkin.com/" },
-      { name: "📄 index.html", url: "index.html" },
-      { name: "📄 style.css", url: "style.css" },
-      { name: "📄 script.js", url: "script.js" },
+      { name: "📁 Download my code", url: "Website_source.zip" },
     ],
     featured: false,
   },
