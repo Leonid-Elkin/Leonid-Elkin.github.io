@@ -8,7 +8,7 @@ const projects = [
       { name: "📁 Download my code", url: "MLP_source/Code.zip" },
       {
         name: "📄 Download my research paper",
-        url: "Documentation/Investigating_neural_scaling_laws (9).pdf",
+        url: "Documentation/Investigating_neural_scaling_laws (11).pdf",
       },
     ],
     featured: false,
