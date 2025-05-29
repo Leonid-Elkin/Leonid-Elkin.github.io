@@ -7,7 +7,7 @@ const projects = [
     files: [
       { name: "📁 Download my code", url: "MLP_source/Code.zip" },
       {
-        name: "📄 Download my documentation",
+        name: "📄 Download my research paper",
         url: "Documentation/Investigating_neural_scaling_laws (9).pdf",
       },
     ],
