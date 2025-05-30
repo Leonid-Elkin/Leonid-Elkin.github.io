@@ -69,9 +69,11 @@ const projects = [
     files: [
       {
         name: "📁 Download Critical design report",
-        url: "📄 Documentation/Tonbridge CanSat_ReLAACS_ 2024-25 CDR .pdf",
+        url: "Documentation/Tonbridge CanSat_ReLAACS_ 2024-25 CDR .pdf",
       },
-      { name: "🎥(YouTube) Regional launch video", url: "Images/Relaacs.mp4" },
+      { name: "🎥(YouTube) Regional launch video", url: "Images/Relaacs.mp4",
+        url: "https://youtu.be/fdKvWOKtPcY",
+      },
     ],
     featured: false,
   },
