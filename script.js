@@ -7,8 +7,8 @@ const projects = [
     files: [
       { name: "📁 Download my code", url: "MLP_source/Code.zip" },
       {
-        name: "📄 Download my research paper",
-        url: "Investigating_neural_scaling_laws (11).pdf",
+        name: "📄 Download my documentation",
+        url: "Documentation/Investigating_neural_scaling_laws (9).pdf",
       },
     ],
     featured: false,
@@ -37,7 +37,7 @@ const projects = [
   {
     title: "Project Euler mathematical programming",
     description: "My solutions to the questions on the website Project Euler",
-    image: "Images/Euler.png",
+    image: "Images/euler.png",
     files: [
       {
         name: "📁 My solutions.zip",
@@ -69,11 +69,9 @@ const projects = [
     files: [
       {
         name: "📁 Download Critical design report",
-        url: "Documentation/Tonbridge CanSat_ReLAACS_ 2024-25 CDR .pdf",
+        url: "📄 Documentation/Tonbridge CanSat_ReLAACS_ 2024-25 CDR .pdf",
       },
-      { name: "🎥(YouTube) Regional launch video",
-        url: "https://youtu.be/fdKvWOKtPcY",
-      },
+      { name: "🎥 Download regional launch video", url: "Images/Relaacs.mp4" },
     ],
     featured: false,
   },
@@ -97,7 +95,10 @@ const projects = [
       "Investigating the effect of primordial binary stars on the rate of decay of a globular star cluster",
     image: "Images/NbodySim.png",
     files: [
-      { name: "📄 Research paper", url: "" },
+      {
+        name: "📄 Research paper",
+        url: "N-body_simulation/Physics_investigation.pdf",
+      },
       { name: "📁 Download my code", url: "N-body_simulation/Main.py" },
     ],
     featured: false,
