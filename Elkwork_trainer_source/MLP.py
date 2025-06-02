@@ -1,7 +1,11 @@
+import matplotlib.pyplot as plt
+import matplotlib.colors as mcolors
+import matplotlib.cm as cm
 import numpy as np
+import pickle
 
 class MLP:
-    def __init__(self, layers, activation, clipValue = 500, weightInit = None, seed=None,lossFunc = 'mean',a=0):
+    def __init__(self, layers, activation, clipValue = 500, weightInit = None, seed=None,lossFunc = 'mean',a=0) -> None:
 
         """
         layers - List of layers. First layer must match the number of inputs and last layer must match the number of outputs
@@ -39,84 +43,84 @@ class MLP:
 
         #init random weights and biases using corresponding optimizers
 
-    def sigmoid(self, x):
+    def __sigmoid(self, x) -> None:
         
         #sigmoid activation function
         x = np.clip(x, -self.clipValue, self.clipValue)
         return 1 / (1 + np.exp(-x))
 
 
-    def sigmoidDerivative(self, x):
+    def __sigmoidDerivative(self, x) -> None:
 
         #sigmoid activation function derivative
         return x * (1 - x)
 
-    def relu(self, x):
+    def __relu(self, x) -> None:
 
         #relu activation function
         x = np.clip(x, -self.clipValue, self.clipValue)
         return np.maximum(0, x)
 
-    def reluDerivative(self, x):
+    def __reluDerivative(self, x) -> None:
 
         #relu activation function derivative
         return np.where(x > 0, 1, 0)
 
-    def leakyRelu(self, x):
+    def __leakyRelu(self, x):
 
         #leaky relu activation function
         x = np.clip(x, -self.clipValue, self.clipValue)
         return np.where(x > 0, x, self.a * x)
 
-    def leakyReluDerivative(self, x, a=0.005):
+    def __leakyReluDerivative(self, x, a=0.005):
 
         #leaky relu activation derivative
         return np.where(x > 0, 1, a)
 
-    def softmax(self, x):
+    def __softmax(self, x):
 
         x = np.clip(x, -self.clipValue, self.clipValue)  #Clip to prevent overflow errors
         expon = np.exp(x) 
         return expon / np.sum(expon, axis=1, keepdims=True)  #Normalize
 
-    def activation(self, x):
+    def __activation(self, x):
 
         #function that compiles all activation functions into one function 
         #I added this because it made the logic clearer and made it very easy to add new experimental activation functions
         if self.activationFunction == 'sigmoid':
-            return self.sigmoid(x)
+            return self.__sigmoid(x)
         elif self.activationFunction == 'relu':
-            return self.relu(x)
+            return self.__relu(x)
         elif self.activationFunction == 'leakyrelu':
-            return self.leakyRelu(x)
+            return self.__leakyRelu(x)
 
-    def activationDerivative(self, x):
+    def __activationDerivative(self, x):
 
         #function that compiles all activation function derivatives into one function
         #I added this because it made the logic clearer and made it very easy to add new experimental activation functions
         if self.activationFunction == 'sigmoid':
-            return self.sigmoidDerivative(x)
+            return self.__sigmoidDerivative(x)
         elif self.activationFunction == 'relu':
-            return self.reluDerivative(x)
+            return self.__reluDerivative(x)
         elif self.activationFunction == 'leakyrelu':
-            return self.leakyReluDerivative(x)
+            return self.__leakyReluDerivative(x)
 
-    def lossDerivative(self, predictions, labels):
+    def __lossDerivative(self, predictions, labels):
 
         #derivative of loss functions
         if self.lossFunc == 'mean':
-            return self.meanLossDerivative(predictions, labels)
+            return self.__meanLossDerivative(predictions, labels)
         elif self.lossFunc == 'cross':
-            return self.crossEntropyLossDerivative(predictions, labels)
+            return self.__crossEntropyLossDerivative(predictions, labels)
 
-    def meanLossDerivative(self, predictions, labels):
+    def __meanLossDerivative(self, predictions, labels):
         return 2 * (predictions - labels) 
     
-    def crossEntropyLossDerivative(self, predictions, labels):
+    def __crossEntropyLossDerivative(self, predictions, labels):
         return predictions - labels
 
 
-    def forward(self, incomingConnections, FLOPPER=False):
+    def __forward(self, incomingConnections, FLOPPER=False):
         """
         forward function for neural network 
         incomingConnections - the input values from the data (in this case pixel values from images)
@@ -127,63 +131,63 @@ class MLP:
         for layer in range(self.numLayers - 2): 
             #for each layer calculate dot product from last item stored in self.activations and store it in self.activations
             dotProduct = np.dot(self.activations[-1], self.weights[layer]) + self.biases[layer]
-            activatedDotProduct = self.activation(dotProduct)
+            activatedDotProduct = self.__activation(dotProduct)
             self.activations.append(activatedDotProduct)
 
             if FLOPPER: #monitor CPU usage
-                self.countFlops()
+                self.__countFlops()
 
         outputLayer = np.dot(self.activations[-1], self.weights[-1]) + self.biases[-1] #Calculate the final output. 
-        answer = self.softmax(outputLayer) #Normalises output layer
+        answer = self.__softmax(outputLayer) #Normalises output layer
         self.activations.append(answer) #Stores answer in self.activations
 
         if FLOPPER: #monitor CPU usage
-            self.countFlops()
+            self.__countFlops()
 
         return answer
     
-    def countFlops(self):
+    def __countFlops(self):
         #this estimate is not at all accurate however it is directly proportional with the real FLOP values
         height, width = self.activations[-2].shape  #finds dimensions of activations
         randomThing = self.weights[-1].shape[1]     #finds shape of weights
         flops = height * width * randomThing        #multiplies all dimensions together
         self.CPUUsage += flops                      #adds calculated product to cumumilative variable
 
-    def crossEntropyLoss(self, predictions, labels):
+    def __crossEntropyLoss(self, predictions, labels):
         #Cross enthropy loss function 
         loss = -np.sum(labels * np.log(predictions)) / labels.shape[0]
         return loss
     
-    def meanLoss(self,predictions,labels):
+    def __meanLoss(self,predictions,labels):
         #mean loss function
         loss = np.mean((predictions - labels) ** 2)
         return loss
 
-    def loss(self,predictions,labels):
+    def __loss(self,predictions,labels):
         #function containing all loss methods so that I can add new ones easily and so that the program structure is clearer
         if self.lossFunc == 'mean': 
-            return self.meanLoss(predictions,labels)
+            return self.__meanLoss(predictions,labels)
         elif self.lossFunc == 'cross':
-            return self.crossEntropyLoss(predictions,labels)
+            return self.__crossEntropyLoss(predictions,labels)
     
 
-    def backward(self, targets, lr, FLOPPER):
+    def __backward(self, targets, lr, FLOPPER):
 
         """
         targets - takes a One-hot-encoded list as a target for what the model output should be
-        lr - the learning rate coefficient
+        lr - the learning rate koeficcient
         FLOPPER - is a variable to toggle CPU usage monitoring 
         """
 
-        outputLayerError = self.lossDerivative(self.activations[-1], targets) #gets derivative of final output in regards to the neural network output
+        outputLayerError = self.__lossDerivative(self.activations[-1], targets) #gets derivative of final output in regards to the neural network output
 
         errorO = [outputLayerError]
         for index in range(self.numLayers - 2, 0, -1): # for each layer starting from the end
-            error = np.dot(errorO[0], self.weights[index].T) * self.activationDerivative(self.activations[index])     
+            error = np.dot(errorO[0], self.weights[index].T) * self.__activationDerivative(self.activations[index])     
             errorO.insert(0, error)                                                                                 
 
             if FLOPPER: # calculates CPU usage
-                self.countFlops()
+                self.__countFlops()
 
         for index in range(self.numLayers - 1): #for each layer excluding the last layer
             weightGradient = np.dot(self.activations[index].T, errorO[index]) #calculates the gradients of the weights by using dot product of errorO and the relevant layer
@@ -193,12 +197,28 @@ class MLP:
             self.biases[index] -= lr * biasGradient # adjusts biases
 
             if FLOPPER: # calculates CPU usage
-               self.countFlops() 
+               self.___countFlops() 
 
 
 
-    def train(self, inputs, targets, numEpochs, lr, batchSize, testInputs, testLabels, lrDecay=False,
-               decayRate=0.95, avgLossToggle=False, recordUsage=False, epochLosses=False,stopper = False):
+    def train(self, inputs, targets, numEpochs, lr, batchSize, testInputs = None, testLabels = None,
+               decayRate=1, avgLossToggle=False, recordUsage=False, epochLosses=False,stopper = False):
+        
+        """
+        inputs - list of lists. Each sublist is a flattened vector image.
+        targets - list of lists. Each sublist is the one-hot-encoded answer.
+        numEpochs - the number of epochs
+        lr - the learning rate constant
+        batchSize - the number of images used per step during batch gradient descent. Keep higher for quicker convergence
+        testInputs and testLabels - similar to inputs and targets but should be from the testing dataset. Used for research.
+        decayRate - the rate at which learning rate decays. Allows higher initial lr values without instability. A good range of values is 1>lr>0.75 depending on training dataset size.
+        avgLossToggle - returns the average loss every batch. Used for research
+        recordUsage - do not toggle on - super specific and used for research
+        epochLosses - do not toggle on - super specific and used for research
+        stopper - a toggle to premature stopping when there is a need to optimize training time at the cost of accuracy. Succeptable to ending prematurely when encountering instability (loss randomly spiking). Lower lr is recommended.
+        """
+
+
         indexes = inputs.shape[0]
         lossList = []
         usageSuperlist = []
@@ -207,15 +227,14 @@ class MLP:
         print(f"beginning training with  {numEpochs} epochs and layer sizes {self.layerSizes}")
 
         for epoch in range(numEpochs):
-            print(f"Starting epoch with {len(inputs)} training items")
             lossEpochList = [] # shuffles training images
             shuffledIndexes = np.random.permutation(indexes)
             Inputs = inputs[shuffledIndexes]
             Labels = targets[shuffledIndexes]
 
             if epochLosses: # option to record losses for each epoch
-                testPredictions = self.forward(testInputs)
-                testLoss = self.loss(testPredictions, testLabels)
+                testPredictions = self.__forward(testInputs)
+                testLoss = self.__loss(testPredictions, testLabels)
                 epochLossesList.append(testLoss)
                 print(testLoss)
 
@@ -223,20 +242,21 @@ class MLP:
                 batchInputs = Inputs[batch: (batch + batchSize)]
                 batchLabels = Labels[batch: (batch + batchSize)]
 
-                predictions = self.forward(batchInputs, recordUsage) # sets up backpropagation
-                loss = self.loss(predictions, batchLabels)
+                predictions = self.__forward(batchInputs, recordUsage) # sets up backpropagation
+                loss = self.__loss(predictions, batchLabels)
                 lossEpochList.append(loss)
 
-                self.backward(batchLabels, lr, recordUsage)
+                self.__backward(batchLabels, lr, recordUsage)
 
 
+            lr *= decayRate
 
             avgLoss = np.mean(lossEpochList) # gets average loss for the epoch
 
 
             if recordUsage: # records CPU usage every epoch if boolean variable recordUsage is True
-                testPredictions = self.forward(testInputs)
-                avgLoss = self.loss(testPredictions, testLabels)
+                testPredictions = self.__forward(testInputs)
+                avgLoss = self.__loss(testPredictions, testLabels)
                 usageSuperlist.append([avgLoss, self.CPUUsage])
     
 
@@ -251,9 +271,6 @@ class MLP:
 
             print(f'Epoch {epoch + 1} / {numEpochs}, Average Loss: {avgLoss:.10f},CPU FLOPs: {self.CPUUsage} lr: {lr:.10f}') # variable print out for debugging
 
-        if lrDecay: # learning rate decay optimisation featureSs
-            lr *= decayRate
-
         # various things that I might want the MLP to return based on the input variables
         if recordUsage: 
             return usageSuperlist
@@ -267,11 +284,26 @@ class MLP:
             if avgLossToggle:
                 return lossList
 
-    def predict(self, inputs):
-        predictions = self.forward(inputs)
-        return np.argmax(predictions, axis=1)
+    def predict(self, inputs, returnProbabilities = False):
+        """
+        inputs - input one item if data, with the same resolution as the size as the input layer size. Must be flattened.
+
+        a number is outputted that relates to the index in the output layer.
+        """
+
+        predictions = self.__forward(inputs)
+
+        if returnProbabilities == False:
+            return np.argmax(predictions, axis=1)
+        else:
+            return self.__softmax(predictions) * 100
 
     def save(self, filename):
+        """
+        Saves the parameters to a file specified by 'filename'
+        """
+
+
         import pickle
         file = open(filename, 'wb')
         pickle.dump({
@@ -285,6 +317,11 @@ class MLP:
         file.close()
 
     def load(self, filename):
+        """
+        Loads paramaters from save file specified by 'filename'
+        A network must already be initialized to call this.
+        """
+
         import pickle
         file = open(filename,'rb')
         data = pickle.load(file)
@@ -296,4 +333,87 @@ class MLP:
         self.clipValue = data['clipValue']
         self.weightInit = data['weightInit']
         file.close()
+
+    def drawStructure(self, filename=None):
+
+        import pickle
+        import numpy as np
+        import matplotlib.pyplot as plt
+        import matplotlib.cm as cm
+        import matplotlib.colors as mcolors
+
+        if filename:
+            with open(filename, 'rb') as f:
+                data = pickle.load(f)
+            layerSizes = data['layerSizes']
+            weights = data['weights']
+            biases = data['biases']
+        else:
+            layerSizes = self.layerSizes
+            weights = self.weights
+            biases = self.biases
+
+        numLayers = len(layerSizes)
+        fig, ax = plt.subplots(figsize=(12, 6))
+        ax.axis('off')
+
+        layerXPositions = np.linspace(0.1, 0.9, numLayers)
+        neuronRadius = 0.015 
+
+        # Calculate neuron vertical positions per layer
+        neuronPositions = []
+        for i, size in enumerate(layerSizes):
+            top = 0.9
+            bottom = 0.1
+            if size == 1:
+                yPositions = [0.5]
+            else:
+                ySpacing = (top - bottom) / (size - 1)
+                yPositions = [bottom + j * ySpacing for j in range(size)]
+            positions = [(layerXPositions[i], y) for y in yPositions]
+            neuronPositions.append(positions)
+
+        # Normalize weights and biases separately
+        allWeights = np.concatenate([w.flatten() for w in weights]) if weights else np.array([0])
+        allBiases = np.concatenate([b.flatten() for b in biases]) if biases else np.array([0])
+
+        weightAbsMax = np.max(np.abs(allWeights)) if allWeights.size > 0 else 1
+        biasAbsMax = np.max(np.abs(allBiases)) if allBiases.size > 0 else 1
+
+        normWeights = mcolors.Normalize(vmin=0, vmax=weightAbsMax)
+        normBiases = mcolors.Normalize(vmin=0, vmax=biasAbsMax)
+        weightCmap = cm.plasma
+        biasCmap = cm.inferno
+
+        # Draw connections first 
+        for i in range(numLayers - 1):
+            for srcIdx, srcPos in enumerate(neuronPositions[i]):
+                for dstIdx, dstPos in enumerate(neuronPositions[i + 1]):
+                    weightVal = weights[i][srcIdx, dstIdx]
+                    color = weightCmap(normWeights(abs(weightVal)))
+                    alpha = min(1, abs(weightVal) / weightAbsMax + 0.1)
+                    ax.plot([srcPos[0], dstPos[0]], [srcPos[1], dstPos[1]],
+                            color=color, alpha=alpha, linewidth=0.7, zorder=1)
+
+        # Draw neurons on top
+        for i, positions in enumerate(neuronPositions):
+            for j, (x, y) in enumerate(positions):
+                if i == 0:
+                    biasVal = 0  # Input layer neurons usually don't have bias
+                else:
+                    biasVal = biases[i - 1][0, j]  
+                neuronColor = biasCmap(normBiases(abs(biasVal)))
+                circle = plt.Circle((x, y), neuronRadius,
+                                    color=neuronColor, ec='black', lw=0.5, zorder=2)
+                ax.add_patch(circle)
+
+        # Add layer labels
+        for i, size in enumerate(layerSizes):
+            ax.text(layerXPositions[i], 0.97, f'Layer {i + 1}\n({size} neurons)',
+                    ha='center', fontsize=10, fontweight='bold')
+
+        plt.title("MLP Structure Visualization", fontsize=14)
+        plt.show()
+
+
 

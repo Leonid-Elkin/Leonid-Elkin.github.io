@@ -1,7 +1,11 @@
+import matplotlib.pyplot as plt
+import matplotlib.colors as mcolors
+import matplotlib.cm as cm
 import numpy as np
+import pickle
 
 class MLP:
-    def __init__(self, layers, activation, clipValue = 500, weightInit = None, seed=None,lossFunc = 'mean',a=0):
+    def __init__(self, layers, activation, clipValue = 500, weightInit = None, seed=None,lossFunc = 'mean',a=0) -> None:
 
         """
         layers - List of layers. First layer must match the number of inputs and last layer must match the number of outputs
@@ -39,25 +43,25 @@ class MLP:
 
         #init random weights and biases using corresponding optimizers
 
-    def __sigmoid(self, x):
+    def __sigmoid(self, x) -> None:
         
         #sigmoid activation function
         x = np.clip(x, -self.clipValue, self.clipValue)
         return 1 / (1 + np.exp(-x))
 
 
-    def __sigmoidDerivative(self, x):
+    def __sigmoidDerivative(self, x) -> None:
 
         #sigmoid activation function derivative
         return x * (1 - x)
 
-    def __relu(self, x):
+    def __relu(self, x) -> None:
 
         #relu activation function
         x = np.clip(x, -self.clipValue, self.clipValue)
         return np.maximum(0, x)
 
-    def __reluDerivative(self, x):
+    def __reluDerivative(self, x) -> None:
 
         #relu activation function derivative
         return np.where(x > 0, 1, 0)
@@ -131,14 +135,14 @@ class MLP:
             self.activations.append(activatedDotProduct)
 
             if FLOPPER: #monitor CPU usage
-                self.countFlops()
+                self.__countFlops()
 
         outputLayer = np.dot(self.activations[-1], self.weights[-1]) + self.biases[-1] #Calculate the final output. 
         answer = self.__softmax(outputLayer) #Normalises output layer
         self.activations.append(answer) #Stores answer in self.activations
 
         if FLOPPER: #monitor CPU usage
-            self.countFlops()
+            self.__countFlops()
 
         return answer
     
@@ -175,15 +179,15 @@ class MLP:
         FLOPPER - is a variable to toggle CPU usage monitoring 
         """
 
-        outputLayerError = self.lossDerivative(self.activations[-1], targets) #gets derivative of final output in regards to the neural network output
+        outputLayerError = self.__lossDerivative(self.activations[-1], targets) #gets derivative of final output in regards to the neural network output
 
         errorO = [outputLayerError]
         for index in range(self.numLayers - 2, 0, -1): # for each layer starting from the end
-            error = np.dot(errorO[0], self.weights[index].T) * self.activationDerivative(self.activations[index])     
+            error = np.dot(errorO[0], self.weights[index].T) * self.__activationDerivative(self.activations[index])     
             errorO.insert(0, error)                                                                                 
 
             if FLOPPER: # calculates CPU usage
-                self.countFlops()
+                self.__countFlops()
 
         for index in range(self.numLayers - 1): #for each layer excluding the last layer
             weightGradient = np.dot(self.activations[index].T, errorO[index]) #calculates the gradients of the weights by using dot product of errorO and the relevant layer
@@ -193,7 +197,7 @@ class MLP:
             self.biases[index] -= lr * biasGradient # adjusts biases
 
             if FLOPPER: # calculates CPU usage
-               self.countFlops() 
+               self.___countFlops() 
 
 
 
@@ -329,4 +333,87 @@ class MLP:
         self.clipValue = data['clipValue']
         self.weightInit = data['weightInit']
         file.close()
+
+    def drawStructure(self, filename=None):
+
+        import pickle
+        import numpy as np
+        import matplotlib.pyplot as plt
+        import matplotlib.cm as cm
+        import matplotlib.colors as mcolors
+
+        if filename:
+            with open(filename, 'rb') as f:
+                data = pickle.load(f)
+            layerSizes = data['layerSizes']
+            weights = data['weights']
+            biases = data['biases']
+        else:
+            layerSizes = self.layerSizes
+            weights = self.weights
+            biases = self.biases
+
+        numLayers = len(layerSizes)
+        fig, ax = plt.subplots(figsize=(12, 6))
+        ax.axis('off')
+
+        layerXPositions = np.linspace(0.1, 0.9, numLayers)
+        neuronRadius = 0.015 
+
+        # Calculate neuron vertical positions per layer
+        neuronPositions = []
+        for i, size in enumerate(layerSizes):
+            top = 0.9
+            bottom = 0.1
+            if size == 1:
+                yPositions = [0.5]
+            else:
+                ySpacing = (top - bottom) / (size - 1)
+                yPositions = [bottom + j * ySpacing for j in range(size)]
+            positions = [(layerXPositions[i], y) for y in yPositions]
+            neuronPositions.append(positions)
+
+        # Normalize weights and biases separately
+        allWeights = np.concatenate([w.flatten() for w in weights]) if weights else np.array([0])
+        allBiases = np.concatenate([b.flatten() for b in biases]) if biases else np.array([0])
+
+        weightAbsMax = np.max(np.abs(allWeights)) if allWeights.size > 0 else 1
+        biasAbsMax = np.max(np.abs(allBiases)) if allBiases.size > 0 else 1
+
+        normWeights = mcolors.Normalize(vmin=0, vmax=weightAbsMax)
+        normBiases = mcolors.Normalize(vmin=0, vmax=biasAbsMax)
+        weightCmap = cm.plasma
+        biasCmap = cm.inferno
+
+        # Draw connections first 
+        for i in range(numLayers - 1):
+            for srcIdx, srcPos in enumerate(neuronPositions[i]):
+                for dstIdx, dstPos in enumerate(neuronPositions[i + 1]):
+                    weightVal = weights[i][srcIdx, dstIdx]
+                    color = weightCmap(normWeights(abs(weightVal)))
+                    alpha = min(1, abs(weightVal) / weightAbsMax + 0.1)
+                    ax.plot([srcPos[0], dstPos[0]], [srcPos[1], dstPos[1]],
+                            color=color, alpha=alpha, linewidth=0.7, zorder=1)
+
+        # Draw neurons on top
+        for i, positions in enumerate(neuronPositions):
+            for j, (x, y) in enumerate(positions):
+                if i == 0:
+                    biasVal = 0  # Input layer neurons usually don't have bias
+                else:
+                    biasVal = biases[i - 1][0, j]  
+                neuronColor = biasCmap(normBiases(abs(biasVal)))
+                circle = plt.Circle((x, y), neuronRadius,
+                                    color=neuronColor, ec='black', lw=0.5, zorder=2)
+                ax.add_patch(circle)
+
+        # Add layer labels
+        for i, size in enumerate(layerSizes):
+            ax.text(layerXPositions[i], 0.97, f'Layer {i + 1}\n({size} neurons)',
+                    ha='center', fontsize=10, fontweight='bold')
+
+        plt.title("MLP Structure Visualization", fontsize=14)
+        plt.show()
+
+
 
