@@ -53,7 +53,7 @@ const projects = [
   {
     title: "Project Euler mathematical programming",
     description: "My solutions to the questions on the website Project Euler",
-    image: "Images/euler.png",
+    image: "Images/Euler.png",
     files: [
       { name: "📁 My solutions.zip", url: "Euler_source.zip" },
       {
