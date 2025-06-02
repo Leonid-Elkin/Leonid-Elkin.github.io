@@ -5,11 +5,29 @@ const projects = [
       "Creating my own AI model from scratch to see how the accuracy of it scales with different hyperparameters.",
     image: "Images/neurons.png",
     files: [
-      { name: "📁 Download my code", url: "MLP_source/Code.zip" },
+      { name: "📁 Download my code", url: "MLP all documents (2).zip" },
       {
         name: "📄 Download my documentation",
         url: "Documentation/Investigating_neural_scaling_laws (9).pdf",
       },
+    ],
+    featured: false,
+  },
+  {
+    title: "Personal Physics investigation",
+    description:
+      "Investigating the effect of primordial binary stars on the rate of decay of a globular star cluster",
+    image: "Images/N-Body Simulation.png",
+    files: [
+      {
+        name: "📄 Research paper",
+        url: "Documentation/Physics_investigation (2).pdf",
+      },
+      {
+        name: "📄 Download project poster",
+        url: "Documentation/Physics_investigation_poster.pdf",
+      },
+      { name: "📁 Download my code", url: "N-body_simulation/Main.py" },
     ],
     featured: false,
   },
@@ -71,7 +89,7 @@ const projects = [
         name: "📁 Download Critical design report",
         url: "📄 Documentation/Tonbridge CanSat_ReLAACS_ 2024-25 CDR .pdf",
       },
-      { name: "🎥 Download regional launch video", url: "https://youtu.be/fdKvWOKtPcY" },
+      { name: "🎥 Download regional launch video", url: "Images/Relaacs.mp4" },
     ],
     featured: false,
   },
@@ -85,21 +103,6 @@ const projects = [
         name: "📄 Rulebook",
         url: "https://boardgamegeek.com/boardgame/33767/yavalath",
       },
-    ],
-    featured: false,
-  },
-
-  {
-    title: "Personal Physics investigation",
-    description:
-      "Investigating the effect of primordial binary stars on the rate of decay of a globular star cluster",
-    image: "Images/NbodySim.png",
-    files: [
-      {
-        name: "📄 Research paper",
-        url: "N-body_simulation/Physics_investigation.pdf",
-      },
-      { name: "📁 Download my code", url: "N-body_simulation/Main.py" },
     ],
     featured: false,
   },
