@@ -5,7 +5,7 @@ const projects = [
   {
     title: "Machine Learning Projects",
     description:
-      "View my AI/ML work uncluding my research paper on scaling, my completed code with a live demonstraction, and different downloadable models all trained by meeee :3",
+      "View my AI/ML work including interactive projects, research paper, and downloadable models all trained by meeee :3",
     image: "Images/neurons.png",
     files: [{ name: "Go to ML Projects Page →", url: "MlProjects.html" }],
     featured: true,
@@ -53,7 +53,7 @@ const projects = [
   {
     title: "Project Euler mathematical programming",
     description: "My solutions to the questions on the website Project Euler",
-    image: "Images/Euler.png",
+    image: "Images/euler.png",
     files: [
       { name: "📁 My solutions.zip", url: "Euler_source.zip" },
       {
