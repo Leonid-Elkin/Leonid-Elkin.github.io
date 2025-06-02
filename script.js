@@ -1,17 +1,15 @@
+// =============================
+// 🚀 Project Data
+// =============================
 const projects = [
   {
-    title: "Investigating neural scaling laws in a multilayer perceptron",
+    title: "Machine Learning Projects",
     description:
-      "Creating my own AI model from scratch to see how the accuracy of it scales with different hyperparameters.",
+      "View my AI/ML work including interactive projects, documentation, and downloadable code.",
     image: "Images/neurons.png",
-    files: [
-      { name: "📁 Download my code", url: "MLP all documents (2).zip" },
-      {
-        name: "📄 Download my documentation",
-        url: "Documentation/Investigating_neural_scaling_laws (9).pdf",
-      },
-    ],
-    featured: false,
+    files: [{ name: "Go to ML Projects Page →", url: "MlProjects.html" }],
+    featured: true,
+    large: true,
   },
   {
     title: "Personal Physics investigation",
@@ -34,7 +32,7 @@ const projects = [
   {
     title: "Live handwritten digit recognition using elkwork library",
     description:
-      "A live demonstration of my neural network. Users can draw numbers and the network will try and predict which digit was drawn. Easily reconfigurable to work with different datasets by just editing the save file",
+      "A live demonstration of my neural network. Users can draw numbers and the network will try and predict which digit was drawn.",
     image: "Images/mnist.png",
     files: [{ name: "📁 Download my code", url: "Drawer_source.zip" }],
     featured: false,
@@ -57,10 +55,7 @@ const projects = [
     description: "My solutions to the questions on the website Project Euler",
     image: "Images/euler.png",
     files: [
-      {
-        name: "📁 My solutions.zip",
-        url: "Euler_source.zip",
-      },
+      { name: "📁 My solutions.zip", url: "Euler_source.zip" },
       {
         name: "📄 Project Euler problem archives",
         url: "https://projecteuler.net/archives",
@@ -71,7 +66,7 @@ const projects = [
   {
     title: "Yagi-Uda antenna based radar system",
     description:
-      "A project I was working on for a long time. It involved lots of software and hardware development over a few months. I built a 14.5dbi gain antenna and used two transceiver chips paired with a pi3 to transmit, receive, and measure distances between other chips. This is currently INCOMPLETE.",
+      "Built a 14.5dbi gain antenna and used RF transceivers with a Raspberry Pi 3 to measure distances. INCOMPLETE.",
     image: "Images/Yagi.png",
     files: [
       { name: "📁 Download my code (currently unavailable)", url: "" },
@@ -82,12 +77,12 @@ const projects = [
   {
     title: "CANSAT 2025",
     description:
-      "A competition that began my work on the Yagi Uda antenna radar. I worked with a team of seven",
+      "A competition that began my work on the Yagi Uda antenna radar. I worked with a team of seven.",
     image: "Images/CANSAT 2025.jpg",
     files: [
       {
         name: "📁 Download Critical design report",
-        url: "📄 Documentation/Tonbridge CanSat_ReLAACS_ 2024-25 CDR .pdf",
+        url: "Documentation/Tonbridge CanSat_ReLAACS_ 2024-25 CDR .pdf",
       },
       { name: "🎥 Download regional launch video", url: "Images/Relaacs.mp4" },
     ],
@@ -96,7 +91,7 @@ const projects = [
   {
     title: "Multiplayer Yavalath",
     description:
-      "Yavalath is an abstract strategy game that was actually created by artificial intelligence. I'm currently working on it for my AQA Computer Science NEA. This is very much a work in progress and will be INCOMPLETE for another year",
+      "Yavalath is an abstract strategy game that was actually created by artificial intelligence. This is very much a work in progress.",
     image: "Images/Yavalath.png",
     files: [
       {
@@ -106,7 +101,6 @@ const projects = [
     ],
     featured: false,
   },
-
   {
     title: "Portfolio website",
     description: "Code for this website",
@@ -120,18 +114,17 @@ const projects = [
   {
     title: "Shooting score visualiser",
     description:
-      "As a member of a prone rifle shooting club, I wanted to track my progress and compare it to other people. So I created this program that analysed excel files sent to us by our coach.",
+      "I created this program to analyze shooting scores from our club and track performance.",
     image: "Images/kk300.png",
     files: [
       { name: "📁 Download my code", url: "Projects/Shooting scores/Scores" },
     ],
     featured: false,
   },
-
   {
     title: "Aimtrainer",
     description:
-      "The first ever thing I made in PyGame. It's a very simplistic 'aimtrainer' game like the ones one might find for games like Counter Strike",
+      "The first thing I ever made in PyGame. A simple aimtrainer game for FPS-style practice.",
     image: "Images/Aimtrainer.png",
     files: [
       {
@@ -143,9 +136,13 @@ const projects = [
   },
 ];
 
+// =============================
+// 📦 Card Creator
+// =============================
 function createProjectCard(project) {
   const card = document.createElement("div");
   card.className = "project-card";
+  if (project.featured) card.classList.add("featured-card");
 
   const img = document.createElement("img");
   img.src = project.image;
@@ -163,25 +160,36 @@ function createProjectCard(project) {
   content.appendChild(title);
   content.appendChild(desc);
 
+  // Add file links
   project.files.forEach((file) => {
     const link = document.createElement("a");
     link.href = file.url;
     link.textContent = file.name;
-    link.setAttribute("download", "");
+
+    // Skip blank links
+    if (!file.url) {
+      link.classList.add("disabled");
+      link.style.pointerEvents = "none";
+      link.style.opacity = "0.5";
+    } else if (!file.url.endsWith(".html")) {
+      link.setAttribute("download", "");
+    }
+
     content.appendChild(link);
   });
 
   card.appendChild(img);
   card.appendChild(content);
-
   return card;
 }
 
-// Load boxes
+// =============================
+// 📂 Load Cards into Grid
+// =============================
 window.addEventListener("DOMContentLoaded", () => {
-  const projectGrid = document.getElementById("project-grid");
+  const grid = document.getElementById("project-grid");
   projects.forEach((project) => {
     const card = createProjectCard(project);
-    projectGrid.appendChild(card);
+    grid.appendChild(card);
   });
 });
