@@ -32,7 +32,7 @@ const trainedModels = [
   },
   {
     name: "FashionMNIST",
-    accuracy: "93.35",
+    accuracy: "93.35%",
     link: "Models/fashion_mnist_model.zip",
   },
 ];
