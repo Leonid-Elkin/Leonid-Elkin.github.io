@@ -23,7 +23,6 @@ const projects = [
   },
 ];
 
-// Data for trained models with download links
 const trainedModels = [
   {
     name: "MNIST",
@@ -67,7 +66,6 @@ function createModelsList() {
   });
 }
 
-// On DOM ready
 document.addEventListener("DOMContentLoaded", () => {
   createProjectBoxes();
 

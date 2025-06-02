@@ -1,6 +1,3 @@
-// =============================
-// 🚀 Project Data
-// =============================
 const projects = [
   {
     title: "Machine Learning Projects",
@@ -136,9 +133,6 @@ const projects = [
   },
 ];
 
-// =============================
-// 📦 Card Creator
-// =============================
 function createProjectCard(project) {
   const card = document.createElement("div");
   card.className = "project-card";
@@ -160,13 +154,11 @@ function createProjectCard(project) {
   content.appendChild(title);
   content.appendChild(desc);
 
-  // Add file links
   project.files.forEach((file) => {
     const link = document.createElement("a");
     link.href = file.url;
     link.textContent = file.name;
 
-    // Skip blank links
     if (!file.url) {
       link.classList.add("disabled");
       link.style.pointerEvents = "none";
@@ -183,9 +175,6 @@ function createProjectCard(project) {
   return card;
 }
 
-// =============================
-// 📂 Load Cards into Grid
-// =============================
 window.addEventListener("DOMContentLoaded", () => {
   const grid = document.getElementById("project-grid");
   projects.forEach((project) => {

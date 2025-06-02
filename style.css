@@ -22,7 +22,6 @@ body {
 
 header {
   background: rgba(42, 44, 46, 0.8);
-  /*background: linear-gradient(90deg, #363636, #b3b3b3);*/
   color: white;
   padding: 0px 0;
 }
@@ -190,7 +189,7 @@ footer a {
   display: grid;
   gap: 20px;
   grid-template-columns: repeat(2, 1fr);
-  grid-auto-rows: 350px; /* Ensures uniform row height */
+  grid-auto-rows: 350px;
 }
 .featured-card {
   grid-row: span 2;
