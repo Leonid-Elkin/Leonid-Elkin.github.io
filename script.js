@@ -5,7 +5,7 @@ const projects = [
   {
     title: "Machine Learning Projects",
     description:
-      "View my AI/ML work including interactive projects, documentation, and downloadable code.",
+      "View my AI/ML work uncluding my research paper on scaling, my completed code with a live demonstraction, and different downloadable models all trained by meeee :3",
     image: "Images/neurons.png",
     files: [{ name: "Go to ML Projects Page →", url: "MlProjects.html" }],
     featured: true,
