@@ -59,7 +59,7 @@ footer {
 }
 
 footer a {
-  color: #b22222;
+  color: #ffffff;
   text-decoration: none;
 }
 
@@ -72,7 +72,7 @@ footer a {
 }
 
 .setup-guide h2 {
-  color: #b22222;
+  color: #ffffff;
   margin-bottom: 12px;
 }
 
@@ -93,7 +93,7 @@ footer a {
 }
 
 .pdf-viewer-box h2 {
-  color: #b22222;
+  color: #ff9999;
   margin-bottom: 15px;
   text-align: center;
 }
@@ -132,12 +132,12 @@ footer a {
 }
 
 .project-box h3 {
-  color: #b22222;
+  color: #ff9999;
   margin-bottom: 10px;
 }
 
 .project-box a {
-  color: #ff6b6b;
+  color: #ff9999;
   font-weight: 600;
   text-decoration: none;
   margin-top: 6px;
@@ -145,13 +145,13 @@ footer a {
 }
 
 .project-box a:hover {
-  color: #ff9696;
+  color: #ff9999;
   text-decoration: underline;
   text-shadow: 0 0 8px rgba(255, 105, 105, 0.9);
 }
 
 .trained-models h2 {
-  color: #b22222;
+  color: #ff9999;
   margin-bottom: 15px;
   text-align: center;
 }
