@@ -27,27 +27,6 @@ const projects = [
     featured: false,
   },
   {
-    title: "Live handwritten digit recognition using elkwork library",
-    description:
-      "A live demonstration of my neural network. Users can draw numbers and the network will try and predict which digit was drawn.",
-    image: "Images/mnist.png",
-    files: [{ name: "📁 Download my code", url: "Drawer_source.zip" }],
-    featured: false,
-  },
-  {
-    title: "Training demonstration for elkwork",
-    description:
-      "An easy program that can be used to train the elkwork MLP on any dataset.",
-    image: "Images/code.png",
-    files: [
-      {
-        name: "📁 Download training demo",
-        url: "Elkwork_trainer_source/Main.zip",
-      },
-    ],
-    featured: false,
-  },
-  {
     title: "Project Euler mathematical programming",
     description: "My solutions to the questions on the website Project Euler",
     image: "Images/euler.png",
