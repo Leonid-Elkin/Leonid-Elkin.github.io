@@ -93,7 +93,7 @@ const projects = [
       "I created this program to analyze shooting scores from our club and track performance.",
     image: "Images/kk300.png",
     files: [
-      { name: "📁 Download my code", url: "Projects/Shooting scores/Scores" },
+      { name: "📁 Download my code", url: "Shooting score visualiser.zip" },
     ],
     featured: false,
   },
