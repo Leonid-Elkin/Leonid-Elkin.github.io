@@ -1,4 +1,3 @@
-<<<<<<< HEAD
 import numpy as np
 import matplotlib.pyplot as plt
 
@@ -104,5 +103,4 @@ def plotPolynomialWithTwo(data, logScale = False):
     plt.ylabel('loss')
     plt.title('loss vs compute graph for different neural network')
     plt.grid(True)
->>>>>>> e04ab7b2ea1636b5dcc3e71a69e9bfbf0ec057d3
     plt.show()
