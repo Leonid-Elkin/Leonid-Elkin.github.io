@@ -1,3 +1,1 @@
 A personal portfolio website I made
-
-HOLY SHIT PLEASE KILL ME PLEASEITS SO BAD PLEASE END IT PLEASE
