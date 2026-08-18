@@ -310,6 +310,119 @@ main.container {
   }
 }
 
+/* ---------- recent commits ---------- */
+
+/* The ul owns the columns so they line up across every row; each li adopts
+   them via subgrid, which keeps its own box for the hover and the rule.
+   Without subgrid each row sizes independently and the messages stagger. */
+.commit-list {
+  list-style: none;
+  display: grid;
+  grid-template-columns: minmax(0, max-content) minmax(0, 1fr) max-content;
+  gap: 2px 0;
+}
+
+.commit-list li {
+  display: grid;
+  grid-column: 1 / -1;
+  grid-template-columns: subgrid;
+  gap: 14px;
+  align-items: baseline;
+  padding: 9px 10px;
+  border-radius: 6px;
+  border-bottom: 1px solid rgba(58, 63, 69, 0.5);
+}
+
+/* Browsers without subgrid keep a readable, if unaligned, three-column row. */
+@supports not (grid-template-columns: subgrid) {
+  .commit-list {
+    display: flex;
+    flex-direction: column;
+  }
+  .commit-list li {
+    grid-template-columns: minmax(120px, max-content) 1fr max-content;
+  }
+}
+
+.commit-list li:last-child {
+  border-bottom: none;
+}
+
+.commit-list li:hover {
+  background: rgba(76, 201, 240, 0.06);
+}
+
+.commit-repo {
+  font-family: "Cascadia Mono", Consolas, monospace;
+  font-size: 0.8rem;
+  color: var(--accent);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.commit-message {
+  color: var(--text);
+  text-decoration: none;
+  font-size: 0.9rem;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.commit-message:hover,
+.commit-message:focus-visible {
+  color: var(--accent);
+  text-decoration: underline;
+}
+
+.commit-date {
+  color: var(--muted);
+  font-size: 0.78rem;
+  white-space: nowrap;
+}
+
+.commit-status {
+  color: var(--muted);
+  font-size: 0.9rem;
+  padding: 6px 0;
+}
+
+.commit-fallback {
+  color: var(--accent);
+  text-decoration: none;
+  font-size: 0.88rem;
+}
+
+.commit-fallback:hover {
+  text-decoration: underline;
+}
+
+/* On a phone the three columns do not fit; stack message over metadata.
+   The ul drops back to a plain column so the rows stop sharing tracks. */
+@media (max-width: 620px) {
+  .commit-list {
+    display: flex;
+    flex-direction: column;
+  }
+  .commit-list li {
+    grid-template-columns: 1fr max-content;
+    gap: 4px 10px;
+  }
+  .commit-message {
+    grid-column: 1 / -1;
+    grid-row: 1;
+    white-space: normal;
+  }
+  .commit-repo {
+    grid-row: 2;
+  }
+  .commit-date {
+    grid-row: 2;
+    text-align: right;
+  }
+}
+
 /* ---------- footer ---------- */
 
 footer {
