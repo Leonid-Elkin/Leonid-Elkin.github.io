@@ -217,6 +217,30 @@ main {
   font-size: 0.92rem;
 }
 
+/* Copy still to be written. Deliberately conspicuous - it should look
+   unfinished until the real words go in. */
+.placeholder {
+  color: var(--ink-faint);
+  border: 2px dashed var(--edge);
+  padding: 8px 11px;
+  letter-spacing: 0.04em;
+  font-size: 0.86rem;
+}
+
+.intro .kicker.placeholder {
+  color: var(--red);
+  border-color: rgba(200, 52, 42, 0.4);
+  font-weight: 400;
+}
+
+/* ---------- durak on the front page ---------- */
+
+.durak-wrap {
+  margin-top: 52px;
+  padding-top: 8px;
+  border-top: 4px solid var(--ink);
+}
+
 /* ---------- project grid ---------- */
 
 .project-grid {

@@ -38,8 +38,6 @@
                         class="num">03</span>live</button>
                 <button class="tab" role="tab" id="tab-log" aria-controls="panel-log" aria-selected="false"><span
                         class="num">04</span>log</button>
-                <button class="tab" role="tab" id="tab-durak" aria-controls="panel-durak"
-                    aria-selected="false"><span class="num">05</span>durak</button>
             </div>
             <div class="rule"></div>
         </div>
@@ -50,16 +48,21 @@
 
             <!-- 01 -->
             <section class="panel" id="panel-work" role="tabpanel" aria-labelledby="tab-work">
-                <!-- PLACEHOLDER: this intro is carried over and has not been checked.
-                     The old "LVI student at Tonbridge" line was a year out of date, so it
-                     is gone; replace the wording below with your own whenever you like. -->
+                <!-- PLACEHOLDER COPY - replace both lines with your own words.
+                     What was here was written for you, not by you. Delete the
+                     `placeholder` classes once the real text is in. -->
                 <div class="intro">
-                    <p>I make things that read the physical world and then argue with it. A naval war game. A
-                        live record of a war that isn't mine. Sheet music turned into guitar tab. A bot that
-                        watches a chessboard over your shoulder.</p>
-                    <p class="kicker">&gt;&gt; mostly python. some c++. one regrettable antenna.</p>
+                    <p class="placeholder">[ WHO YOU ARE AND WHAT YOU BUILD &mdash; two or three sentences ]</p>
+                    <p class="kicker placeholder">[ THE LANGUAGES AND TOOLS YOU ACTUALLY USE ]</p>
                 </div>
                 <div id="project-grid" class="project-grid"></div>
+
+                <!-- Durak sits at the foot of the front page and deals itself only
+                     once it scrolls into view, so it costs nothing on load. -->
+                <div class="durak-wrap">
+                    <h2 class="section-title">durak</h2>
+                    <div class="durak" id="durak"></div>
+                </div>
             </section>
 
             <!-- 02 -->
@@ -104,12 +107,6 @@
             <section class="panel" id="panel-log" role="tabpanel" aria-labelledby="tab-log" hidden>
                 <h2 class="section-title">log</h2>
                 <div id="commit-feed"></div>
-            </section>
-
-            <!-- 05 -->
-            <section class="panel" id="panel-durak" role="tabpanel" aria-labelledby="tab-durak" hidden>
-                <h2 class="section-title">durak</h2>
-                <div class="durak" id="durak"></div>
             </section>
 
         </div>

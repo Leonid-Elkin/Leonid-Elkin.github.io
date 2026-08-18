@@ -5,7 +5,7 @@
  * dronestrikemap.com), and Durak only deals on its first open.
  */
 
-const TABS = ["work", "skills", "live", "log", "durak"];
+const TABS = ["work", "skills", "live", "log"];
 
 /* dronestrikemap.com currently refuses to be framed (`frame-ancestors 'none'`
    plus `X-Frame-Options: DENY`). Set this to true once that server allows
@@ -35,10 +35,6 @@ function selectTab(name, { push = true } = {}) {
       if (poster) poster.hidden = true;
     }
   }
-  if (name === "durak") {
-    document.dispatchEvent(new CustomEvent("durak:open"));
-  }
-
   if (push) {
     const target = name === TABS[0] ? " " : "#" + name;
     history.replaceState(null, "", target === " " ? location.pathname : target);

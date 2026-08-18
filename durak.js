@@ -442,11 +442,35 @@ function render() {
   }
 }
 
-/* Deal only when the tab is first opened - nothing runs behind the scenes.
- *
- * Registered at top level, not inside DOMContentLoaded: tabs.js dispatches
- * durak:open from its own DOMContentLoaded handler, which runs first, so a
- * listener added there would miss the event on a direct #durak load. */
-document.addEventListener("durak:open", () => {
-  if (!G) newGame();
-});
+/* The board lives at the foot of the front page, so it deals itself the first
+ * time it scrolls into view rather than on load - nothing runs behind the
+ * scenes, and arriving at the page costs nothing. */
+function armDurak() {
+  const root = document.getElementById("durak");
+  if (!root) return;
+
+  const deal = () => {
+    if (!G) newGame();
+  };
+
+  if (!("IntersectionObserver" in window)) {
+    deal();
+    return;
+  }
+  const io = new IntersectionObserver(
+    (entries) => {
+      if (entries.some((e) => e.isIntersecting)) {
+        io.disconnect();
+        deal();
+      }
+    },
+    { rootMargin: "150px" }
+  );
+  io.observe(root);
+}
+
+if (document.readyState === "loading") {
+  document.addEventListener("DOMContentLoaded", armDurak);
+} else {
+  armDurak();
+}
