@@ -757,6 +757,44 @@ main {
   }
 }
 
+/* ---------- live page ---------- */
+
+.live-section {
+  padding-top: 0;
+}
+
+/* The embedded site sits in the two-plate frame like the hero photograph. */
+.live-frame {
+  position: relative;
+  box-shadow: var(--shadow);
+}
+
+.live-frame::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  border: 2px solid var(--orange);
+  transform: translate(8px, 8px);
+  pointer-events: none;
+  z-index: -1;
+}
+
+.live-frame iframe {
+  width: 100%;
+  height: 80vh;
+  min-height: 520px;
+  border: 0;
+  display: block;
+  background: #131b22;
+}
+
+@media (max-width: 700px) {
+  .live-frame iframe {
+    height: 70vh;
+    min-height: 420px;
+  }
+}
+
 /* ---------- ML page ---------- */
 
 .ml-grid {

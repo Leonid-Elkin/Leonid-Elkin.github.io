@@ -43,6 +43,7 @@ const projects = [
     image: "Images/dronestrikemap.png",
     tags: ["Python", "SQLite", "systemd", "Leaflet"],
     links: [
+      { name: "watch it live here", url: "live.html" },
       { name: "open the map", url: "https://dronestrikemap.com/" },
       { name: "public API", url: "https://dronestrikemap.com/api/strikes" },
       { name: "source", url: "", pending: true },

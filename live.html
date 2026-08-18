@@ -4,9 +4,9 @@
 <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <title>Projects &middot; Leonid Elkin</title>
+    <title>Live &middot; Leonid Elkin</title>
     <meta name="description"
-        content="Software and hardware projects by Leonid Elkin, with source, downloads and write-ups." />
+        content="The Drone Strike Map, running live: every reported drone and missile strike in the Russia-Ukraine war, day by day, with its source." />
     <link rel="icon" href="Images/Pig.png" />
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
@@ -21,8 +21,8 @@
             <a class="brand" href="index.html"><span class="mark" aria-hidden="true"></span>Leonid Elkin</a>
             <ul class="nav-links">
                 <li><a href="index.html">Home</a></li>
-                <li><a href="projects.html" aria-current="page">Projects</a></li>
-                <li><a href="live.html">Live</a></li>
+                <li><a href="projects.html">Projects</a></li>
+                <li><a href="live.html" aria-current="page">Live</a></li>
                 <li><a href="MlProjects.html">Machine learning</a></li>
                 <li><a href="index.html#contact">Contact</a></li>
             </ul>
@@ -33,23 +33,23 @@
         <section class="section">
             <div class="wrap">
                 <div class="section-head">
-                    <h1 class="display overprint" data-text="Projects" style="font-size: clamp(2rem, 5vw, 3.2rem);">
-                        Projects</h1>
-                    <span class="aside mono" id="project-count"></span>
+                    <h1 class="display overprint" data-text="Drone Strike Map"
+                        style="font-size: clamp(2rem, 5vw, 3.2rem);">Drone Strike Map</h1>
+                    <a class="mono" href="https://dronestrikemap.com/" target="_blank" rel="noopener">open it in its
+                        own tab &rarr;</a>
                 </div>
+                <p class="setup">Every reported drone and missile strike in the Russia-Ukraine war, day by day. Every
+                    figure is a claim, and each one names the outlet that made it. This is the real site, running
+                    here; the arrows walk the days.</p>
+            </div>
+        </section>
 
-                <!-- The filter is the one piece of functionality this page has, so it
-                     is a set of pressed/unpressed buttons rather than links: the URL
-                     hash tracks it (#software, #hardware) so a view can be linked to. -->
-                <div class="filter-row" role="group" aria-label="Filter projects">
-                    <button class="filter" data-filter="all" aria-pressed="true">All <span class="count"></span></button>
-                    <button class="filter" data-filter="software" aria-pressed="false">Software <span
-                            class="count"></span></button>
-                    <button class="filter" data-filter="hardware" aria-pressed="false">Hardware <span
-                            class="count"></span></button>
+        <section class="section live-section">
+            <div class="wrap">
+                <div class="live-frame">
+                    <iframe src="https://dronestrikemap.com/" title="Drone Strike Map" loading="lazy"
+                        referrerpolicy="strict-origin-when-cross-origin"></iframe>
                 </div>
-
-                <div id="project-grid" class="project-grid"></div>
             </div>
         </section>
     </main>
@@ -65,8 +65,6 @@
                 Mono.</span>
         </div>
     </footer>
-
-    <script src="script.js"></script>
 </body>
 
 </html>
