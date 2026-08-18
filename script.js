@@ -1,38 +1,62 @@
-/* Project grid (tab 01) and skills (tab 02).
+/* Content and rendering for the home page (skills) and the projects page
+ * (grid + category filter).
  *
- * A file with `pending: true` (or an empty url) renders greyed out with a
- * "coming soon" tag instead of a link that 404s.
- *
- * Drone Strike Map is deliberately NOT in this grid: its thumbnail is the war
- * map, and that is kept off the landing view. It lives in tab 03 instead.
+ * Every project carries a category (software | hardware), a caption written
+ * for a reader rather than a search engine, tech tags, links, and a status.
+ * A link with `pending: true` renders greyed with a "soon" tag instead of
+ * 404ing. A project with `placeholder: true` is a slot still to be filled -
+ * it says so on its face and never pretends to be a real entry.
  */
 
 const projects = [
+  /* ---------- software ---------- */
   {
-    title: "Machine Learning",
-    description:
-      "Interactive demos, the neural scaling laws paper, and downloadable models, all trained by me.",
+    title: "Machine learning",
+    cat: "software",
+    caption:
+      "The elkwork library, the neural scaling laws paper, and the models it produced. It has its own page.",
     image: "Images/neurons.png",
-    files: [{ name: "the ML page →", url: "MlProjects.html" }],
+    tags: ["Python", "NumPy", "LaTeX"],
+    links: [{ name: "the ML page", url: "MlProjects.html" }],
     featured: true,
   },
   {
     title: "SHELLFALL",
-    description:
-      "Command a coastal fortress against a campaign of named capital ships. Aim your batteries by hand, mark priority targets, and out-build an enemy that never stops sailing. Released as Penumbra.",
+    cat: "software",
+    status: "live",
+    caption:
+      "Hold a coastal fortress against a campaign of named capital ships. You lay the guns yourself and mark what to hit; the enemy keeps sailing. Released as Penumbra.",
     image: "Images/shellfall.png",
-    files: [
-      { name: "play it on itch.io", url: "https://elkyy.itch.io/penumbra" },
-      { name: "windows build", url: "", pending: true },
+    tags: ["Python", "pygame"],
+    links: [
+      { name: "play on itch.io", url: "https://elkyy.itch.io/penumbra" },
       { name: "source", url: "https://github.com/Leonid-Elkin/Penumbra" },
+      { name: "windows build", url: "", pending: true },
+    ],
+  },
+  {
+    title: "Drone Strike Map",
+    cat: "software",
+    status: "live",
+    caption:
+      "Every reported drone and missile strike in the Russia-Ukraine war, day by day, with the outlet behind each figure. Reads a few dozen sources every morning and runs on its own server.",
+    image: "Images/dronestrikemap.png",
+    tags: ["Python", "SQLite", "systemd", "Leaflet"],
+    links: [
+      { name: "open the map", url: "https://dronestrikemap.com/" },
+      { name: "public API", url: "https://dronestrikemap.com/api/strikes" },
+      { name: "source", url: "", pending: true },
     ],
   },
   {
     title: "Sheet2Tab",
-    description:
-      "Turns a PDF of sheet music into playable classical-guitar tablature, with an editor for whatever the reader gets wrong. Also transcribes from a recording or a video of a score.",
+    cat: "software",
+    status: "wip",
+    caption:
+      "Give it a PDF of a score and it hands back classical-guitar tablature under the notation, with an editor for the bars it misreads. Also transcribes from a recording or a video of a page.",
     image: "Images/sheet2tab.png",
-    files: [
+    tags: ["Python", "PyMuPDF", "MusicXML"],
+    links: [
       { name: "example output", url: "Documentation/sheet2tab_example.pdf" },
       { name: "the app", url: "", pending: true },
       { name: "source", url: "", pending: true },
@@ -40,21 +64,26 @@ const projects = [
   },
   {
     title: "Chess Vision Bot",
-    description:
-      "Reads a chessboard off the screen, reconstructs the position, and suggests the best move in real time. The engine has since been ported to C++.",
+    cat: "software",
+    status: "wip",
+    caption:
+      "Watches a chessboard on your screen, rebuilds the position, and says what to play. The engine now has a C++ port for speed.",
     image: "Images/chess.png",
     contain: true,
-    files: [
+    tags: ["Python", "PyQt5", "python-chess", "C++"],
+    links: [
       { name: "the bot", url: "", pending: true },
       { name: "source", url: "", pending: true },
     ],
   },
   {
     title: "Globular clusters",
-    description:
-      "Investigating the effect of primordial binary stars on the rate of decay of a globular star cluster.",
+    cat: "software",
+    caption:
+      "Does a population of primordial binaries change how fast a globular cluster evaporates? An N-body simulation, a paper and a poster.",
     image: "Images/N-Body Simulation.png",
-    files: [
+    tags: ["Python", "NumPy"],
+    links: [
       { name: "the paper", url: "Documentation/Physics_investigation (2).pdf" },
       { name: "the poster", url: "Documentation/Physics_investigation_poster.pdf" },
       { name: "source", url: "N-body_simulation/Main.py" },
@@ -62,209 +91,307 @@ const projects = [
   },
   {
     title: "Yavalath & Pentalath",
-    description:
-      "A-Level coursework: the hex board games Yavalath and Pentalath in full, with a UI, sound and a computer opponent. Yavalath was itself designed by an AI.",
+    cat: "software",
+    caption:
+      "A-Level coursework: both hex board games in full, with sound and a computer opponent. Yavalath was itself designed by a program.",
     image: "Images/Yavalath.png",
-    files: [
+    tags: ["Python"],
+    links: [
       { name: "documentation", url: "Documentation/Yavalath_NEA_documentation.pdf" },
       { name: "the rules", url: "https://boardgamegeek.com/boardgame/33767/yavalath" },
     ],
   },
   {
-    title: "Yagi-Uda radar",
-    description:
-      "A 14.5 dBi antenna driving RF transceivers off a Raspberry Pi 3 to measure distance. Unfinished.",
-    image: "Images/Yagi.png",
-    files: [
-      { name: "source", url: "", pending: true },
-      { name: "documentation", url: "", pending: true },
-    ],
-  },
-  {
-    title: "CANSAT 2025",
-    description: "The competition that started the antenna work. Seven of us.",
-    image: "Images/CANSAT 2025.jpg",
-    files: [
-      { name: "critical design report", url: "Documentation/Tonbridge CanSat_ReLAACS_ 2024-25 CDR .pdf" },
-      { name: "launch video", url: "Images/Relaacs.mp4", pending: true },
-    ],
-  },
-  {
     title: "Project Euler",
-    description: "My solutions to the problems on Project Euler.",
+    cat: "software",
+    caption: "Solutions to the first hundred-odd problems.",
     image: "Images/Euler.png",
-    files: [
+    tags: ["Python"],
+    links: [
       { name: "solutions", url: "Euler_source.zip" },
       { name: "the archive", url: "https://projecteuler.net/archives" },
     ],
   },
   {
     title: "Shooting scores",
-    description: "Written to analyse scores from our club and track performance over a season.",
+    cat: "software",
+    caption: "Plots a season of club scores so you can see whether practice is working.",
     image: "Images/kk300.png",
-    files: [{ name: "source", url: "Shooting score visualiser.zip" }],
+    tags: ["Python"],
+    links: [{ name: "source", url: "Shooting score visualiser.zip" }],
   },
   {
     title: "Aimtrainer",
-    description: "The first thing I ever made in PyGame.",
+    cat: "software",
+    status: "old",
+    caption: "The first thing made in PyGame. Click the circles before they go.",
     image: "Images/Aimtrainer.png",
-    files: [{ name: "source", url: "Aimtrainer_source/Aimtrainer.zip" }],
+    tags: ["Python", "pygame"],
+    links: [{ name: "source", url: "Aimtrainer_source/Aimtrainer.zip" }],
   },
   {
     title: "This website",
-    description: "Cut out and stuck back down.",
+    cat: "software",
+    caption: "Two-ink riso, static HTML, no build step. The commits feed pulls from GitHub in your browser.",
     image: "Images/2fort.png",
-    files: [
-      { name: "source", url: "Website_source.zip" },
-      { name: "my brother's", url: "https://alexeyelkin.com/" },
+    tags: ["HTML", "CSS", "JavaScript"],
+    links: [
+      { name: "source", url: "https://github.com/Leonid-Elkin/Leonid-Elkin.github.io" },
+      { name: "my brother's site", url: "https://alexeyelkin.com/" },
+    ],
+  },
+
+  /* ---------- hardware ---------- */
+  {
+    title: "Yagi-Uda radar",
+    cat: "hardware",
+    status: "wip",
+    caption:
+      "A 14.5 dBi Yagi-Uda feeding RF transceivers off a Raspberry Pi 3 to range a target. Not finished.",
+    image: "Images/Yagi.png",
+    tags: ["Raspberry Pi", "RF", "antenna"],
+    links: [
+      { name: "source", url: "", pending: true },
+      { name: "write-up", url: "", pending: true },
+    ],
+  },
+  {
+    title: "CANSAT 2025",
+    cat: "hardware",
+    caption:
+      "A can-sized satellite for the CanSat competition, built with six others. The antenna work above started here.",
+    image: "Images/CANSAT 2025.jpg",
+    tags: ["RF", "telemetry"],
+    links: [
+      { name: "critical design report", url: "Documentation/Tonbridge CanSat_ReLAACS_ 2024-25 CDR .pdf" },
+      { name: "launch video", url: "Images/Relaacs.mp4", pending: true },
+    ],
+  },
+  /* Placeholders. Fill in the object, drop `placeholder`, add a photo. */
+  {
+    title: "Desk organiser",
+    cat: "hardware",
+    placeholder: true,
+    caption: "[ what it is made of, what it holds, what you would do differently ]",
+    tags: ["[ material ]", "[ tool ]"],
+    links: [{ name: "photos", url: "", pending: true }],
+  },
+  {
+    title: "[ hardware build ]",
+    cat: "hardware",
+    placeholder: true,
+    caption: "[ a sentence on what it is and why it exists ]",
+    tags: ["[ material ]"],
+    links: [{ name: "photos", url: "", pending: true }],
+  },
+  {
+    title: "[ hardware build ]",
+    cat: "hardware",
+    placeholder: true,
+    caption: "[ a sentence on what it is and why it exists ]",
+    tags: ["[ material ]"],
+    links: [{ name: "photos", url: "", pending: true }],
+  },
+];
+
+/* Skills by category. Every line names the work that evidences it - no
+   invented levels or percentages. */
+const skills = [
+  {
+    head: "Languages",
+    items: [
+      { name: "Python", via: "most of the above" },
+      { name: "C++", via: "chess engine port" },
+      { name: "C", via: "a CMake game engine" },
+      { name: "C#", via: "Unity" },
+      { name: "JavaScript", via: "this site" },
+    ],
+  },
+  {
+    head: "Frameworks & tools",
+    items: [
+      { name: "pygame", via: "SHELLFALL, Aimtrainer" },
+      { name: "PyQt5", via: "Chess Vision Bot" },
+      { name: "Unity 6", via: "an air-combat prototype" },
+      { name: "SQLite + systemd", via: "Drone Strike Map" },
+      { name: "PyMuPDF, MusicXML", via: "Sheet2Tab" },
+      { name: "LaTeX", via: "the scaling-laws paper" },
+    ],
+  },
+  {
+    head: "Hardware & radio",
+    items: [
+      { name: "Raspberry Pi", via: "Yagi-Uda radar" },
+      { name: "RF transceivers", via: "Yagi-Uda radar" },
+      { name: "Antenna construction", via: "14.5 dBi Yagi-Uda" },
+      { name: "Payload design", via: "CANSAT 2025" },
+      { name: "[ workshop tools ]", via: "[ placeholder ]", placeholder: true },
+    ],
+  },
+  {
+    head: "Machine learning",
+    items: [
+      { name: "MLPs from scratch", via: "elkwork" },
+      { name: "Training and evaluation", via: "MNIST 98.5%, FashionMNIST 93.4%" },
+      { name: "Computer vision", via: "Chess Vision Bot" },
+      { name: "Optical music recognition", via: "Sheet2Tab" },
     ],
   },
 ];
 
-/* Skills carry no invented percentages - each says what the thing is and
-   points at the work that proves it. */
-const skills = [
-  {
-    name: "Simulation & game engines",
-    note: "SHELLFALL: physics, AI, campaign and netcode, built from nothing",
-    icon: ["M3 12h4l3-8 4 16 3-8h4"],
-  },
-  {
-    name: "Scrapers & data pipelines",
-    note: "a few dozen outlets read every day, unattended, on their own server",
-    icon: ["M4 6h16", "M4 12h16", "M4 18h10", "M18 16v5", "M15.5 18.5L18 21l2.5-2.5"],
-  },
-  {
-    name: "Neural networks",
-    note: "elkwork: multilayer perceptrons written from scratch, no framework",
-    icon: ["M6 6v12", "M12 4v16", "M18 6v12", "M6 9h6", "M12 9h6", "M6 15h6", "M12 15h6"],
-  },
-  {
-    name: "Computer vision",
-    note: "reads a live chessboard off raw pixels and reconstructs the position",
-    icon: ["M2 12s3.6-7 10-7 10 7 10 7-3.6 7-10 7-10-7-10-7Z", "M12 15a3 3 0 1 0 0-6 3 3 0 0 0 0 6Z"],
-  },
-  {
-    name: "RF & antenna design",
-    note: "a 14.5 dBi Yagi-Uda, and the CANSAT payload behind it",
-    icon: ["M12 20v-8", "M8 12h8", "M6 8h12", "M4 4h16", "M12 20h0"],
-  },
-  {
-    name: "Optical music recognition",
-    note: "Sheet2Tab: a printed score becomes playable guitar tablature",
-    icon: ["M9 18V5l10-2v13", "M9 18a3 3 0 1 1-6 0 3 3 0 0 1 6 0Z", "M19 16a3 3 0 1 1-6 0 3 3 0 0 1 6 0Z"],
-  },
-];
+/* ---------- helpers ---------- */
 
-function svgIcon(paths, size) {
-  const ns = "http://www.w3.org/2000/svg";
-  const svg = document.createElementNS(ns, "svg");
-  svg.setAttribute("width", size);
-  svg.setAttribute("height", size);
-  svg.setAttribute("viewBox", "0 0 24 24");
-  svg.setAttribute("fill", "none");
-  svg.setAttribute("stroke", "currentColor");
-  svg.setAttribute("stroke-width", "1.7");
-  svg.setAttribute("stroke-linecap", "round");
-  svg.setAttribute("stroke-linejoin", "round");
-  paths.forEach((d) => {
-    const p = document.createElementNS(ns, "path");
-    p.setAttribute("d", d);
-    svg.appendChild(p);
-  });
-  return svg;
-}
+const el = (tag, cls, text) => {
+  const n = document.createElement(tag);
+  if (cls) n.className = cls;
+  if (text !== undefined) n.textContent = text;
+  return n;
+};
 
-function isExternal(url) {
-  return /^https?:\/\//i.test(url);
-}
+const isExternal = (url) => /^https?:\/\//i.test(url);
 
-function createFileLink(file) {
-  const link = document.createElement("a");
-  link.textContent = file.name;
-
-  if (file.pending || !file.url) {
-    link.href = "";
-    link.classList.add("disabled");
-    link.setAttribute("aria-disabled", "true");
-    link.tabIndex = -1;
-    const tag = document.createElement("span");
-    tag.className = "pending";
-    tag.textContent = "soon";
-    const wrap = document.createElement("span");
-    wrap.appendChild(link);
-    wrap.appendChild(tag);
+function linkEl(link) {
+  const a = el("a", null, link.name);
+  if (link.pending || !link.url) {
+    a.href = "";
+    a.classList.add("disabled");
+    a.setAttribute("aria-disabled", "true");
+    a.tabIndex = -1;
+    const wrap = el("span");
+    wrap.appendChild(a);
+    wrap.appendChild(el("span", "soon", "soon"));
     return wrap;
   }
-
-  link.href = file.url;
-  if (isExternal(file.url)) {
-    link.target = "_blank";
-    link.rel = "noopener";
-  } else if (!file.url.endsWith(".html")) {
-    link.setAttribute("download", "");
+  a.href = link.url;
+  if (isExternal(link.url)) {
+    a.target = "_blank";
+    a.rel = "noopener";
+  } else if (!/\.html$/.test(link.url)) {
+    a.setAttribute("download", "");
   }
-  return link;
+  return a;
 }
 
-function createProjectCard(project) {
-  const card = document.createElement("article");
-  card.className = "project-card";
-  if (project.featured) card.classList.add("featured-card");
+const STATUS_LABEL = { live: "live", wip: "in progress", old: "early", placeholder: "placeholder" };
 
-  const img = document.createElement("img");
-  img.src = project.image;
-  img.alt = project.title;
-  img.loading = "lazy";
-  if (project.contain) img.classList.add("contain");
+function projectCard(p) {
+  const card = el("article", "project-card");
+  card.dataset.cat = p.cat;
+  if (p.featured) card.classList.add("featured");
 
-  const content = document.createElement("div");
-  content.className = "project-content";
+  /* thumbnail */
+  let thumb;
+  if (p.image) {
+    thumb = el("div", "thumb duotone" + (p.contain ? " contain" : ""));
+    const img = el("img");
+    img.src = p.image;
+    img.alt = "";
+    img.loading = "lazy";
+    thumb.appendChild(img);
+  } else {
+    thumb = el("div", "thumb empty halftone");
+    thumb.setAttribute("aria-hidden", "true");
+    // a small blue register mark where the photograph will go
+    const ns = "http://www.w3.org/2000/svg";
+    const svg = document.createElementNS(ns, "svg");
+    svg.setAttribute("width", "34");
+    svg.setAttribute("height", "34");
+    svg.setAttribute("viewBox", "0 0 24 24");
+    svg.setAttribute("fill", "none");
+    svg.setAttribute("stroke", "currentColor");
+    svg.setAttribute("stroke-width", "1.5");
+    ["M12 3v18", "M3 12h18", "M12 12m-5 0a5 5 0 1 0 10 0a5 5 0 1 0-10 0"].forEach((d) => {
+      const path = document.createElementNS(ns, "path");
+      path.setAttribute("d", d);
+      svg.appendChild(path);
+    });
+    thumb.appendChild(svg);
+  }
+  card.appendChild(thumb);
 
-  const title = document.createElement("h3");
-  title.textContent = project.title;
+  /* body */
+  const body = el("div", "project-body");
+  const top = el("div", "top");
+  top.appendChild(el("h3", null, p.title));
+  const st = p.placeholder ? "placeholder" : p.status;
+  if (st) top.appendChild(el("span", "status " + st, STATUS_LABEL[st]));
+  body.appendChild(top);
 
-  const desc = document.createElement("p");
-  desc.textContent = project.description;
+  body.appendChild(el("p", "caption" + (p.placeholder ? " mono" : ""), p.caption));
 
-  content.appendChild(title);
-  content.appendChild(desc);
-  project.files.forEach((f) => content.appendChild(createFileLink(f)));
+  if (p.tags && p.tags.length) {
+    const ul = el("ul", "tags");
+    p.tags.forEach((t) => ul.appendChild(el("li", null, t)));
+    body.appendChild(ul);
+  }
 
-  card.appendChild(img);
-  card.appendChild(content);
+  const links = el("div", "links");
+  p.links.forEach((l) => links.appendChild(linkEl(l)));
+  body.appendChild(links);
+
+  card.appendChild(body);
   return card;
 }
 
-function createSkill(s) {
-  const el = document.createElement("div");
-  el.className = "skill";
-  el.appendChild(svgIcon(s.icon, 24));
+/* ---------- projects page ---------- */
 
-  const body = document.createElement("div");
-  const h = document.createElement("h3");
-  h.textContent = s.name;
-  const p = document.createElement("p");
-  p.textContent = s.note;
-  body.appendChild(h);
-  body.appendChild(p);
+function initProjects() {
+  const grid = document.getElementById("project-grid");
+  if (!grid) return;
 
-  el.appendChild(body);
-  return el;
+  const frag = document.createDocumentFragment();
+  projects.forEach((p) => frag.appendChild(projectCard(p)));
+  grid.appendChild(frag);
+
+  const cards = Array.from(grid.children);
+  const buttons = Array.from(document.querySelectorAll(".filter"));
+  const countEl = document.getElementById("project-count");
+
+  const counts = { all: cards.length };
+  cards.forEach((c) => (counts[c.dataset.cat] = (counts[c.dataset.cat] || 0) + 1));
+  buttons.forEach((b) => {
+    const c = b.querySelector(".count");
+    if (c) c.textContent = counts[b.dataset.filter] || 0;
+  });
+
+  function apply(filter, { push = true } = {}) {
+    if (!buttons.some((b) => b.dataset.filter === filter)) filter = "all";
+    let shown = 0;
+    cards.forEach((c) => {
+      const on = filter === "all" || c.dataset.cat === filter;
+      c.hidden = !on;
+      if (on) shown++;
+    });
+    buttons.forEach((b) => b.setAttribute("aria-pressed", b.dataset.filter === filter ? "true" : "false"));
+    if (countEl) countEl.textContent = shown === 1 ? "1 project" : shown + " projects";
+    if (push) history.replaceState(null, "", filter === "all" ? location.pathname : "#" + filter);
+  }
+
+  buttons.forEach((b) => b.addEventListener("click", () => apply(b.dataset.filter)));
+  apply((location.hash || "").replace("#", ""), { push: false });
+}
+
+/* ---------- home: skills ---------- */
+
+function initSkills() {
+  const root = document.getElementById("skill-cols");
+  if (!root) return;
+  skills.forEach((col) => {
+    const box = el("div", "skill-col");
+    box.appendChild(el("h3", null, col.head));
+    const ul = el("ul");
+    col.items.forEach((it) => {
+      const li = el("li");
+      li.appendChild(el("span", it.placeholder ? "placeholder" : null, it.name));
+      li.appendChild(el("span", "via" + (it.placeholder ? " placeholder" : ""), it.via));
+      ul.appendChild(li);
+    });
+    box.appendChild(ul);
+    root.appendChild(box);
+  });
 }
 
 window.addEventListener("DOMContentLoaded", () => {
-  const grid = document.getElementById("project-grid");
-  if (grid) {
-    const frag = document.createDocumentFragment();
-    projects.forEach((p) => frag.appendChild(createProjectCard(p)));
-    grid.appendChild(frag);
-  }
-
-  const sg = document.getElementById("skill-grid");
-  if (sg) {
-    const frag = document.createDocumentFragment();
-    skills.forEach((s) => frag.appendChild(createSkill(s)));
-    sg.appendChild(frag);
-  }
+  initProjects();
+  initSkills();
 });

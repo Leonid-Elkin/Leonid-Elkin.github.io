@@ -6,121 +6,117 @@
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <title>Leonid Elkin</title>
     <meta name="description"
-        content="Projects by Leonid Elkin: simulation, machine learning, computer vision, signal processing and RF." />
+        content="Leonid Elkin builds software and hardware: naval simulation, a live strike record, sheet music to tablature, radar on a Yagi-Uda antenna." />
     <link rel="icon" href="Images/Pig.png" />
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
     <link rel="stylesheet"
-        href="https://fonts.googleapis.com/css2?family=Anton&family=Courier+Prime:ital,wght@0,400;0,700;1,400&display=swap" />
+        href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,700;12..96,800&family=Instrument+Sans:ital,wght@0,400;0,500;0,600;1,400&family=JetBrains+Mono:wght@400;500&display=swap" />
     <link rel="stylesheet" href="style.css" />
     <link rel="stylesheet" href="durak.css" />
 </head>
 
 <body>
-    <header>
-        <div class="container">
-            <!-- the name, cut out one letter at a time -->
-            <div class="masthead">
-                <span class="cut glyph">E</span>
-                <span class="cut glyph">L</span>
-                <span class="cut glyph">K</span>
-                <span class="cut glyph">I</span>
-                <span class="cut glyph">N</span>
-                <span class="byline">leonid, &amp; the things he built</span>
-            </div>
-
-            <div class="tabs" role="tablist" aria-label="Sections">
-                <button class="tab" role="tab" id="tab-work" aria-controls="panel-work" aria-selected="true"><span
-                        class="num">01</span>work</button>
-                <button class="tab" role="tab" id="tab-skills" aria-controls="panel-skills"
-                    aria-selected="false"><span class="num">02</span>skills</button>
-                <button class="tab" role="tab" id="tab-live" aria-controls="panel-live" aria-selected="false"><span
-                        class="num">03</span>live</button>
-                <button class="tab" role="tab" id="tab-log" aria-controls="panel-log" aria-selected="false"><span
-                        class="num">04</span>log</button>
-            </div>
-            <div class="rule"></div>
+    <nav class="nav" aria-label="Main">
+        <div class="wrap">
+            <a class="brand" href="index.html"><span class="mark" aria-hidden="true"></span>Leonid Elkin</a>
+            <ul class="nav-links">
+                <li><a href="index.html" aria-current="page">Home</a></li>
+                <li><a href="projects.html">Projects</a></li>
+                <li><a href="MlProjects.html">Machine learning</a></li>
+                <li><a href="#contact">Contact</a></li>
+            </ul>
         </div>
-    </header>
+    </nav>
 
     <main>
-        <div class="container">
 
-            <!-- 01 -->
-            <section class="panel" id="panel-work" role="tabpanel" aria-labelledby="tab-work">
-                <!-- PLACEHOLDER COPY - replace both lines with your own words.
-                     What was here was written for you, not by you. Delete the
-                     `placeholder` classes once the real text is in. -->
-                <div class="intro">
-                    <p class="placeholder">[ WHO YOU ARE AND WHAT YOU BUILD &mdash; two or three sentences ]</p>
-                    <p class="kicker placeholder">[ THE LANGUAGES AND TOOLS YOU ACTUALLY USE ]</p>
+        <section class="hero">
+            <div class="wrap">
+                <div>
+                    <h1 class="display overprint" data-text="Leonid Elkin">Leonid Elkin</h1>
+                    <p class="tagline">Software and hardware, mostly in Python, some in C++. Things that read the
+                        physical world and answer it.</p>
+                    <div class="cta-row">
+                        <a class="btn primary" href="projects.html">See the projects</a>
+                        <a class="btn" href="mailto:lnd.elkn@gmail.com">Get in touch</a>
+                    </div>
                 </div>
-                <div id="project-grid" class="project-grid"></div>
-
-                <!-- Durak sits at the foot of the front page and deals itself only
-                     once it scrolls into view, so it costs nothing on load. -->
-                <div class="durak-wrap">
-                    <h2 class="section-title">durak</h2>
-                    <div class="durak" id="durak"></div>
+                <div class="hero-figure duotone">
+                    <img src="Images/Pig.png" alt="" width="360" height="450" />
                 </div>
-            </section>
+            </div>
+        </section>
 
-            <!-- 02 -->
-            <section class="panel" id="panel-skills" role="tabpanel" aria-labelledby="tab-skills" hidden>
-                <h2 class="section-title">what I can do</h2>
-                <div class="skill-grid" id="skill-grid"></div>
-            </section>
-
-            <!-- 03 -->
-            <section class="panel" id="panel-live" role="tabpanel" aria-labelledby="tab-live" hidden>
-                <h2 class="section-title">running right now</h2>
-                <!-- dronestrikemap.com sends `frame-ancestors 'none'` and
-                     `X-Frame-Options: DENY`, so it cannot be embedded until that
-                     server allows this origin. Until then this is a poster that
-                     opens the real thing. Flip EMBED in tabs.js once the header
-                     permits https://leonid-elkin.github.io and the iframe below
-                     takes over. -->
-                <div class="live-frame">
-                    <a class="live-poster" id="live-poster" href="https://dronestrikemap.com/" target="_blank"
-                        rel="noopener">
-                        <img src="Images/dronestrikemap.png" alt="Drone Strike Map" loading="lazy" />
-                        <span class="live-open" aria-hidden="true">
-                            <svg width="30" height="30" viewBox="0 0 24 24" fill="none" stroke="currentColor"
-                                stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                                <path d="M7 17L17 7" />
-                                <path d="M9 7h8v8" />
-                            </svg>
-                        </span>
-                    </a>
-                    <iframe id="live-map" data-src="https://dronestrikemap.com/" title="Drone Strike Map"
-                        loading="lazy" hidden></iframe>
+        <section class="section about" id="about">
+            <div class="wrap">
+                <div class="about-copy">
+                    <div class="section-head">
+                        <h2 class="display">About</h2>
+                    </div>
+                    <!-- PLACEHOLDER: write these two paragraphs yourself. Everything drafted
+                         here before was written for you, not by you, so it is left blank rather
+                         than shipped in your voice. Delete the `placeholder` class when done. -->
+                    <p class="placeholder">[ who you are, where you are, what you are studying - two or three
+                        sentences ]</p>
+                    <p class="placeholder">[ what you build and why - a paragraph, or nothing ]</p>
                 </div>
-                <div class="live-meta">
-                    <span>a day-by-day record of drone and missile strikes; every figure is a claim, with its
-                        source</span>
-                    <a href="https://dronestrikemap.com/" target="_blank" rel="noopener">open it properly
-                        &#8599;</a>
-                </div>
-            </section>
+                <dl class="fact-list">
+                    <div><dt class="k">Based</dt><dd class="placeholder">[ town, country ]</dd></div>
+                    <div><dt class="k">Studying</dt><dd class="placeholder">[ course, year ]</dd></div>
+                    <div><dt class="k">GitHub</dt><dd><a href="https://github.com/Leonid-Elkin" target="_blank"
+                                rel="noopener">Leonid-Elkin</a></dd></div>
+                    <div><dt class="k">Email</dt><dd><a href="mailto:lnd.elkn@gmail.com">lnd.elkn@gmail.com</a></dd>
+                    </div>
+                </dl>
+            </div>
+        </section>
 
-            <!-- 04 -->
-            <section class="panel" id="panel-log" role="tabpanel" aria-labelledby="tab-log" hidden>
-                <h2 class="section-title">log</h2>
+        <section class="section" id="skills">
+            <div class="wrap">
+                <div class="section-head">
+                    <h2 class="display">Skills</h2>
+                    <span class="aside mono">each one points at the work that shows it</span>
+                </div>
+                <div class="skill-cols" id="skill-cols"></div>
+            </div>
+        </section>
+
+        <section class="section" id="activity">
+            <div class="wrap">
+                <div class="section-head">
+                    <h2 class="display">Recent commits</h2>
+                    <a class="mono" href="https://github.com/Leonid-Elkin?tab=repositories" target="_blank"
+                        rel="noopener">all repositories &rarr;</a>
+                </div>
                 <div id="commit-feed"></div>
-            </section>
+            </div>
+        </section>
 
-        </div>
+        <section class="section" id="play">
+            <div class="wrap">
+                <div class="section-head">
+                    <h2 class="display">Durak</h2>
+                    <span class="aside mono play-note">a card game. suits and ranks only.</span>
+                </div>
+                <div class="durak" id="durak"></div>
+            </div>
+        </section>
+
     </main>
 
-    <footer>
-        <div class="container">
-            <span><a href="mailto:lnd.elkn@gmail.com">lnd.elkn@gmail.com</a></span>
-            <span><a href="https://github.com/Leonid-Elkin" target="_blank"
-                    rel="noopener">github.com/Leonid-Elkin</a></span>
+    <footer id="contact">
+        <div class="wrap">
+            <ul class="foot-links">
+                <li><a href="mailto:lnd.elkn@gmail.com">lnd.elkn@gmail.com</a></li>
+                <li><a href="https://github.com/Leonid-Elkin" target="_blank" rel="noopener">GitHub</a></li>
+                <li><a href="https://elkyy.itch.io/" target="_blank" rel="noopener">itch.io</a></li>
+            </ul>
+            <span class="colophon">Two inks on newsprint. Bricolage Grotesque, Instrument Sans, JetBrains
+                Mono.</span>
         </div>
     </footer>
 
-    <script src="tabs.js"></script>
     <script src="script.js"></script>
     <script src="commits.js"></script>
     <script src="durak.js"></script>

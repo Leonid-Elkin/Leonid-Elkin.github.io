@@ -1,11 +1,12 @@
 /* Durak - symbols only, no copy anywhere in the UI.
-   Cards are paper scraps like everything else on the page. */
+   Cards are printed in the two inks: blue backs on a halftone screen, red
+   suits in the orange plate. */
 
 .durak {
   --card-w: 76px;
   --card-h: 108px;
-  background: var(--scrap-2);
-  box-shadow: var(--shadow-lift);
+  background: var(--paper-2);
+  box-shadow: var(--shadow);
   padding: 18px;
   position: relative;
   overflow: hidden;
@@ -43,7 +44,7 @@
   align-items: center;
   justify-content: center;
   padding: 8px;
-  border: 2px dashed var(--edge);
+  border: 2px dashed var(--rule);
 }
 
 /* --- the card --- */
@@ -51,7 +52,7 @@
 .card {
   width: var(--card-w);
   height: var(--card-h);
-  background: var(--scrap);
+  background: var(--card);
   box-shadow: var(--shadow);
   display: flex;
   flex-direction: column;
@@ -70,8 +71,9 @@
 }
 
 .card .pip {
-  font-family: "Anton", "Arial Narrow", sans-serif;
-  font-size: 1.15rem;
+  font-family: "Bricolage Grotesque", sans-serif;
+  font-weight: 800;
+  font-size: 1.05rem;
   line-height: 1;
   letter-spacing: 0;
 }
@@ -87,17 +89,18 @@
   transform: rotate(180deg);
 }
 
-.card.red { color: var(--red); }
+.card.red { color: var(--orange); }
 .card.black { color: var(--ink); }
 
 /* face-down: the printed back. The pale outline is load-bearing - without it
    a fanned row of identical backs merges into one black slab. */
 .card.back {
-  background:
-    repeating-linear-gradient(45deg, var(--ink) 0 4px, #2b2820 4px 8px);
+  background-color: var(--blue);
+  background-image: radial-gradient(rgba(255, 255, 255, 0.28) 1px, transparent 1.3px);
+  background-size: 5px 5px;
   box-shadow: var(--shadow);
-  border: 2px solid var(--scrap);
-  outline: 1px solid rgba(23, 21, 15, 0.35);
+  border: 3px solid var(--card);
+  outline: 1px solid var(--rule);
 }
 
 /* trump marker in the corner of a trump card */
@@ -118,7 +121,7 @@
 .card.playable:hover,
 .card.playable:focus-visible {
   transform: translateY(-14px) rotate(0deg);
-  box-shadow: var(--shadow-lift);
+  box-shadow: var(--shadow);
   z-index: 3;
   outline: none;
 }
@@ -173,7 +176,7 @@
 
 /* the pair the player must answer gets a red ring */
 .pair.target .card.attack {
-  outline: 3px solid var(--red);
+  outline: 3px solid var(--orange);
   outline-offset: 2px;
 }
 
@@ -222,9 +225,9 @@
   left: 2px;
   bottom: -9px;
   z-index: 3;
-  background: var(--red);
-  color: var(--scrap);
-  font-family: "Anton", sans-serif;
+  background: var(--orange);
+  color: var(--card);
+  font-family: "Bricolage Grotesque", sans-serif;
   font-size: 0.8rem;
   padding: 1px 7px;
   box-shadow: var(--shadow);
@@ -233,7 +236,7 @@
 .discard-pile {
   width: var(--card-w);
   height: var(--card-h);
-  border: 2px dashed var(--edge);
+  border: 2px dashed var(--rule);
   opacity: 0.55;
   position: relative;
 }
@@ -254,13 +257,13 @@
   align-items: center;
   margin-top: 22px;
   padding-top: 16px;
-  border-top: 2px dashed var(--edge);
+  border-top: 2px dashed var(--rule);
 }
 
 .durak-btn {
   width: 52px;
   height: 52px;
-  background: var(--scrap);
+  background: var(--card);
   border: none;
   box-shadow: var(--shadow);
   cursor: pointer;
@@ -272,9 +275,9 @@
 
 .durak-btn:hover:not(:disabled) {
   transform: translate(-1px, -2px);
-  box-shadow: var(--shadow-lift);
+  box-shadow: var(--shadow);
   background: var(--ink);
-  color: var(--scrap);
+  color: var(--card);
 }
 
 .durak-btn:disabled {
@@ -283,37 +286,42 @@
 }
 
 .durak-btn.primary {
-  background: var(--red);
-  color: var(--scrap);
+  background: var(--orange);
+  color: var(--card);
 }
 
 .durak-btn.primary:hover:not(:disabled) {
-  background: var(--red-deep);
-  color: var(--scrap);
+  background: var(--orange-deep);
+  color: var(--card);
 }
 
 /* --- end-of-game stamp, still wordless --- */
+
+@keyframes rise {
+  from { opacity: 0; transform: translateY(6px); }
+  to   { opacity: 1; transform: none; }
+}
 
 .durak-stamp {
   position: absolute;
   inset: 0;
   display: grid;
   place-items: center;
-  background: rgba(222, 219, 212, 0.86);
+  background: color-mix(in srgb, var(--paper) 86%, transparent);
   z-index: 8;
   animation: rise 0.3s ease both;
 }
 
 .durak-stamp .mark {
-  border: 6px solid var(--red);
-  color: var(--red);
+  border: 6px solid var(--orange);
+  color: var(--orange);
   padding: 14px 30px;
   transform: rotate(-9deg);
-  font-family: "Anton", sans-serif;
+  font-family: "Bricolage Grotesque", sans-serif;
   font-size: 3.4rem;
   line-height: 1;
-  box-shadow: var(--shadow-lift);
-  background: var(--scrap);
+  box-shadow: var(--shadow);
+  background: var(--card);
   display: flex;
   align-items: center;
   gap: 14px;

@@ -46,8 +46,8 @@ const trainedModels = [
 
 function pendingTag() {
   const tag = document.createElement("span");
-  tag.className = "pending";
-  tag.textContent = "coming soon";
+  tag.className = "soon";
+  tag.textContent = "soon";
   return tag;
 }
 
@@ -84,10 +84,13 @@ function createProjectBoxes() {
     const card = document.createElement("article");
     card.className = "ml-card";
 
+    const thumb = document.createElement("div");
+    thumb.className = "thumb duotone";
     const img = document.createElement("img");
     img.src = project.img;
-    img.alt = project.title;
+    img.alt = "";
     img.loading = "lazy";
+    thumb.appendChild(img);
 
     const body = document.createElement("div");
     body.className = "ml-card-body";
@@ -103,7 +106,7 @@ function createProjectBoxes() {
       })
     );
 
-    card.appendChild(img);
+    card.appendChild(thumb);
     card.appendChild(body);
     container.appendChild(card);
   });
