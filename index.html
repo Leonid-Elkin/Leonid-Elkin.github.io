@@ -4,78 +4,129 @@
 <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <title>Leonid Elkin - Projects</title>
+    <title>Leonid Elkin</title>
     <meta name="description"
-        content="Projects by Leonid Elkin: machine learning, game development, signal processing and RF communication." />
+        content="Projects by Leonid Elkin: simulation, machine learning, computer vision, signal processing and RF." />
     <link rel="icon" href="Images/Pig.png" />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link rel="stylesheet"
+        href="https://fonts.googleapis.com/css2?family=Anton&family=Courier+Prime:ital,wght@0,400;0,700;1,400&display=swap" />
     <link rel="stylesheet" href="style.css" />
+    <link rel="stylesheet" href="durak.css" />
 </head>
 
 <body>
     <header>
         <div class="container">
-            <h1>Leonid Elkin</h1>
-            <nav>
-                <a class="link-white" href="#projects">Projects</a>
-                <a class="link-white" href="#activity">Commits</a>
-                <a class="link-white" href="MlProjects.html">Machine learning</a>
-                <a class="link-white" href="https://github.com/Leonid-Elkin" target="_blank"
-                    rel="noopener">GitHub &#8599;</a>
-                <span class="link-white">v2.1</span>
-            </nav>
+            <!-- the name, cut out one letter at a time -->
+            <div class="masthead">
+                <span class="cut glyph">E</span>
+                <span class="cut glyph">L</span>
+                <span class="cut glyph">K</span>
+                <span class="cut glyph">I</span>
+                <span class="cut glyph">N</span>
+                <span class="byline">leonid, &amp; the things he built</span>
+            </div>
+
+            <div class="tabs" role="tablist" aria-label="Sections">
+                <button class="tab" role="tab" id="tab-work" aria-controls="panel-work" aria-selected="true"><span
+                        class="num">01</span>work</button>
+                <button class="tab" role="tab" id="tab-skills" aria-controls="panel-skills"
+                    aria-selected="false"><span class="num">02</span>skills</button>
+                <button class="tab" role="tab" id="tab-live" aria-controls="panel-live" aria-selected="false"><span
+                        class="num">03</span>live</button>
+                <button class="tab" role="tab" id="tab-log" aria-controls="panel-log" aria-selected="false"><span
+                        class="num">04</span>log</button>
+                <button class="tab" role="tab" id="tab-durak" aria-controls="panel-durak"
+                    aria-selected="false"><span class="num">05</span>durak</button>
+            </div>
+            <div class="rule"></div>
         </div>
     </header>
 
-    <main class="container">
+    <main>
+        <div class="container">
 
-        <!-- PLACEHOLDER: this About Me text is carried over from the June 2025 version
-             and has not been checked for accuracy. Update the year, the school and the
-             subject list below when you get a chance. -->
-        <section class="intro-box">
-            <img src="Images/Pig.png" alt="Leonid Elkin" class="profile-pic" />
-            <div class="about-me">
-                <h2>About Me</h2>
-                <p>I am a LVI student currently studying at Tonbridge School</p>
-                <p>Interested in computer science (especially computer engineering) and RF communication.
-                    Currently studying:</p>
-                <ul class="subject-list">
-                    <li>Mathematics</li>
-                    <li>Further mathematics</li>
-                    <li>Computer science</li>
-                    <li>Physics</li>
-                    <li>EPQ</li>
-                </ul>
-            </div>
-        </section>
+            <!-- 01 -->
+            <section class="panel" id="panel-work" role="tabpanel" aria-labelledby="tab-work">
+                <!-- PLACEHOLDER: this intro is carried over and has not been checked.
+                     The old "LVI student at Tonbridge" line was a year out of date, so it
+                     is gone; replace the wording below with your own whenever you like. -->
+                <div class="intro">
+                    <p>I make things that read the physical world and then argue with it. A naval war game. A
+                        live record of a war that isn't mine. Sheet music turned into guitar tab. A bot that
+                        watches a chessboard over your shoulder.</p>
+                    <p class="kicker">&gt;&gt; mostly python. some c++. one regrettable antenna.</p>
+                </div>
+                <div id="project-grid" class="project-grid"></div>
+            </section>
 
-        <section class="box advertisement">
-            <p><strong>Try my MLP library:</strong> <code>pip install elkwork</code></p>
-            <p>
-                <a href="" class="link disabled">&#128196; Download usage guide</a>
-                <span class="pending">coming soon</span>
-            </p>
-        </section>
+            <!-- 02 -->
+            <section class="panel" id="panel-skills" role="tabpanel" aria-labelledby="tab-skills" hidden>
+                <h2 class="section-title">what I can do</h2>
+                <div class="skill-grid" id="skill-grid"></div>
+            </section>
 
-        <section class="box" id="projects">
-            <h2 class="project-heading">Projects</h2>
-            <div id="project-grid" class="project-grid"></div>
-        </section>
+            <!-- 03 -->
+            <section class="panel" id="panel-live" role="tabpanel" aria-labelledby="tab-live" hidden>
+                <h2 class="section-title">running right now</h2>
+                <!-- dronestrikemap.com sends `frame-ancestors 'none'` and
+                     `X-Frame-Options: DENY`, so it cannot be embedded until that
+                     server allows this origin. Until then this is a poster that
+                     opens the real thing. Flip EMBED in tabs.js once the header
+                     permits https://leonid-elkin.github.io and the iframe below
+                     takes over. -->
+                <div class="live-frame">
+                    <a class="live-poster" id="live-poster" href="https://dronestrikemap.com/" target="_blank"
+                        rel="noopener">
+                        <img src="Images/dronestrikemap.png" alt="Drone Strike Map" loading="lazy" />
+                        <span class="live-open" aria-hidden="true">
+                            <svg width="30" height="30" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                                stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                <path d="M7 17L17 7" />
+                                <path d="M9 7h8v8" />
+                            </svg>
+                        </span>
+                    </a>
+                    <iframe id="live-map" data-src="https://dronestrikemap.com/" title="Drone Strike Map"
+                        loading="lazy" hidden></iframe>
+                </div>
+                <div class="live-meta">
+                    <span>a day-by-day record of drone and missile strikes; every figure is a claim, with its
+                        source</span>
+                    <a href="https://dronestrikemap.com/" target="_blank" rel="noopener">open it properly
+                        &#8599;</a>
+                </div>
+            </section>
 
-        <section class="box" id="activity">
-            <h2 class="project-heading">Recent commits</h2>
-            <div id="commit-feed"></div>
-        </section>
+            <!-- 04 -->
+            <section class="panel" id="panel-log" role="tabpanel" aria-labelledby="tab-log" hidden>
+                <h2 class="section-title">log</h2>
+                <div id="commit-feed"></div>
+            </section>
+
+            <!-- 05 -->
+            <section class="panel" id="panel-durak" role="tabpanel" aria-labelledby="tab-durak" hidden>
+                <h2 class="section-title">durak</h2>
+                <div class="durak" id="durak"></div>
+            </section>
+
+        </div>
     </main>
 
     <footer>
         <div class="container">
-            &#128156; <a href="mailto:lnd.elkn@gmail.com">lnd.elkn@gmail.com</a> |
-            <a href="https://github.com/Leonid-Elkin" target="_blank" rel="noopener">github.com/Leonid-Elkin</a>
+            <span><a href="mailto:lnd.elkn@gmail.com">lnd.elkn@gmail.com</a></span>
+            <span><a href="https://github.com/Leonid-Elkin" target="_blank"
+                    rel="noopener">github.com/Leonid-Elkin</a></span>
         </div>
     </footer>
 
+    <script src="tabs.js"></script>
     <script src="script.js"></script>
     <script src="commits.js"></script>
+    <script src="durak.js"></script>
 </body>
 
 </html>

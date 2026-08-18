@@ -1,0 +1,343 @@
+/* Durak - symbols only, no copy anywhere in the UI.
+   Cards are paper scraps like everything else on the page. */
+
+.durak {
+  --card-w: 76px;
+  --card-h: 108px;
+  background: var(--scrap-2);
+  box-shadow: var(--shadow-lift);
+  padding: 18px;
+  position: relative;
+  overflow: hidden;
+}
+
+.durak-board {
+  display: grid;
+  grid-template-rows: auto minmax(150px, 1fr) auto;
+  gap: 14px;
+  min-height: 460px;
+}
+
+/* --- rows --- */
+
+.durak-row {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  min-height: var(--card-h);
+}
+
+.durak-row.opponent {
+  justify-content: center;
+}
+
+.durak-row.mine {
+  justify-content: center;
+  flex-wrap: wrap;
+}
+
+.durak-table {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 20px;
+  align-items: center;
+  justify-content: center;
+  padding: 8px;
+  border: 2px dashed var(--edge);
+}
+
+/* --- the card --- */
+
+.card {
+  width: var(--card-w);
+  height: var(--card-h);
+  background: var(--scrap);
+  box-shadow: var(--shadow);
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  padding: 7px 8px;
+  position: relative;
+  flex-shrink: 0;
+  user-select: none;
+  transition: transform 0.18s ease, box-shadow 0.18s ease, opacity 0.18s;
+  animation: dealt 0.34s cubic-bezier(0.2, 0.9, 0.3, 1.2) both;
+}
+
+@keyframes dealt {
+  from { opacity: 0; transform: translateY(-38px) rotate(-14deg) scale(0.86); }
+  to   { opacity: 1; }
+}
+
+.card .pip {
+  font-family: "Anton", "Arial Narrow", sans-serif;
+  font-size: 1.15rem;
+  line-height: 1;
+  letter-spacing: 0;
+}
+
+.card .suit-lg {
+  font-size: 1.9rem;
+  line-height: 1;
+  text-align: center;
+}
+
+.card .pip.foot {
+  align-self: flex-end;
+  transform: rotate(180deg);
+}
+
+.card.red { color: var(--red); }
+.card.black { color: var(--ink); }
+
+/* face-down: the printed back. The pale outline is load-bearing - without it
+   a fanned row of identical backs merges into one black slab. */
+.card.back {
+  background:
+    repeating-linear-gradient(45deg, var(--ink) 0 4px, #2b2820 4px 8px);
+  box-shadow: var(--shadow);
+  border: 2px solid var(--scrap);
+  outline: 1px solid rgba(23, 21, 15, 0.35);
+}
+
+/* trump marker in the corner of a trump card */
+.card.trump::after {
+  content: "";
+  position: absolute;
+  inset: 3px;
+  border: 1.5px solid currentColor;
+  opacity: 0.35;
+  pointer-events: none;
+}
+
+/* playable cards lift */
+.card.playable {
+  cursor: pointer;
+}
+
+.card.playable:hover,
+.card.playable:focus-visible {
+  transform: translateY(-14px) rotate(0deg);
+  box-shadow: var(--shadow-lift);
+  z-index: 3;
+  outline: none;
+}
+
+.card.dimmed {
+  opacity: 0.4;
+  filter: grayscale(0.6);
+}
+
+/* the fan in hand: each card leans a little */
+.durak-row.mine .card:nth-child(3n + 1) { transform: rotate(-2deg); }
+.durak-row.mine .card:nth-child(3n + 2) { transform: rotate(1.4deg); }
+.durak-row.mine .card:nth-child(3n + 3) { transform: rotate(-0.6deg); }
+.durak-row.mine .card.playable:hover { transform: translateY(-14px) rotate(0deg); }
+
+.durak-row.opponent .card { margin-left: -46px; }
+.durak-row.opponent .card:first-child { margin-left: 0; }
+
+/* --- a table pair: defence laid across the attack --- */
+
+.pair {
+  position: relative;
+  width: var(--card-w);
+  height: var(--card-h);
+}
+
+.pair .card {
+  position: absolute;
+  inset: 0;
+  animation: none;
+}
+
+.pair .card.defence {
+  transform: translate(14px, 16px) rotate(9deg);
+  animation: beat 0.3s cubic-bezier(0.2, 0.9, 0.3, 1.15) both;
+}
+
+@keyframes beat {
+  from { opacity: 0; transform: translate(44px, -22px) rotate(28deg); }
+  to   { opacity: 1; transform: translate(14px, 16px) rotate(9deg); }
+}
+
+.pair.open .card.attack {
+  cursor: default;
+  animation: land 0.28s cubic-bezier(0.2, 0.9, 0.3, 1.15) both;
+}
+
+@keyframes land {
+  from { opacity: 0; transform: translateY(-34px) scale(0.9); }
+  to   { opacity: 1; }
+}
+
+/* the pair the player must answer gets a red ring */
+.pair.target .card.attack {
+  outline: 3px solid var(--red);
+  outline-offset: 2px;
+}
+
+/* --- deck + trump + discard --- */
+
+.durak-side {
+  display: flex;
+  align-items: center;
+  gap: 22px;
+  justify-content: center;
+  flex-wrap: wrap;
+}
+
+/* Deck with the trump lying across underneath it, half sticking out - the
+   way it sits on a real table. A rotated card occupies card-h across, so the
+   stack has to be that wide plus the deck's own offset. */
+.deck-stack {
+  position: relative;
+  width: calc(var(--card-w) * 1.75);
+  height: calc(var(--card-h) + 10px);
+}
+
+.deck-stack .card {
+  position: absolute;
+  animation: none;
+}
+
+/* Tucked at a slant rather than square-on: a 90deg rotation leaves only the
+   card's upside-down foot showing past the deck, which reads as a mistake. */
+.deck-stack .trump-under {
+  left: calc(var(--card-w) * 0.60);
+  top: 8px;
+  transform: rotate(11deg);
+  transform-origin: bottom left;
+  z-index: 1;
+}
+
+.deck-stack .deck-top {
+  left: 0;
+  top: 0;
+  z-index: 2;
+}
+
+.deck-count {
+  position: absolute;
+  left: 2px;
+  bottom: -9px;
+  z-index: 3;
+  background: var(--red);
+  color: var(--scrap);
+  font-family: "Anton", sans-serif;
+  font-size: 0.8rem;
+  padding: 1px 7px;
+  box-shadow: var(--shadow);
+}
+
+.discard-pile {
+  width: var(--card-w);
+  height: var(--card-h);
+  border: 2px dashed var(--edge);
+  opacity: 0.55;
+  position: relative;
+}
+
+.discard-pile .card {
+  position: absolute;
+  inset: 0;
+  animation: none;
+}
+
+/* --- controls: icons only --- */
+
+/* Clear of the fanned hand, which lifts 14px on hover. */
+.durak-controls {
+  display: flex;
+  gap: 12px;
+  justify-content: center;
+  align-items: center;
+  margin-top: 22px;
+  padding-top: 16px;
+  border-top: 2px dashed var(--edge);
+}
+
+.durak-btn {
+  width: 52px;
+  height: 52px;
+  background: var(--scrap);
+  border: none;
+  box-shadow: var(--shadow);
+  cursor: pointer;
+  display: grid;
+  place-items: center;
+  color: var(--ink);
+  transition: transform 0.12s, box-shadow 0.12s, background 0.12s;
+}
+
+.durak-btn:hover:not(:disabled) {
+  transform: translate(-1px, -2px);
+  box-shadow: var(--shadow-lift);
+  background: var(--ink);
+  color: var(--scrap);
+}
+
+.durak-btn:disabled {
+  opacity: 0.3;
+  cursor: default;
+}
+
+.durak-btn.primary {
+  background: var(--red);
+  color: var(--scrap);
+}
+
+.durak-btn.primary:hover:not(:disabled) {
+  background: var(--red-deep);
+  color: var(--scrap);
+}
+
+/* --- end-of-game stamp, still wordless --- */
+
+.durak-stamp {
+  position: absolute;
+  inset: 0;
+  display: grid;
+  place-items: center;
+  background: rgba(222, 219, 212, 0.86);
+  z-index: 8;
+  animation: rise 0.3s ease both;
+}
+
+.durak-stamp .mark {
+  border: 6px solid var(--red);
+  color: var(--red);
+  padding: 14px 30px;
+  transform: rotate(-9deg);
+  font-family: "Anton", sans-serif;
+  font-size: 3.4rem;
+  line-height: 1;
+  box-shadow: var(--shadow-lift);
+  background: var(--scrap);
+  display: flex;
+  align-items: center;
+  gap: 14px;
+}
+
+.durak-stamp .mark.win {
+  border-color: var(--ink);
+  color: var(--ink);
+}
+
+@media (max-width: 640px) {
+  .durak {
+    --card-w: 58px;
+    --card-h: 84px;
+    padding: 12px;
+  }
+  .durak-row.opponent .card { margin-left: -36px; }
+  .durak-table { gap: 14px; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .card,
+  .pair .card.defence,
+  .pair.open .card.attack {
+    animation: none !important;
+  }
+}

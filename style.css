@@ -1,18 +1,23 @@
 /* Leonid Elkin - portfolio
-   Dark steel + cyan. Rebuilt 2026-08 for a responsive, accessible layout. */
+   Cut-and-paste: photocopied paper, scraps stuck down slightly off-square.
+   Rebuilt from scratch 2026-08.
+
+   Rotation is the whole idea, so it is rationed: a handful of fixed angles,
+   applied to scraps and headings only. Body text and controls stay square,
+   otherwise the page reads as broken rather than assembled. */
 
 :root {
-  --bg: #16181a;
-  --panel: rgba(32, 35, 38, 0.88);
-  --panel-solid: #202326;
-  --panel-hover: rgba(44, 48, 52, 0.94);
-  --line: #3a3f45;
-  --text: #f1f1f1;
-  --muted: #b3bac1;
-  --accent: #4cc9f0;
-  --accent-dim: #2b93b4;
-  --radius: 10px;
-  --shadow: 0 4px 20px rgba(0, 0, 0, 0.45);
+  --paper: #dedbd4;
+  --scrap: #f7f5ef;
+  --scrap-2: #efece3;
+  --ink: #17150f;
+  --ink-soft: #4a453a;
+  --ink-faint: #7d7768;
+  --red: #c8342a;
+  --red-deep: #9d2820;
+  --edge: rgba(23, 21, 15, 0.22);
+  --shadow: 2px 3px 0 rgba(23, 21, 15, 0.26);
+  --shadow-lift: 4px 6px 0 rgba(23, 21, 15, 0.3);
 }
 
 * {
@@ -26,431 +31,540 @@ html {
 }
 
 body {
-  font-family: "Segoe UI", system-ui, -apple-system, sans-serif;
-  color: var(--text);
-  background-color: var(--bg);
-  /* Fixed attachment breaks on mobile, so the image is a separate layer. */
-  background-image: url("Images/steel.png");
-  background-size: cover;
-  background-position: center;
-  background-attachment: fixed;
+  font-family: "Courier Prime", "Courier New", ui-monospace, monospace;
+  color: var(--ink);
+  /* Toner speckle: two offset dot grids read as photocopier grain. */
+  background-color: var(--paper);
+  background-image:
+    radial-gradient(rgba(23, 21, 15, 0.055) 1px, transparent 1px),
+    radial-gradient(rgba(23, 21, 15, 0.035) 1px, transparent 1px);
+  background-size: 4px 4px, 7px 7px;
+  background-position: 0 0, 2px 3px;
   min-height: 100vh;
   display: flex;
   flex-direction: column;
-  line-height: 1.6;
+  line-height: 1.62;
   -webkit-font-smoothing: antialiased;
 }
 
-@media (max-width: 700px) {
-  body {
-    background-attachment: scroll;
-  }
+.cut {
+  font-family: "Anton", "Arial Narrow", "Haettenschweiler", sans-serif;
+  text-transform: uppercase;
+  font-weight: 400;
+  letter-spacing: 0.01em;
+  line-height: 0.95;
 }
 
 .container {
   width: 100%;
-  max-width: 1100px;
+  max-width: 1080px;
   margin-inline: auto;
-  padding: 20px;
+  padding: 0 24px;
 }
 
-/* ---------- header ---------- */
+/* ---------- masthead: the name as cut-out letters ---------- */
 
 header {
-  background: rgba(22, 24, 26, 0.92);
-  backdrop-filter: blur(6px);
-  border-bottom: 1px solid var(--line);
-  position: sticky;
-  top: 0;
-  z-index: 10;
+  padding: 34px 0 0 0;
 }
 
-header .container {
+.masthead {
   display: flex;
+  align-items: flex-end;
   flex-wrap: wrap;
-  gap: 10px;
-  justify-content: space-between;
-  align-items: center;
-  padding-block: 14px;
+  gap: 5px;
 }
 
-header h1 {
-  font-size: clamp(1.3rem, 3vw, 1.75rem);
-  letter-spacing: 0.04em;
-  font-weight: 600;
-}
-
-nav {
-  display: flex;
-  gap: 18px;
-  align-items: center;
-  flex-wrap: wrap;
-}
-
-.link-white {
-  color: var(--muted);
-  text-decoration: none;
-  font-size: 0.9rem;
-  border-bottom: 1px solid transparent;
-  transition: color 0.15s, border-color 0.15s;
-}
-
-.link-white:hover,
-.link-white:focus-visible {
-  color: var(--accent);
-  border-bottom-color: var(--accent);
-}
-
-/* ---------- shared panels ---------- */
-
-.box,
-.intro-box {
-  background: var(--panel);
-  border: 1px solid var(--line);
-  border-radius: var(--radius);
+.masthead .glyph {
+  display: block;
+  background: var(--scrap);
   box-shadow: var(--shadow);
-  padding: 24px;
-  margin-bottom: 24px;
+  padding: 2px 10px;
+  font-size: clamp(2.6rem, 8.5vw, 4.7rem);
 }
 
-main.container {
-  flex: 1;
-}
+/* Each letter cut separately - own size, own angle, two of them inked. */
+.masthead .glyph:nth-child(1) { transform: rotate(-2.4deg); background: var(--ink); color: var(--scrap); font-size: clamp(2.5rem, 8vw, 4.5rem); }
+.masthead .glyph:nth-child(2) { transform: rotate(1.8deg); font-size: clamp(2.2rem, 7.2vw, 4rem); }
+.masthead .glyph:nth-child(3) { transform: rotate(-1.1deg); background: var(--red); color: var(--scrap); font-size: clamp(2.7rem, 9vw, 4.9rem); }
+.masthead .glyph:nth-child(4) { transform: rotate(2.9deg); font-size: clamp(2rem, 6.8vw, 3.8rem); }
+.masthead .glyph:nth-child(5) { transform: rotate(-0.6deg); font-size: clamp(2.5rem, 8.2vw, 4.4rem); }
 
-/* ---------- intro ---------- */
-
-.intro-box {
-  display: flex;
-  gap: 24px;
-  align-items: flex-start;
-}
-
-.profile-pic {
-  width: 120px;
-  height: 120px;
-  object-fit: cover;
-  border-radius: 50%;
-  border: 2px solid var(--accent);
-  flex-shrink: 0;
-  background: var(--panel-solid);
-}
-
-.about-me h2 {
-  margin-bottom: 10px;
-  font-size: 1.3rem;
-}
-
-.about-me p {
-  margin-bottom: 6px;
-  color: var(--muted);
-}
-
-.subject-list {
-  list-style: none;
-  display: flex;
-  flex-wrap: wrap;
-  gap: 8px;
-  margin-top: 10px;
-}
-
-.subject-list li {
-  background: rgba(76, 201, 240, 0.1);
-  border: 1px solid var(--accent-dim);
-  color: var(--accent);
-  border-radius: 999px;
-  padding: 3px 12px;
-  font-size: 0.82rem;
+.masthead .byline {
+  font-size: 0.86rem;
+  padding: 0 0 10px 8px;
+  border-bottom: 2px solid var(--ink);
+  transform: rotate(-1.2deg);
+  color: var(--ink-soft);
 }
 
 @media (max-width: 620px) {
-  .intro-box {
-    flex-direction: column;
-    align-items: center;
-    text-align: center;
-  }
-  .subject-list {
-    justify-content: center;
+  .masthead .byline {
+    border-bottom: none;
+    padding-left: 2px;
+    transform: none;
   }
 }
 
-/* ---------- advertisement strip ---------- */
+/* ---------- tabs: numbered scraps ---------- */
 
-.advertisement {
-  border-left: 3px solid var(--accent);
+.tabs {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 9px;
+  margin-top: 28px;
+  padding-bottom: 4px;
 }
 
-.advertisement code {
-  background: #101214;
-  border: 1px solid var(--line);
-  border-radius: 5px;
-  padding: 2px 8px;
-  font-family: "Cascadia Mono", Consolas, monospace;
-  color: var(--accent);
+.tab {
+  font-family: "Anton", "Arial Narrow", sans-serif;
+  text-transform: uppercase;
+  font-size: 1rem;
+  letter-spacing: 0.02em;
+  padding: 7px 16px;
+  background: var(--scrap);
+  color: var(--ink);
+  border: none;
+  box-shadow: var(--shadow);
+  cursor: pointer;
+  font-weight: 400;
+  transition: transform 0.12s ease, box-shadow 0.12s ease, background 0.12s;
+}
+
+.tab:nth-child(1) { transform: rotate(-1.6deg); }
+.tab:nth-child(2) { transform: rotate(1.2deg); }
+.tab:nth-child(3) { transform: rotate(-0.8deg); }
+.tab:nth-child(4) { transform: rotate(2deg); }
+.tab:nth-child(5) { transform: rotate(-2.2deg); }
+
+.tab:hover {
+  box-shadow: var(--shadow-lift);
+  translate: -1px -2px;
+}
+
+.tab[aria-selected="true"] {
+  background: var(--ink);
+  color: var(--scrap);
+}
+
+.tab .num {
+  color: var(--red);
+  margin-right: 6px;
+}
+
+.tab[aria-selected="true"] .num {
+  color: var(--scrap);
+  opacity: 0.55;
+}
+
+/* A cut rule under the tab row. */
+.rule {
+  height: 4px;
+  background: var(--ink);
+  margin-top: 6px;
+}
+
+/* ---------- panels ---------- */
+
+main {
+  flex: 1;
+  padding: 30px 0 60px 0;
+}
+
+.panel[hidden] {
+  display: none;
+}
+
+.panel {
+  animation: rise 0.26s ease both;
+}
+
+@keyframes rise {
+  from { opacity: 0; transform: translateY(7px); }
+  to { opacity: 1; transform: none; }
+}
+
+.section-title {
+  font-family: "Anton", "Arial Narrow", sans-serif;
+  text-transform: uppercase;
+  font-size: clamp(1.7rem, 4.5vw, 2.3rem);
+  display: inline-block;
+  border-bottom: 4px solid var(--red);
+  padding-bottom: 2px;
+  margin-bottom: 20px;
+  transform: rotate(-0.5deg);
+}
+
+/* ---------- intro scrap ---------- */
+
+.intro {
+  background: var(--scrap);
+  box-shadow: var(--shadow);
+  padding: 22px 24px;
+  transform: rotate(-0.7deg);
+  max-width: 680px;
+  margin-bottom: 34px;
+}
+
+.intro p {
+  font-size: 0.98rem;
+}
+
+.intro .kicker {
+  color: var(--red);
+  font-weight: 700;
+  margin-top: 12px;
+  font-size: 0.92rem;
 }
 
 /* ---------- project grid ---------- */
 
-.project-heading {
-  margin-bottom: 18px;
-  font-size: 1.3rem;
-  border-bottom: 1px solid var(--line);
-  padding-bottom: 10px;
-}
-
 .project-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
-  gap: 20px;
+  grid-template-columns: repeat(auto-fill, minmax(272px, 1fr));
+  gap: 26px 22px;
 }
 
 .project-card {
-  background: var(--panel-solid);
-  border: 1px solid var(--line);
-  border-radius: var(--radius);
-  overflow: hidden;
+  background: var(--scrap);
+  box-shadow: var(--shadow);
   display: flex;
   flex-direction: column;
-  transition: transform 0.18s ease, border-color 0.18s ease;
+  transition: transform 0.14s ease, box-shadow 0.14s ease;
 }
 
+/* Alternating tilt, so the grid never lines up. */
+.project-card:nth-child(3n + 1) { transform: rotate(-0.8deg); }
+.project-card:nth-child(3n + 2) { transform: rotate(0.6deg); }
+.project-card:nth-child(3n + 3) { transform: rotate(-0.3deg); }
+
 .project-card:hover {
-  transform: translateY(-3px);
-  border-color: var(--accent-dim);
+  transform: rotate(0deg) translate(-2px, -3px);
+  box-shadow: var(--shadow-lift);
 }
 
 .project-card img {
   width: 100%;
-  height: 165px;
+  height: 168px;
   object-fit: cover;
-  background: #0d0f10;
-  border-bottom: 1px solid var(--line);
   display: block;
+  /* Photocopied photo: crushed and slightly grey. */
+  filter: grayscale(0.35) contrast(1.12);
+  border-bottom: 3px solid var(--ink);
 }
 
-/* Small icon-style art (e.g. the chess knight) should sit centred rather
-   than being blown up to fill the frame. */
 .project-card img.contain {
   object-fit: contain;
-  padding: 26px;
+  padding: 24px;
+  filter: none;
 }
 
 .project-content {
-  padding: 16px;
+  padding: 15px 16px 16px 16px;
   display: flex;
   flex-direction: column;
   flex: 1;
-  gap: 8px;
+  gap: 7px;
 }
 
 .project-content h3 {
-  font-size: 1.05rem;
-  line-height: 1.35;
+  font-family: "Anton", "Arial Narrow", sans-serif;
+  text-transform: uppercase;
+  font-weight: 400;
+  font-size: 1.08rem;
+  line-height: 1.12;
+  letter-spacing: 0.01em;
 }
 
 .project-content p {
-  color: var(--muted);
-  font-size: 0.9rem;
+  font-size: 0.83rem;
+  color: var(--ink-soft);
   flex: 1;
+  line-height: 1.55;
 }
 
 .project-content a {
-  color: var(--accent);
+  color: var(--ink);
   text-decoration: none;
-  font-size: 0.87rem;
-  padding: 5px 0;
-  border-bottom: 1px solid rgba(76, 201, 240, 0.18);
-  transition: color 0.15s, padding-left 0.15s;
+  font-size: 0.81rem;
+  padding: 3px 0;
+  border-bottom: 1px solid var(--edge);
+  transition: color 0.12s, padding-left 0.12s;
 }
 
 .project-content a:last-child {
   border-bottom: none;
 }
 
-.project-content a:hover:not(.disabled),
-.project-content a:focus-visible:not(.disabled) {
-  padding-left: 5px;
-  color: #8fe0ff;
+.project-content a:hover:not(.disabled) {
+  color: var(--red);
+  padding-left: 4px;
 }
 
 .project-content a.disabled {
-  color: var(--muted);
-  opacity: 0.45;
+  color: var(--ink-faint);
+  opacity: 0.55;
   pointer-events: none;
-  cursor: default;
 }
 
-/* The tag shown against links that are placeholders, not live files. */
 .pending {
-  font-size: 0.72rem;
+  font-size: 0.66rem;
   text-transform: uppercase;
-  letter-spacing: 0.06em;
-  color: #8a929a;
-  border: 1px solid #43494f;
-  border-radius: 4px;
+  letter-spacing: 0.09em;
+  border: 1px solid var(--edge);
   padding: 0 5px;
   margin-left: 6px;
+  color: var(--ink-faint);
   white-space: nowrap;
 }
 
-/* Featured card spans two columns where there is room for it. */
 .featured-card {
-  border-color: var(--accent-dim);
+  outline: 3px solid var(--ink);
+  outline-offset: -3px;
 }
 
-@media (min-width: 620px) {
+@media (min-width: 720px) {
   .featured-card {
     grid-column: span 2;
     flex-direction: row;
   }
+  /* height:auto here let a tall image stretch the card to ~900px. */
   .featured-card img {
-    width: 45%;
+    width: 44%;
     height: auto;
+    min-height: 100%;
+    max-height: 320px;
+    object-fit: cover;
     border-bottom: none;
-    border-right: 1px solid var(--line);
+    border-right: 3px solid var(--ink);
   }
 }
 
-/* ---------- recent commits ---------- */
+/* ---------- skills ---------- */
 
-/* The ul owns the columns so they line up across every row; each li adopts
-   them via subgrid, which keeps its own box for the hover and the rule.
-   Without subgrid each row sizes independently and the messages stagger. */
+.skill-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+  gap: 14px 24px;
+}
+
+.skill {
+  background: var(--scrap);
+  box-shadow: var(--shadow);
+  padding: 13px 16px;
+  display: flex;
+  gap: 13px;
+  align-items: flex-start;
+}
+
+.skill:nth-child(4n + 1) { transform: rotate(-0.6deg); }
+.skill:nth-child(4n + 2) { transform: rotate(0.9deg); }
+.skill:nth-child(4n + 3) { transform: rotate(0.4deg); }
+.skill:nth-child(4n + 4) { transform: rotate(-1.1deg); }
+
+.skill svg {
+  flex-shrink: 0;
+  margin-top: 3px;
+}
+
+.skill h3 {
+  font-family: "Anton", "Arial Narrow", sans-serif;
+  text-transform: uppercase;
+  font-weight: 400;
+  font-size: 0.98rem;
+  letter-spacing: 0.01em;
+}
+
+.skill p {
+  font-size: 0.8rem;
+  color: var(--ink-soft);
+  margin-top: 2px;
+  line-height: 1.5;
+}
+
+/* ---------- live panel ---------- */
+
+.live-frame {
+  background: var(--scrap);
+  box-shadow: var(--shadow-lift);
+  padding: 8px;
+  transform: rotate(-0.4deg);
+}
+
+.live-frame iframe {
+  width: 100%;
+  height: 76vh;
+  min-height: 460px;
+  border: 0;
+  display: block;
+  background: #131b22;
+}
+
+.live-frame iframe[hidden],
+.live-poster[hidden] {
+  display: none;
+}
+
+/* Poster stand-in while the map cannot be framed. */
+.live-poster {
+  display: block;
+  position: relative;
+  line-height: 0;
+}
+
+.live-poster img {
+  width: 100%;
+  display: block;
+  filter: grayscale(0.2) contrast(1.06);
+  transition: filter 0.18s ease;
+}
+
+.live-poster:hover img {
+  filter: none;
+}
+
+.live-open {
+  position: absolute;
+  right: 14px;
+  bottom: 14px;
+  width: 48px;
+  height: 48px;
+  display: grid;
+  place-items: center;
+  background: var(--red);
+  color: var(--scrap);
+  box-shadow: var(--shadow);
+  transition: transform 0.14s ease, box-shadow 0.14s ease;
+}
+
+.live-poster:hover .live-open {
+  transform: translate(-2px, -3px);
+  box-shadow: var(--shadow-lift);
+}
+
+.live-meta {
+  display: flex;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 8px;
+  font-size: 0.78rem;
+  color: var(--ink-soft);
+  padding: 8px 2px 2px 2px;
+}
+
+.live-meta a {
+  color: var(--red);
+  text-decoration: none;
+}
+
+.live-meta a:hover {
+  text-decoration: underline;
+}
+
+/* ---------- commits ---------- */
+
 .commit-list {
   list-style: none;
   display: grid;
   grid-template-columns: minmax(0, max-content) minmax(0, 1fr) max-content;
-  gap: 2px 0;
+  gap: 8px 0;
 }
 
 .commit-list li {
   display: grid;
   grid-column: 1 / -1;
   grid-template-columns: subgrid;
-  gap: 14px;
+  gap: 16px;
   align-items: baseline;
-  padding: 9px 10px;
-  border-radius: 6px;
-  border-bottom: 1px solid rgba(58, 63, 69, 0.5);
+  background: var(--scrap);
+  box-shadow: var(--shadow);
+  padding: 9px 14px;
 }
 
-/* Browsers without subgrid keep a readable, if unaligned, three-column row. */
+.commit-list li:nth-child(odd) { transform: rotate(-0.35deg); }
+.commit-list li:nth-child(even) { transform: rotate(0.45deg); }
+
 @supports not (grid-template-columns: subgrid) {
-  .commit-list {
-    display: flex;
-    flex-direction: column;
-  }
-  .commit-list li {
-    grid-template-columns: minmax(120px, max-content) 1fr max-content;
-  }
-}
-
-.commit-list li:last-child {
-  border-bottom: none;
-}
-
-.commit-list li:hover {
-  background: rgba(76, 201, 240, 0.06);
+  .commit-list { display: flex; flex-direction: column; }
+  .commit-list li { grid-template-columns: minmax(130px, max-content) 1fr max-content; }
 }
 
 .commit-repo {
-  font-family: "Cascadia Mono", Consolas, monospace;
-  font-size: 0.8rem;
-  color: var(--accent);
+  font-size: 0.76rem;
+  color: var(--red);
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
 }
 
 .commit-message {
-  color: var(--text);
+  color: var(--ink);
   text-decoration: none;
-  font-size: 0.9rem;
+  font-size: 0.85rem;
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
 }
 
-.commit-message:hover,
-.commit-message:focus-visible {
-  color: var(--accent);
+.commit-message:hover {
   text-decoration: underline;
 }
 
 .commit-date {
-  color: var(--muted);
-  font-size: 0.78rem;
+  font-size: 0.72rem;
+  color: var(--ink-faint);
   white-space: nowrap;
 }
 
 .commit-status {
-  color: var(--muted);
-  font-size: 0.9rem;
+  font-size: 0.86rem;
+  color: var(--ink-soft);
   padding: 6px 0;
 }
 
 .commit-fallback {
-  color: var(--accent);
-  text-decoration: none;
-  font-size: 0.88rem;
+  color: var(--red);
+  font-size: 0.84rem;
 }
 
-.commit-fallback:hover {
-  text-decoration: underline;
-}
-
-/* On a phone the three columns do not fit; stack message over metadata.
-   The ul drops back to a plain column so the rows stop sharing tracks. */
 @media (max-width: 620px) {
-  .commit-list {
-    display: flex;
-    flex-direction: column;
-  }
-  .commit-list li {
-    grid-template-columns: 1fr max-content;
-    gap: 4px 10px;
-  }
-  .commit-message {
-    grid-column: 1 / -1;
-    grid-row: 1;
-    white-space: normal;
-  }
-  .commit-repo {
-    grid-row: 2;
-  }
-  .commit-date {
-    grid-row: 2;
-    text-align: right;
-  }
+  .commit-list { display: flex; flex-direction: column; }
+  .commit-list li { grid-template-columns: 1fr max-content; gap: 3px 10px; }
+  .commit-message { grid-column: 1 / -1; grid-row: 1; white-space: normal; }
+  .commit-repo { grid-row: 2; }
+  .commit-date { grid-row: 2; text-align: right; }
 }
 
 /* ---------- footer ---------- */
 
 footer {
-  background: linear-gradient(90deg, #202326, #16181a);
-  border-top: 1px solid var(--accent-dim);
+  border-top: 4px solid var(--ink);
   padding: 18px 0;
-  text-align: center;
-  font-size: 0.88rem;
-  color: var(--muted);
+  font-size: 0.82rem;
+  color: var(--ink-soft);
+}
+
+footer .container {
+  display: flex;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 8px;
 }
 
 footer a {
-  color: var(--accent);
-  text-decoration: none;
+  color: var(--ink);
 }
 
-footer a:hover,
-footer a:focus-visible {
-  text-decoration: underline;
+footer a:hover {
+  color: var(--red);
 }
 
-/* ---------- accessibility ---------- */
+/* ---------- focus + motion ---------- */
 
 a:focus-visible,
 button:focus-visible {
-  outline: 2px solid var(--accent);
+  outline: 3px solid var(--red);
   outline-offset: 2px;
-  border-radius: 3px;
 }
 
 @media (prefers-reduced-motion: reduce) {
