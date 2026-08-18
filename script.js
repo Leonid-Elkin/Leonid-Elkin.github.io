@@ -16,6 +16,17 @@ const projects = [
     large: true,
   },
   {
+    title: "Drone Strike Map",
+    description:
+      "A live, day-by-day map of reported drone and missile strikes in the Russia-Ukraine war. Scrapers read the daily reports from a few dozen outlets, pin what was launched and where it landed, and cite the source behind every figure. Runs on its own server with a public read API.",
+    image: "Images/dronestrikemap.png",
+    files: [
+      { name: "🌐 Open the live map", url: "https://dronestrikemap.com/" },
+      { name: "📡 Public API", url: "https://dronestrikemap.com/api/strikes" },
+      { name: "📁 Source on GitHub", url: "", pending: true },
+    ],
+  },
+  {
     title: "SHELLFALL — Naval Warfare",
     description:
       "Command a coastal fortress against a campaign of named capital ships. Aim your batteries by hand, mark priority targets, rally your fleet and out-build an enemy that never stops sailing. Previously released as Penumbra.",
