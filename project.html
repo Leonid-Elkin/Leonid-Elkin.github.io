@@ -4,8 +4,9 @@
 <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <title>Project One &middot; Your Name</title>
-    <meta name="description" content="[ One line on what this project is. ]" />
+    <title>Drone Strike Map &middot; Leonid Elkin</title>
+    <meta name="description"
+        content="Case study: the Drone Strike Map, a live record of every reported drone and missile strike in the Russia-Ukraine war, with the outlet behind each figure." />
     <meta name="theme-color" content="#0a0a0a" />
     <link rel="icon"
         href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' fill='%230a0a0a'/%3E%3Crect x='7' y='7' width='18' height='18' fill='%23ff2d16'/%3E%3C/svg%3E" />
@@ -19,10 +20,10 @@
 <body>
     <nav class="nav" aria-label="Main">
         <div class="wrap">
-            <a class="brand" href="index.html"><span class="mark" aria-hidden="true"></span>Your Name</a>
+            <a class="brand" href="index.html"><span class="mark" aria-hidden="true"></span>Leonid Elkin</a>
             <ul class="nav-links">
                 <li><a href="index.html">Home</a></li>
-                <li><a href="index.html#experience">Experience</a></li>
+                <li><a href="index.html#experience">Research</a></li>
                 <li><a href="projects.html" aria-current="page">Projects</a></li>
                 <li><a href="index.html#skills">Skills</a></li>
                 <li><a href="index.html#contact">Contact</a></li>
@@ -31,47 +32,58 @@
     </nav>
 
     <main>
-        <!-- COPY THIS PAGE per project. It is the one format that does real work
-             in an interview: problem, approach, what broke, result. -->
         <section class="section">
             <div class="wrap">
                 <div class="section-head">
                     <span class="idx">01 &mdash;</span>
-                    <h1 class="display overprint" data-text="Project One">Project One</h1>
+                    <h1 class="display overprint" data-text="Drone Strike Map">Drone Strike Map</h1>
                     <a class="mono" href="projects.html">&larr; all projects</a>
                 </div>
 
-                <p class="setup">[ One or two sentences that tell a reader what this is before they decide whether
-                    to keep reading. Assume they will read only this paragraph. ]</p>
+                <p class="setup">Every reported drone and missile strike in the Russia&ndash;Ukraine war, day by
+                    day. Every figure is a claim, and each one names the outlet that made it. It reads a few dozen
+                    sources every morning and has run on its own server since launch.</p>
 
                 <div class="about-body">
                     <p class="col-label">Write-up</p>
                     <div class="about-copy">
                         <h2 class="display" style="font-size: clamp(1.2rem, 2.2vw, 1.6rem); margin-bottom: 8px;">The
                             problem</h2>
-                        <p class="placeholder">[ What was broken or missing, and for whom. Two or three sentences.
-                            Resist explaining your solution here. ]</p>
+                        <p>Strike reporting is scattered across dozens of outlets, in different languages, with
+                            different counting rules, and none of it stays findable a week later. There was no
+                            single place where a day's claims sat next to their sources &mdash; only aggregates
+                            with the sourcing stripped out.</p>
 
                         <h2 class="display"
                             style="font-size: clamp(1.2rem, 2.2vw, 1.6rem); margin: 22px 0 8px;">What I built</h2>
-                        <p class="placeholder">[ The approach, and one decision you would defend in an interview. ]
-                        </p>
+                        <p>A scraper that reads a few dozen sources every morning, a SQLite store keyed by day and
+                            claim, and a Leaflet map that walks the days. It runs under systemd on its own server
+                            and serves a public JSON API as well as the site. The core decision: never merge
+                            claims. Two outlets giving two figures for the same strike stay two rows, each with
+                            its byline &mdash; the map reports reporting, it does not adjudicate it.</p>
 
                         <h2 class="display"
                             style="font-size: clamp(1.2rem, 2.2vw, 1.6rem); margin: 22px 0 8px;">What went wrong</h2>
-                        <p class="placeholder">[ The section most portfolios skip and every interviewer reads. What
-                            broke, what you changed, what you would do differently. ]</p>
+                        <p class="placeholder">[ Yours to write &mdash; the scraper that silently broke, the outlet
+                            that changed its markup, the dedup rule that was wrong for a month. This is the section
+                            an interviewer actually reads. ]</p>
 
                         <h2 class="display"
                             style="font-size: clamp(1.2rem, 2.2vw, 1.6rem); margin: 22px 0 8px;">Result</h2>
-                        <p class="placeholder">[ Where it ended up, with a number if you have one. ]</p>
+                        <p>Live and public at <a href="https://dronestrikemap.com/" target="_blank"
+                                rel="noopener">dronestrikemap.com</a>, with the full dataset available through the
+                            <a href="https://dronestrikemap.com/api/strikes" target="_blank" rel="noopener">open
+                                API</a>. It updates itself every morning without being touched.</p>
                     </div>
 
                     <dl class="fact-list">
-                        <div><dt class="k">Role</dt><dd class="placeholder">[ Solo / team of N ]</dd></div>
-                        <div><dt class="k">Timeframe</dt><dd class="placeholder">[ N weeks ]</dd></div>
-                        <div><dt class="k">Stack</dt><dd class="placeholder">[ Stack, stack ]</dd></div>
+                        <div><dt class="k">Role</dt><dd>Solo &mdash; everything</dd></div>
                         <div><dt class="k">Status</dt><dd><span class="status live">live</span></dd></div>
+                        <div><dt class="k">Stack</dt><dd>Python, SQLite, systemd, Leaflet</dd></div>
+                        <div><dt class="k">Map</dt><dd><a href="https://dronestrikemap.com/" target="_blank"
+                                    rel="noopener">dronestrikemap.com</a></dd></div>
+                        <div><dt class="k">API</dt><dd><a href="https://dronestrikemap.com/api/strikes"
+                                    target="_blank" rel="noopener">/api/strikes</a></dd></div>
                     </dl>
                 </div>
             </div>
@@ -82,14 +94,15 @@
         <div class="wrap">
             <p class="col-label">Contact</p>
             <ul class="foot-links">
-                <li><a href="mailto:you@example.com">you@example.com</a></li>
-                <li><a href="https://github.com/" target="_blank" rel="noopener">GitHub</a></li>
-                <li><a href="https://www.linkedin.com/" target="_blank" rel="noopener">LinkedIn</a></li>
+                <li><a href="mailto:lnd.elkn@gmail.com">lnd.elkn@gmail.com</a></li>
+                <li><a href="https://github.com/Leonid-Elkin" target="_blank" rel="noopener">GitHub</a></li>
+                <li><a href="https://elkyy.itch.io/" target="_blank" rel="noopener">itch.io</a></li>
             </ul>
             <span class="colophon">Set in Archivo, Inter Tight and JetBrains Mono. Black stock, one red. No images
                 anywhere on this site &mdash; every mark is type or rule. Static HTML, no build step.</span>
         </div>
     </footer>
+    <script src="extras.js"></script>
 </body>
 
 </html>

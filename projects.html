@@ -4,8 +4,8 @@
 <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <title>Projects &middot; Your Name</title>
-    <meta name="description" content="[ Projects by Your Name, with source, write-ups and links. ]" />
+    <title>Projects &middot; Leonid Elkin</title>
+    <meta name="description" content="Software, hardware and research projects by Leonid Elkin, with source, downloads and write-ups." />
     <meta name="theme-color" content="#0a0a0a" />
     <link rel="icon"
         href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' fill='%230a0a0a'/%3E%3Crect x='7' y='7' width='18' height='18' fill='%23ff2d16'/%3E%3C/svg%3E" />
@@ -19,10 +19,10 @@
 <body>
     <nav class="nav" aria-label="Main">
         <div class="wrap">
-            <a class="brand" href="index.html"><span class="mark" aria-hidden="true"></span>Your Name</a>
+            <a class="brand" href="index.html"><span class="mark" aria-hidden="true"></span>Leonid Elkin</a>
             <ul class="nav-links">
                 <li><a href="index.html">Home</a></li>
-                <li><a href="index.html#experience">Experience</a></li>
+                <li><a href="index.html#experience">Research</a></li>
                 <li><a href="projects.html" aria-current="page">Projects</a></li>
                 <li><a href="index.html#skills">Skills</a></li>
                 <li><a href="index.html#contact">Contact</a></li>
@@ -47,14 +47,14 @@
                 <!-- The filter is the one piece of functionality this page has, so it
                      is a set of pressed/unpressed buttons rather than links: the URL
                      hash tracks it (#product, #tooling) so a view can be linked to.
-                     The three category names come from `cat` in script.js. -->
+                     Category names come from `cat` in script.js. -->
                 <div class="filter-row" role="group" aria-label="Filter projects">
                     <button class="filter" data-filter="all" aria-pressed="true">All <span class="count"></span></button>
-                    <button class="filter" data-filter="product" aria-pressed="false">Product <span
+                    <button class="filter" data-filter="software" aria-pressed="false">Software <span
                             class="count"></span></button>
-                    <button class="filter" data-filter="tooling" aria-pressed="false">Tooling <span
+                    <button class="filter" data-filter="hardware" aria-pressed="false">Hardware <span
                             class="count"></span></button>
-                    <button class="filter" data-filter="experiment" aria-pressed="false">Experiment <span
+                    <button class="filter" data-filter="research" aria-pressed="false">Research <span
                             class="count"></span></button>
                 </div>
 
@@ -67,9 +67,9 @@
         <div class="wrap">
             <p class="col-label">Contact</p>
             <ul class="foot-links">
-                <li><a href="mailto:you@example.com">you@example.com</a></li>
-                <li><a href="https://github.com/" target="_blank" rel="noopener">GitHub</a></li>
-                <li><a href="https://www.linkedin.com/" target="_blank" rel="noopener">LinkedIn</a></li>
+                <li><a href="mailto:lnd.elkn@gmail.com">lnd.elkn@gmail.com</a></li>
+                <li><a href="https://github.com/Leonid-Elkin" target="_blank" rel="noopener">GitHub</a></li>
+                <li><a href="https://elkyy.itch.io/" target="_blank" rel="noopener">itch.io</a></li>
             </ul>
             <span class="colophon">Set in Archivo, Inter Tight and JetBrains Mono. Black stock, one red. No images
                 anywhere on this site &mdash; every mark is type or rule. Static HTML, no build step.</span>
@@ -77,6 +77,7 @@
     </footer>
 
     <script src="script.js"></script>
+    <script src="extras.js"></script>
 </body>
 
 </html>

@@ -1,165 +1,286 @@
-/* Content and rendering for the home page (skills, experience) and the
- * projects page (index + category filter).
+/* Content and rendering for the home page (skills, research) and the projects
+ * page (index + category filter).
  *
- * THIS IS A TEMPLATE. Everything in the three data blocks below is a
- * placeholder for you to replace. Anything wrapped in [ square brackets ]
- * renders in the loud placeholder treatment (red rule, monospace) so an
- * unfilled slot reads as unfinished rather than as a design choice - see the
- * foot of style.css. Delete the brackets and the copy stops shouting.
+ * Every project carries a category (software | hardware | research), a caption
+ * written for a reader rather than a search engine, tech tags, links, and a
+ * status. A link with `pending: true` renders greyed with a "soon" tag instead
+ * of 404ing.
  *
- * A link with `pending: true` renders greyed with a "soon" tag instead of
- * 404ing. A project with `placeholder: true` says so on its face.
+ * Anything still wrapped in [ square brackets ] is a slot nobody has filled -
+ * it renders in the loud placeholder treatment at the foot of style.css so it
+ * cannot be mistaken for finished copy.
  */
 
 /* ---------- projects ---------- */
 
-/* `cat` drives the filter buttons on projects.html. Rename the three
-   categories to whatever splits your work honestly - the filter reads them
-   from here, so changing a name here changes the button. */
 const projects = [
+  /* ---------- software ---------- */
   {
-    title: "Project One",
-    cat: "product",
+    title: "Drone Strike Map",
+    cat: "software",
     status: "live",
     featured: true,
     caption:
-      "[ What it is, who it is for, and the part that was genuinely hard. Two sentences. The featured entry gets more room, so use it. ]",
-    tags: ["[ Stack ]", "[ Stack ]", "[ Stack ]"],
+      "Every reported drone and missile strike in the Russia-Ukraine war, day by day, with the outlet behind each figure. Reads a few dozen sources every morning and runs on its own server.",
+    tags: ["Python", "SQLite", "systemd", "Leaflet"],
     links: [
       { name: "case study", url: "project.html" },
-      { name: "view live", url: "", pending: true },
+      { name: "open the map", url: "https://dronestrikemap.com/" },
+      { name: "public API", url: "https://dronestrikemap.com/api/strikes" },
       { name: "source", url: "", pending: true },
     ],
   },
   {
-    title: "Project Two",
-    cat: "product",
+    title: "SHELLFALL",
+    cat: "software",
     status: "live",
-    caption: "[ What it is, and the problem it solved. ]",
-    tags: ["[ Stack ]", "[ Stack ]"],
+    caption:
+      "Hold a coastal fortress against a campaign of named capital ships. You lay the guns yourself and mark what to hit; the enemy keeps sailing. Released as Penumbra.",
+    tags: ["Python", "pygame"],
     links: [
-      { name: "view live", url: "", pending: true },
+      { name: "play on itch.io", url: "https://elkyy.itch.io/penumbra" },
+      { name: "source", url: "https://github.com/Leonid-Elkin/Penumbra" },
+      { name: "windows build", url: "", pending: true },
+    ],
+  },
+  {
+    title: "Sheet2Tab",
+    cat: "software",
+    status: "wip",
+    caption:
+      "Give it a PDF of a score and it hands back classical-guitar tablature under the notation, with an editor for the bars it misreads. Also transcribes from a recording or a video of a page.",
+    tags: ["Python", "PyMuPDF", "MusicXML"],
+    links: [
+      { name: "example output", url: "Documentation/sheet2tab_example.pdf" },
+      { name: "the app", url: "", pending: true },
       { name: "source", url: "", pending: true },
     ],
   },
   {
-    title: "Project Three",
-    cat: "tooling",
+    title: "Chess Vision Bot",
+    cat: "software",
     status: "wip",
-    caption: "[ What it is, and what you learned building it. ]",
-    tags: ["[ Stack ]", "[ Stack ]"],
-    links: [{ name: "source", url: "", pending: true }],
+    caption:
+      "Watches a chessboard on your screen, rebuilds the position, and says what to play. The engine now has a C++ port for speed.",
+    tags: ["Python", "PyQt5", "python-chess", "C++"],
+    links: [
+      { name: "the bot", url: "", pending: true },
+      { name: "source", url: "", pending: true },
+    ],
   },
   {
-    title: "Project Four",
-    cat: "tooling",
-    caption: "[ One sentence is enough for the smaller ones. ]",
-    tags: ["[ Stack ]"],
-    links: [{ name: "source", url: "", pending: true }],
+    title: "Yavalath & Pentalath",
+    cat: "software",
+    caption:
+      "A-Level coursework: both hex board games in full, with sound and a computer opponent. Yavalath was itself designed by a program.",
+    tags: ["Python"],
+    links: [
+      { name: "documentation", url: "Documentation/Yavalath_NEA_documentation.pdf" },
+      { name: "the rules", url: "https://boardgamegeek.com/boardgame/33767/yavalath" },
+    ],
   },
   {
-    title: "Project Five",
-    cat: "experiment",
-    caption: "[ One sentence. ]",
-    tags: ["[ Stack ]"],
-    links: [{ name: "write-up", url: "", pending: true }],
+    title: "Project Euler",
+    cat: "software",
+    caption: "Solutions to the first hundred-odd problems.",
+    tags: ["Python"],
+    links: [
+      { name: "solutions", url: "Euler_source.zip" },
+      { name: "the archive", url: "https://projecteuler.net/archives" },
+    ],
   },
   {
-    title: "[ Next project ]",
-    cat: "experiment",
-    placeholder: true,
-    caption: "[ An empty slot is fine. It says you are still building. ]",
-    tags: ["[ Stack ]"],
-    links: [{ name: "soon", url: "", pending: true }],
+    title: "Shooting scores",
+    cat: "software",
+    caption: "Plots a season of club scores so you can see whether practice is working.",
+    tags: ["Python"],
+    links: [{ name: "source", url: "Shooting score visualiser.zip" }],
+  },
+  {
+    title: "Aimtrainer",
+    cat: "software",
+    status: "old",
+    caption: "The first thing made in PyGame. Click the circles before they go.",
+    tags: ["Python", "pygame"],
+    links: [{ name: "source", url: "Aimtrainer_source/Aimtrainer.zip" }],
+  },
+  {
+    title: "This website",
+    cat: "software",
+    caption:
+      "Swiss editorial on black, static HTML, no build step and no images anywhere - every mark is type, rule or inline SVG. The commits feed pulls from GitHub in your browser.",
+    tags: ["HTML", "CSS", "JavaScript"],
+    links: [
+      { name: "source", url: "https://github.com/Leonid-Elkin/Leonid-Elkin.github.io" },
+      { name: "my brother's site", url: "https://alexeyelkin.com/" },
+    ],
+  },
+
+  /* ---------- hardware ---------- */
+  {
+    title: "Yagi-Uda radar",
+    cat: "hardware",
+    status: "wip",
+    caption:
+      "A 14.5 dBi Yagi-Uda feeding RF transceivers off a Raspberry Pi 3 to range a target. Not finished.",
+    tags: ["Raspberry Pi", "RF", "antenna"],
+    links: [
+      { name: "source", url: "", pending: true },
+      { name: "write-up", url: "", pending: true },
+    ],
+  },
+  {
+    title: "CanSat 2025",
+    cat: "hardware",
+    caption:
+      "A can-sized satellite for the CanSat competition, built with six others. The antenna work above started here.",
+    tags: ["RF", "telemetry", "payload"],
+    links: [
+      {
+        name: "critical design report",
+        url: "Documentation/Tonbridge CanSat_ReLAACS_ 2024-25 CDR .pdf",
+      },
+    ],
+  },
+
+  /* ---------- research ---------- */
+  {
+    title: "Neural scaling laws",
+    cat: "research",
+    caption:
+      "Multilayer perceptrons written from scratch in NumPy, run at different sizes to see how loss falls with parameters. The library is on PyPI as elkwork; the paper is 56 pages.",
+    tags: ["Python", "NumPy", "LaTeX"],
+    links: [
+      { name: "the paper", url: "Documentation/Investigating_neural_scaling_laws (9).pdf" },
+      { name: "elkwork on PyPI", url: "https://pypi.org/project/elkwork/" },
+      { name: "code and models", url: "MLP all documents (2).zip" },
+    ],
+  },
+  {
+    title: "Globular clusters",
+    cat: "research",
+    caption:
+      "Does a population of primordial binaries change how fast a globular cluster evaporates? An N-body simulation, a paper and a poster.",
+    tags: ["Python", "NumPy"],
+    links: [
+      { name: "the paper", url: "Documentation/Physics_investigation (2).pdf" },
+      { name: "the poster", url: "Documentation/Physics_investigation_poster.pdf" },
+      { name: "source", url: "N-body_simulation/Main.py" },
+    ],
+  },
+  {
+    title: "Drawer",
+    cat: "research",
+    caption:
+      "A companion to the MLP work: draw a digit and watch the trained network read it back, one layer at a time.",
+    tags: ["Python", "NumPy"],
+    links: [{ name: "source", url: "Drawer_source.zip" }],
   },
 ];
 
-/* ---------- experience ---------- */
-
-/* Most recent first. The first entry renders as the current role. */
+/* ---------- what fills the experience slot ----------
+ *
+ * No employment history yet, so this section carries the things that actually
+ * evidence the work: a team competition, and two pieces of independent
+ * research. Dates come from the documents themselves. When a job does turn up,
+ * add it at the top with `current: true` and rename the section heading in
+ * index.html from "Research & competitions" back to "Experience".
+ */
 const roles = [
   {
-    title: "[ Job title ]",
-    org: "[ Company ]",
-    place: "[ Location ]",
-    from: "[ 20XX ]",
-    to: "Present",
+    title: "CanSat 2025 — payload & radio",
+    org: "Tonbridge School",
+    place: "Team of seven",
+    from: "2024",
+    to: "2025",
     current: true,
     bullets: [
-      "[ What you built or owned, and the number that proves it mattered. ]",
-      "[ A second bullet. Verb first, outcome second. ]",
-      "[ A third, if it earns its place. ]",
+      "Built a can-sized satellite for the CanSat competition with six others, through to a full critical design report.",
+      "Worked the telemetry and RF side; the 14.5 dBi Yagi-Uda antenna project grew directly out of this.",
+      "[ Add the result — where it placed, what flew, what failed on the day. ]",
     ],
   },
   {
-    title: "[ Job title ]",
-    org: "[ Company ]",
-    place: "[ Location ]",
-    from: "[ 20XX ]",
-    to: "[ 20XX ]",
+    title: "Investigating neural scaling laws",
+    org: "Independent research",
+    place: "56-page paper",
+    from: "2024",
+    to: "Apr 2025",
     bullets: [
-      "[ What you shipped here. ]",
-      "[ What changed because of it. ]",
+      "Wrote multilayer perceptrons from scratch in NumPy — no framework — and published the library on PyPI as elkwork.",
+      "Trained at a range of model sizes to measure how test loss falls with parameter count; reached 98.52% on MNIST and 93.35% on FashionMNIST.",
     ],
   },
   {
-    title: "[ Job title ]",
-    org: "[ Company ]",
-    place: "[ Location ]",
-    from: "[ 20XX ]",
-    to: "[ 20XX ]",
-    bullets: ["[ What you shipped here. ]"],
+    title: "Globular cluster evaporation",
+    org: "Physics investigation",
+    place: "Paper and poster",
+    from: "2024",
+    to: "2024",
+    bullets: [
+      "Built an N-body simulation to test whether primordial binaries change how fast a globular cluster evaporates.",
+      "Wrote it up as a paper and presented it as a poster.",
+    ],
   },
 ];
 
 const education = [
   {
-    award: "[ Degree ]",
-    org: "[ Institution ]",
-    years: "[ 20XX&ndash;20XX ]",
-    note: "[ Grade / honours ]",
+    award: "A-Levels",
+    org: "Tonbridge School",
+    years: "[ 20XX–20XX ]",
+    note: "[ Subjects and grades ]",
   },
   {
-    award: "[ Qualification ]",
+    award: "[ Current course ]",
     org: "[ Institution ]",
-    years: "[ 20XX&ndash;20XX ]",
-    note: "[ Grade ]",
+    years: "[ 20XX– ]",
+    note: "[ Or delete this box if it does not apply yet ]",
   },
 ];
 
 /* ---------- skills ---------- */
 
 /* Every line names the work that evidences it - no invented levels or
-   percentages. `via` is where a reader can go and see the claim proved. */
+   percentages. */
 const skills = [
   {
     head: "Languages",
     items: [
-      { name: "[ Language ]", via: "[ where you used it ]", placeholder: true },
-      { name: "[ Language ]", via: "[ where you used it ]", placeholder: true },
-      { name: "[ Language ]", via: "[ where you used it ]", placeholder: true },
+      { name: "Python", via: "most of the above" },
+      { name: "C++", via: "chess engine port" },
+      { name: "C", via: "a CMake game engine" },
+      { name: "C#", via: "Unity" },
+      { name: "JavaScript", via: "this site" },
     ],
   },
   {
-    head: "Frameworks",
+    head: "Frameworks & tools",
     items: [
-      { name: "[ Framework ]", via: "[ project ]", placeholder: true },
-      { name: "[ Framework ]", via: "[ project ]", placeholder: true },
-      { name: "[ Tool ]", via: "[ project ]", placeholder: true },
+      { name: "pygame", via: "SHELLFALL, Aimtrainer" },
+      { name: "PyQt5", via: "Chess Vision Bot" },
+      { name: "Unity 6", via: "an air-combat prototype" },
+      { name: "SQLite + systemd", via: "Drone Strike Map" },
+      { name: "PyMuPDF, MusicXML", via: "Sheet2Tab" },
+      { name: "LaTeX", via: "the scaling-laws paper" },
     ],
   },
   {
-    head: "Infrastructure",
+    head: "Hardware & radio",
     items: [
-      { name: "[ Tool ]", via: "[ project ]", placeholder: true },
-      { name: "[ Tool ]", via: "[ project ]", placeholder: true },
+      { name: "Raspberry Pi", via: "Yagi-Uda radar" },
+      { name: "RF transceivers", via: "Yagi-Uda radar" },
+      { name: "Antenna construction", via: "14.5 dBi Yagi-Uda" },
+      { name: "Payload design", via: "CanSat 2025" },
     ],
   },
   {
-    head: "[ Your specialism ]",
+    head: "Machine learning",
     items: [
-      { name: "[ Skill ]", via: "[ evidence ]", placeholder: true },
-      { name: "[ Skill ]", via: "[ evidence ]", placeholder: true },
+      { name: "MLPs from scratch", via: "elkwork, on PyPI" },
+      { name: "Training and evaluation", via: "MNIST 98.5%, FashionMNIST 93.4%" },
+      { name: "Computer vision", via: "Chess Vision Bot" },
+      { name: "Optical music recognition", via: "Sheet2Tab" },
     ],
   },
 ];
@@ -286,7 +407,6 @@ function initProjects() {
 
 /* ---------- home: selected work ---------- */
 
-/* The three featured entries on the front page. Same data, shorter form. */
 function initSelected() {
   const root = document.getElementById("selected-work");
   if (!root) return;
@@ -314,7 +434,7 @@ function initSelected() {
   });
 }
 
-/* ---------- home: experience ---------- */
+/* ---------- home: research & competitions ---------- */
 
 function initRoles() {
   const root = document.getElementById("role-list");
@@ -347,11 +467,11 @@ function initEducation() {
 
   education.forEach((e) => {
     const box = el("div", "edu");
-    box.appendChild(el("h3", null, e.award));
+    box.appendChild(el("h3", isSlot(e.award) ? "placeholder" : null, e.award));
     const line = el("p", "mono edu-org");
-    line.append(e.org, " · ", e.years.replace(/&ndash;/g, "–"));
+    line.append(e.org, " · ", e.years);
     box.appendChild(line);
-    box.appendChild(el("p", "mono edu-note", e.note));
+    box.appendChild(el("p", "mono edu-note" + (isSlot(e.note) ? " placeholder" : ""), e.note));
     root.appendChild(box);
   });
 }

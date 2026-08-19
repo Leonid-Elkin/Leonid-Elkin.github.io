@@ -1032,6 +1032,21 @@ footer .col-label {
   .nav-links { margin-left: -12px; }
 }
 
+/* ---------- misprint mode (the Konami code) ----------
+   The overprint plate drifts well out of register and the red rules slip a
+   couple of pixels. Purely presentational: toggled as a class on <html> from
+   extras.js, and everything returns on the second entry of the code. */
+
+.misprint .overprint::before {
+  transform: translate(0.14em, 0.09em) rotate(-0.6deg);
+  opacity: 0.9;
+}
+
+.misprint .section-head::after { transform: translateX(6px); }
+.misprint .brand .mark { transform: translate(2px, -1px) rotate(12deg); }
+.misprint .ticker-track > span::after { color: var(--ink-3); }
+.misprint .eyebrow .red::after { content: " // REGISTRATION LOST"; }
+
 /* ---------- reduced motion ---------- */
 
 @media (prefers-reduced-motion: reduce) {
