@@ -442,12 +442,20 @@ function render() {
   }
 }
 
-/* The board lives at the foot of the front page, so it deals itself the first
- * time it scrolls into view rather than on load - nothing runs behind the
- * scenes, and arriving at the page costs nothing. */
+/* The board now lives behind the card stack in the corner (see egg.js), so it
+ * must NOT deal itself on load or on scroll - it would be shuffling away
+ * inside a hidden panel for every visitor who never finds it. A board marked
+ * `data-deferred` waits to be asked, and egg.js asks through window.startDurak
+ * when someone opens the panel. Anything else (a board dropped straight into a
+ * page) keeps the old deal-when-visible behaviour. */
+window.startDurak = function () {
+  if (!G) newGame();
+};
+
 function armDurak() {
   const root = document.getElementById("durak");
   if (!root) return;
+  if (root.hasAttribute("data-deferred")) return;
 
   const deal = () => {
     if (!G) newGame();

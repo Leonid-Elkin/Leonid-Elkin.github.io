@@ -9,7 +9,9 @@
  * trailers that have no business on a portfolio page.
  */
 
-const GH_USER = "Leonid-Elkin";
+/* SET THIS. Your GitHub username - the feed reads public repos only,
+   no token needed. Left empty the section explains itself instead of 404ing. */
+const GH_USER = "";
 const REPO_COUNT = 5; // most recently pushed repos to look at
 const PER_REPO = 5; // commits to pull from each
 const SHOW = 8; // commits displayed after merging
@@ -119,6 +121,13 @@ function statusLine(text) {
 window.addEventListener("DOMContentLoaded", async () => {
   const into = document.getElementById("commit-feed");
   if (!into) return;
+
+  if (!GH_USER) {
+    into.appendChild(
+      statusLine("Set GH_USER in commits.js to your GitHub username and this fills itself in.")
+    );
+    return;
+  }
 
   into.appendChild(statusLine("Loading recent commits…"));
 

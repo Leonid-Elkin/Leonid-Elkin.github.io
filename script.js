@@ -1,227 +1,165 @@
-/* Content and rendering for the home page (skills) and the projects page
- * (grid + category filter).
+/* Content and rendering for the home page (skills, experience) and the
+ * projects page (index + category filter).
  *
- * Every project carries a category (software | hardware), a caption written
- * for a reader rather than a search engine, tech tags, links, and a status.
+ * THIS IS A TEMPLATE. Everything in the three data blocks below is a
+ * placeholder for you to replace. Anything wrapped in [ square brackets ]
+ * renders in the loud placeholder treatment (red rule, monospace) so an
+ * unfilled slot reads as unfinished rather than as a design choice - see the
+ * foot of style.css. Delete the brackets and the copy stops shouting.
+ *
  * A link with `pending: true` renders greyed with a "soon" tag instead of
- * 404ing. A project with `placeholder: true` is a slot still to be filled -
- * it says so on its face and never pretends to be a real entry.
+ * 404ing. A project with `placeholder: true` says so on its face.
  */
 
-const projects = [
-  /* ---------- software ---------- */
-  {
-    title: "Machine learning",
-    cat: "software",
-    caption:
-      "The elkwork library, the neural scaling laws paper, and the models it produced. It has its own page.",
-    tags: ["Python", "NumPy", "LaTeX"],
-    links: [{ name: "the ML page", url: "MlProjects.html" }],
-    featured: true,
-  },
-  {
-    title: "SHELLFALL",
-    cat: "software",
-    status: "live",
-    caption:
-      "Hold a coastal fortress against a campaign of named capital ships. You lay the guns yourself and mark what to hit; the enemy keeps sailing. Released as Penumbra.",
-    tags: ["Python", "pygame"],
-    links: [
-      { name: "play on itch.io", url: "https://elkyy.itch.io/penumbra" },
-      { name: "source", url: "https://github.com/Leonid-Elkin/Penumbra" },
-      { name: "windows build", url: "", pending: true },
-    ],
-  },
-  {
-    title: "Drone Strike Map",
-    cat: "software",
-    status: "live",
-    caption:
-      "Every reported drone and missile strike in the Russia-Ukraine war, day by day, with the outlet behind each figure. Reads a few dozen sources every morning and runs on its own server.",
-    tags: ["Python", "SQLite", "systemd", "Leaflet"],
-    links: [
-      { name: "watch it live here", url: "live.html" },
-      { name: "open the map", url: "https://dronestrikemap.com/" },
-      { name: "public API", url: "https://dronestrikemap.com/api/strikes" },
-      { name: "source", url: "", pending: true },
-    ],
-  },
-  {
-    title: "Sheet2Tab",
-    cat: "software",
-    status: "wip",
-    caption:
-      "Give it a PDF of a score and it hands back classical-guitar tablature under the notation, with an editor for the bars it misreads. Also transcribes from a recording or a video of a page.",
-    tags: ["Python", "PyMuPDF", "MusicXML"],
-    links: [
-      { name: "example output", url: "Documentation/sheet2tab_example.pdf" },
-      { name: "the app", url: "", pending: true },
-      { name: "source", url: "", pending: true },
-    ],
-  },
-  {
-    title: "Chess Vision Bot",
-    cat: "software",
-    status: "wip",
-    caption:
-      "Watches a chessboard on your screen, rebuilds the position, and says what to play. The engine now has a C++ port for speed.",
-    tags: ["Python", "PyQt5", "python-chess", "C++"],
-    links: [
-      { name: "the bot", url: "", pending: true },
-      { name: "source", url: "", pending: true },
-    ],
-  },
-  {
-    title: "Globular clusters",
-    cat: "software",
-    caption:
-      "Does a population of primordial binaries change how fast a globular cluster evaporates? An N-body simulation, a paper and a poster.",
-    tags: ["Python", "NumPy"],
-    links: [
-      { name: "the paper", url: "Documentation/Physics_investigation (2).pdf" },
-      { name: "the poster", url: "Documentation/Physics_investigation_poster.pdf" },
-      { name: "source", url: "N-body_simulation/Main.py" },
-    ],
-  },
-  {
-    title: "Yavalath & Pentalath",
-    cat: "software",
-    caption:
-      "A-Level coursework: both hex board games in full, with sound and a computer opponent. Yavalath was itself designed by a program.",
-    tags: ["Python"],
-    links: [
-      { name: "documentation", url: "Documentation/Yavalath_NEA_documentation.pdf" },
-      { name: "the rules", url: "https://boardgamegeek.com/boardgame/33767/yavalath" },
-    ],
-  },
-  {
-    title: "Project Euler",
-    cat: "software",
-    caption: "Solutions to the first hundred-odd problems.",
-    tags: ["Python"],
-    links: [
-      { name: "solutions", url: "Euler_source.zip" },
-      { name: "the archive", url: "https://projecteuler.net/archives" },
-    ],
-  },
-  {
-    title: "Shooting scores",
-    cat: "software",
-    caption: "Plots a season of club scores so you can see whether practice is working.",
-    tags: ["Python"],
-    links: [{ name: "source", url: "Shooting score visualiser.zip" }],
-  },
-  {
-    title: "Aimtrainer",
-    cat: "software",
-    status: "old",
-    caption: "The first thing made in PyGame. Click the circles before they go.",
-    tags: ["Python", "pygame"],
-    links: [{ name: "source", url: "Aimtrainer_source/Aimtrainer.zip" }],
-  },
-  {
-    title: "This website",
-    cat: "software",
-    caption: "Two-ink riso, static HTML, no build step. The commits feed pulls from GitHub in your browser.",
-    tags: ["HTML", "CSS", "JavaScript"],
-    links: [
-      { name: "source", url: "https://github.com/Leonid-Elkin/Leonid-Elkin.github.io" },
-      { name: "my brother's site", url: "https://alexeyelkin.com/" },
-    ],
-  },
+/* ---------- projects ---------- */
 
-  /* ---------- hardware ---------- */
+/* `cat` drives the filter buttons on projects.html. Rename the three
+   categories to whatever splits your work honestly - the filter reads them
+   from here, so changing a name here changes the button. */
+const projects = [
   {
-    title: "Yagi-Uda radar",
-    cat: "hardware",
-    status: "wip",
+    title: "Project One",
+    cat: "product",
+    status: "live",
+    featured: true,
     caption:
-      "A 14.5 dBi Yagi-Uda feeding RF transceivers off a Raspberry Pi 3 to range a target. Not finished.",
-    tags: ["Raspberry Pi", "RF", "antenna"],
+      "[ What it is, who it is for, and the part that was genuinely hard. Two sentences. The featured entry gets more room, so use it. ]",
+    tags: ["[ Stack ]", "[ Stack ]", "[ Stack ]"],
     links: [
+      { name: "case study", url: "project.html" },
+      { name: "view live", url: "", pending: true },
       { name: "source", url: "", pending: true },
-      { name: "write-up", url: "", pending: true },
     ],
   },
   {
-    title: "CANSAT 2025",
-    cat: "hardware",
-    caption:
-      "A can-sized satellite for the CanSat competition, built with six others. The antenna work above started here.",
-    tags: ["RF", "telemetry"],
+    title: "Project Two",
+    cat: "product",
+    status: "live",
+    caption: "[ What it is, and the problem it solved. ]",
+    tags: ["[ Stack ]", "[ Stack ]"],
     links: [
-      { name: "critical design report", url: "Documentation/Tonbridge CanSat_ReLAACS_ 2024-25 CDR .pdf" },
-      { name: "launch video", url: "Images/Relaacs.mp4", pending: true },
+      { name: "view live", url: "", pending: true },
+      { name: "source", url: "", pending: true },
     ],
   },
-  /* Placeholders. Fill in the object, drop `placeholder`, add a photo. */
   {
-    title: "Desk organiser",
-    cat: "hardware",
-    placeholder: true,
-    caption: "[ what it is made of, what it holds, what you would do differently ]",
-    tags: ["[ material ]", "[ tool ]"],
-    links: [{ name: "photos", url: "", pending: true }],
+    title: "Project Three",
+    cat: "tooling",
+    status: "wip",
+    caption: "[ What it is, and what you learned building it. ]",
+    tags: ["[ Stack ]", "[ Stack ]"],
+    links: [{ name: "source", url: "", pending: true }],
   },
   {
-    title: "[ hardware build ]",
-    cat: "hardware",
-    placeholder: true,
-    caption: "[ a sentence on what it is and why it exists ]",
-    tags: ["[ material ]"],
-    links: [{ name: "photos", url: "", pending: true }],
+    title: "Project Four",
+    cat: "tooling",
+    caption: "[ One sentence is enough for the smaller ones. ]",
+    tags: ["[ Stack ]"],
+    links: [{ name: "source", url: "", pending: true }],
   },
   {
-    title: "[ hardware build ]",
-    cat: "hardware",
+    title: "Project Five",
+    cat: "experiment",
+    caption: "[ One sentence. ]",
+    tags: ["[ Stack ]"],
+    links: [{ name: "write-up", url: "", pending: true }],
+  },
+  {
+    title: "[ Next project ]",
+    cat: "experiment",
     placeholder: true,
-    caption: "[ a sentence on what it is and why it exists ]",
-    tags: ["[ material ]"],
-    links: [{ name: "photos", url: "", pending: true }],
+    caption: "[ An empty slot is fine. It says you are still building. ]",
+    tags: ["[ Stack ]"],
+    links: [{ name: "soon", url: "", pending: true }],
   },
 ];
 
-/* Skills by category. Every line names the work that evidences it - no
-   invented levels or percentages. */
+/* ---------- experience ---------- */
+
+/* Most recent first. The first entry renders as the current role. */
+const roles = [
+  {
+    title: "[ Job title ]",
+    org: "[ Company ]",
+    place: "[ Location ]",
+    from: "[ 20XX ]",
+    to: "Present",
+    current: true,
+    bullets: [
+      "[ What you built or owned, and the number that proves it mattered. ]",
+      "[ A second bullet. Verb first, outcome second. ]",
+      "[ A third, if it earns its place. ]",
+    ],
+  },
+  {
+    title: "[ Job title ]",
+    org: "[ Company ]",
+    place: "[ Location ]",
+    from: "[ 20XX ]",
+    to: "[ 20XX ]",
+    bullets: [
+      "[ What you shipped here. ]",
+      "[ What changed because of it. ]",
+    ],
+  },
+  {
+    title: "[ Job title ]",
+    org: "[ Company ]",
+    place: "[ Location ]",
+    from: "[ 20XX ]",
+    to: "[ 20XX ]",
+    bullets: ["[ What you shipped here. ]"],
+  },
+];
+
+const education = [
+  {
+    award: "[ Degree ]",
+    org: "[ Institution ]",
+    years: "[ 20XX&ndash;20XX ]",
+    note: "[ Grade / honours ]",
+  },
+  {
+    award: "[ Qualification ]",
+    org: "[ Institution ]",
+    years: "[ 20XX&ndash;20XX ]",
+    note: "[ Grade ]",
+  },
+];
+
+/* ---------- skills ---------- */
+
+/* Every line names the work that evidences it - no invented levels or
+   percentages. `via` is where a reader can go and see the claim proved. */
 const skills = [
   {
     head: "Languages",
     items: [
-      { name: "Python", via: "most of the above" },
-      { name: "C++", via: "chess engine port" },
-      { name: "C", via: "a CMake game engine" },
-      { name: "C#", via: "Unity" },
-      { name: "JavaScript", via: "this site" },
+      { name: "[ Language ]", via: "[ where you used it ]", placeholder: true },
+      { name: "[ Language ]", via: "[ where you used it ]", placeholder: true },
+      { name: "[ Language ]", via: "[ where you used it ]", placeholder: true },
     ],
   },
   {
-    head: "Frameworks & tools",
+    head: "Frameworks",
     items: [
-      { name: "pygame", via: "SHELLFALL, Aimtrainer" },
-      { name: "PyQt5", via: "Chess Vision Bot" },
-      { name: "Unity 6", via: "an air-combat prototype" },
-      { name: "SQLite + systemd", via: "Drone Strike Map" },
-      { name: "PyMuPDF, MusicXML", via: "Sheet2Tab" },
-      { name: "LaTeX", via: "the scaling-laws paper" },
+      { name: "[ Framework ]", via: "[ project ]", placeholder: true },
+      { name: "[ Framework ]", via: "[ project ]", placeholder: true },
+      { name: "[ Tool ]", via: "[ project ]", placeholder: true },
     ],
   },
   {
-    head: "Hardware & radio",
+    head: "Infrastructure",
     items: [
-      { name: "Raspberry Pi", via: "Yagi-Uda radar" },
-      { name: "RF transceivers", via: "Yagi-Uda radar" },
-      { name: "Antenna construction", via: "14.5 dBi Yagi-Uda" },
-      { name: "Payload design", via: "CANSAT 2025" },
-      { name: "[ workshop tools ]", via: "[ placeholder ]", placeholder: true },
+      { name: "[ Tool ]", via: "[ project ]", placeholder: true },
+      { name: "[ Tool ]", via: "[ project ]", placeholder: true },
     ],
   },
   {
-    head: "Machine learning",
+    head: "[ Your specialism ]",
     items: [
-      { name: "MLPs from scratch", via: "elkwork" },
-      { name: "Training and evaluation", via: "MNIST 98.5%, FashionMNIST 93.4%" },
-      { name: "Computer vision", via: "Chess Vision Bot" },
-      { name: "Optical music recognition", via: "Sheet2Tab" },
+      { name: "[ Skill ]", via: "[ evidence ]", placeholder: true },
+      { name: "[ Skill ]", via: "[ evidence ]", placeholder: true },
     ],
   },
 ];
@@ -236,6 +174,9 @@ const el = (tag, cls, text) => {
 };
 
 const isExternal = (url) => /^https?:\/\//i.test(url);
+
+/* A string wrapped in [ brackets ] is an unfilled slot. */
+const isSlot = (s) => typeof s === "string" && /^\s*\[.*\]\s*$/.test(s);
 
 function linkEl(link) {
   const a = el("a", null, link.name);
@@ -261,10 +202,8 @@ function linkEl(link) {
 
 const STATUS_LABEL = { live: "live", wip: "in progress", old: "early", placeholder: "placeholder" };
 
-/* The plate that stands in the left column of every entry: a running number
-   set large, with the category under it. This is what replaced the
-   thumbnails - the site carries no images at all, so the index is typographic
-   and the number does the work a photograph used to. */
+/* The running number in the left column - what stands where a thumbnail would
+   on a site that used images. This one does not. */
 function plate(n, p) {
   const box = el("div", "plate" + (p.placeholder ? " is-placeholder" : ""));
   box.setAttribute("aria-hidden", "true");
@@ -279,7 +218,6 @@ function projectCard(p, i) {
 
   card.appendChild(plate(i + 1, p));
 
-  /* body */
   const body = el("div", "project-body");
   const top = el("div", "top");
   top.appendChild(el("h3", null, p.title));
@@ -287,7 +225,9 @@ function projectCard(p, i) {
   if (st) top.appendChild(el("span", "status " + st, STATUS_LABEL[st]));
   body.appendChild(top);
 
-  body.appendChild(el("p", "caption" + (p.placeholder ? " mono" : ""), p.caption));
+  body.appendChild(
+    el("p", "caption" + (isSlot(p.caption) ? " placeholder" : ""), p.caption)
+  );
 
   if (p.tags && p.tags.length) {
     const ul = el("ul", "tags");
@@ -344,6 +284,78 @@ function initProjects() {
   apply((location.hash || "").replace("#", ""), { push: false });
 }
 
+/* ---------- home: selected work ---------- */
+
+/* The three featured entries on the front page. Same data, shorter form. */
+function initSelected() {
+  const root = document.getElementById("selected-work");
+  if (!root) return;
+
+  projects.slice(0, 3).forEach((p, i) => {
+    const row = el("article", "select-row");
+    row.appendChild(plate(i + 1, p));
+
+    const body = el("div", "project-body");
+    const top = el("div", "top");
+    top.appendChild(el("h3", null, p.title));
+    const st = p.placeholder ? "placeholder" : p.status;
+    if (st) top.appendChild(el("span", "status " + st, STATUS_LABEL[st]));
+    body.appendChild(top);
+    body.appendChild(
+      el("p", "caption" + (isSlot(p.caption) ? " placeholder" : ""), p.caption)
+    );
+    row.appendChild(body);
+
+    const links = el("div", "links");
+    links.appendChild(linkEl(p.links[0]));
+    row.appendChild(links);
+
+    root.appendChild(row);
+  });
+}
+
+/* ---------- home: experience ---------- */
+
+function initRoles() {
+  const root = document.getElementById("role-list");
+  if (!root) return;
+
+  roles.forEach((r) => {
+    const item = el("article", "role" + (r.current ? " current" : ""));
+
+    const head = el("div", "role-head");
+    const who = el("div");
+    who.appendChild(el("h3", null, r.title));
+    const org = el("p", "role-org");
+    org.append(r.org, " · ", r.place);
+    who.appendChild(org);
+    head.appendChild(who);
+    head.appendChild(el("span", "role-when mono", r.from + " — " + r.to));
+    item.appendChild(head);
+
+    const ul = el("ul", "bullets");
+    r.bullets.forEach((b) => ul.appendChild(el("li", isSlot(b) ? "placeholder" : null, b)));
+    item.appendChild(ul);
+
+    root.appendChild(item);
+  });
+}
+
+function initEducation() {
+  const root = document.getElementById("edu-list");
+  if (!root) return;
+
+  education.forEach((e) => {
+    const box = el("div", "edu");
+    box.appendChild(el("h3", null, e.award));
+    const line = el("p", "mono edu-org");
+    line.append(e.org, " · ", e.years.replace(/&ndash;/g, "–"));
+    box.appendChild(line);
+    box.appendChild(el("p", "mono edu-note", e.note));
+    root.appendChild(box);
+  });
+}
+
 /* ---------- home: skills ---------- */
 
 function initSkills() {
@@ -364,12 +376,8 @@ function initSkills() {
   });
 }
 
-/* ---------- home: the size of the index ---------- */
+/* ---------- counts quoted in the chrome ---------- */
 
-/* The masthead strip and the hero eyebrow both quote how many entries there
-   are. Filling them from the array means adding a project can never leave a
-   stale number printed on the front page. `pad` gets a leading zero, because
-   the eyebrow reads as a range - INDEX 01-16. */
 function initCounts() {
   const n = projects.length;
   document.querySelectorAll("[data-project-count]").forEach((node) => {
@@ -380,6 +388,9 @@ function initCounts() {
 
 window.addEventListener("DOMContentLoaded", () => {
   initProjects();
+  initSelected();
+  initRoles();
+  initEducation();
   initSkills();
   initCounts();
 });

@@ -1040,6 +1040,298 @@ footer .col-label {
   *, *::before, *::after { transition-duration: 0.01ms !important; }
 }
 
+/* ---------- experience ---------- */
+
+.role-list { border-top: 1px solid var(--rule); }
+
+.role {
+  display: grid;
+  grid-template-columns: var(--label-col) minmax(0, 1fr);
+  gap: clamp(14px, 3vw, 44px);
+  padding: clamp(18px, 2.4vw, 30px) 0;
+  border-bottom: 1px solid var(--rule);
+}
+
+/* The current role is the only one that gets the accent rule. */
+.role.current { border-left: 2px solid var(--red); padding-left: 18px; }
+.role.current .role-head h3 { font-size: clamp(1.3rem, 2.4vw, 1.9rem); }
+
+.role-head {
+  grid-column: 1 / -1;
+  display: grid;
+  grid-template-columns: var(--label-col) minmax(0, 1fr) auto;
+  gap: clamp(14px, 3vw, 44px);
+  align-items: baseline;
+  margin-bottom: 12px;
+}
+
+.role.current .role-head { grid-template-columns: calc(var(--label-col) - 20px) minmax(0, 1fr) auto; }
+
+.role-head > div { grid-column: 2; }
+
+.role-head h3 {
+  font-family: var(--f-display);
+  font-weight: 700;
+  font-size: clamp(1.15rem, 2vw, 1.55rem);
+  text-transform: uppercase;
+  letter-spacing: -0.03em;
+  line-height: 0.98;
+}
+
+.role-org {
+  font-family: var(--f-mono);
+  font-size: 0.72rem;
+  letter-spacing: 0.08em;
+  color: var(--red);
+  margin-top: 4px;
+}
+
+.role-when {
+  grid-column: 3;
+  color: var(--ink-3);
+  white-space: nowrap;
+  text-align: right;
+}
+
+.bullets {
+  grid-column: 2;
+  display: flex;
+  flex-direction: column;
+  gap: 7px;
+  max-width: 62ch;
+}
+
+.role.current .bullets { grid-column: 2; }
+
+.bullets li {
+  position: relative;
+  padding-left: 18px;
+  font-size: 0.98rem;
+  line-height: 1.55;
+  color: var(--ink-2);
+}
+
+/* a small red square, not a bullet glyph */
+.bullets li::before {
+  content: "";
+  position: absolute;
+  left: 0;
+  top: 0.62em;
+  width: 6px;
+  height: 6px;
+  background: var(--red);
+}
+
+.bullets li.placeholder { padding-left: 14px; }
+.bullets li.placeholder::before { display: none; }
+
+/* ---------- education ---------- */
+
+.edu-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+  gap: 1px;
+  background: var(--rule);
+  border: 1px solid var(--rule);
+  margin-left: calc(var(--label-col) + clamp(14px, 3vw, 44px));
+}
+
+.edu { background: var(--paper); padding: 16px 18px; }
+
+.edu h3 {
+  font-family: var(--f-display);
+  font-weight: 700;
+  font-size: 1.15rem;
+  text-transform: uppercase;
+  letter-spacing: -0.025em;
+}
+
+.edu-org {
+  font-size: 0.68rem;
+  letter-spacing: 0.08em;
+  color: var(--ink-3);
+  text-transform: none;
+  margin-top: 5px;
+}
+
+.edu-note {
+  font-size: 0.68rem;
+  letter-spacing: 0.08em;
+  color: var(--red);
+  text-transform: none;
+  margin-top: 3px;
+}
+
+/* ---------- selected work (home) ---------- */
+
+.selected { border-top: 1px solid var(--rule); }
+
+.select-row {
+  display: grid;
+  grid-template-columns: var(--label-col) minmax(0, 1fr) minmax(0, 0.4fr);
+  gap: clamp(14px, 3vw, 44px);
+  align-items: start;
+  padding: clamp(16px, 2.2vw, 26px) 0;
+  border-bottom: 1px solid var(--rule);
+  transition: background 0.18s ease;
+}
+
+.select-row:hover { background: var(--paper-2); }
+.select-row:hover .plate { color: var(--red); }
+
+/* ==========================================================================
+   The card stack in the corner.
+   Durak is no longer a section with a heading - it is an unlabelled stack of
+   backs in the bottom corner that fans when clicked and opens the board on a
+   second click. See egg.js. Sized and placed to read as a stray artefact
+   until you are already hovering it.
+   ========================================================================== */
+
+.egg {
+  position: fixed;
+  right: 22px;
+  bottom: 18px;
+  width: 168px;
+  height: 116px;
+  z-index: 400;
+  cursor: pointer;
+  border: 0;
+  background: none;
+  padding: 0;
+}
+
+.egg[hidden] { display: none; }
+
+.egg-stack { position: absolute; inset: 0; }
+
+.egg-card {
+  position: absolute;
+  /* right / bottom / transform are set inline by egg.js - keeping the fan
+     geometry in one place beat splitting it across a calc() chain here. */
+  width: 46px;
+  height: 66px;
+  box-sizing: border-box;
+  padding: 4px 5px;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  background: var(--red);
+  color: transparent;
+  outline: 1px solid var(--paper);
+  box-shadow: inset 0 0 0 3px var(--red), inset 0 0 0 4px rgba(242, 240, 236, 0.5);
+  font-family: var(--f-display);
+  font-weight: 800;
+  font-size: 0.72rem;
+  line-height: 1;
+  transition: right 0.34s cubic-bezier(0.2, 0.9, 0.3, 1.25),
+              bottom 0.34s cubic-bezier(0.2, 0.9, 0.3, 1.25),
+              transform 0.34s cubic-bezier(0.2, 0.9, 0.3, 1.25),
+              background 0.2s ease, color 0.2s ease, box-shadow 0.2s ease;
+}
+
+.egg-suit { text-align: center; font-size: 1.05rem; line-height: 1; }
+
+/* dealt: the faces come up. Geometry is inline, from egg.js. */
+.egg.is-dealt .egg-card {
+  background: var(--ink);
+  color: var(--paper);
+  box-shadow: none;
+  outline: 1px solid var(--paper);
+}
+
+.egg.is-dealt .egg-card.red { color: var(--red); }
+
+.egg-hint {
+  position: absolute;
+  right: 4px;
+  top: 0;
+  font-family: var(--f-mono);
+  font-size: 0.6rem;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  color: var(--ink-3);
+  opacity: 0;
+  transition: opacity 0.18s ease;
+  pointer-events: none;
+}
+
+.egg:hover .egg-hint,
+.egg:focus-visible .egg-hint { opacity: 1; }
+.egg.is-dealt .egg-hint { color: var(--red); }
+
+/* ---------- the board, once opened ---------- */
+
+.durak-panel {
+  position: fixed;
+  inset: 0;
+  z-index: 600;
+  background: color-mix(in srgb, var(--paper) 92%, transparent);
+  display: grid;
+  place-items: center;
+  padding: clamp(14px, 3vw, 40px);
+  overflow: auto;
+}
+
+.durak-panel[hidden] { display: none; }
+
+.panel-inner {
+  width: min(100%, 760px);
+  background: var(--paper);
+  border: 1px solid var(--rule-hot);
+  border-top: 2px solid var(--red);
+}
+
+.panel-head {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 16px;
+  padding: 12px 16px;
+  border-bottom: 1px solid var(--rule);
+}
+
+.panel-head h2 {
+  font-family: var(--f-display);
+  font-weight: 700;
+  font-size: 1.2rem;
+  text-transform: uppercase;
+  letter-spacing: -0.02em;
+}
+
+.panel-close {
+  font-family: var(--f-mono);
+  font-size: 0.66rem;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  color: var(--ink-2);
+  border: 1px solid var(--rule-hot);
+  background: none;
+  padding: 5px 12px;
+  cursor: pointer;
+  transition: color 0.15s, border-color 0.15s;
+}
+
+.panel-close:hover { color: var(--red); border-color: var(--red); }
+
+@media (max-width: 720px) {
+  .egg { right: 12px; bottom: 10px; width: 132px; height: 92px; }
+  .egg-card { width: 38px; height: 54px; }
+  .edu-grid { margin-left: 0; }
+  .role,
+  .role-head { grid-template-columns: 1fr; gap: 10px; }
+  .role.current { padding-left: 12px; }
+  .role.current .role-head { grid-template-columns: 1fr; }
+  .role-head > div,
+  .bullets,
+  .role.current .bullets { grid-column: auto; }
+  .role-when { grid-column: auto; text-align: left; }
+  .select-row { grid-template-columns: 1fr; gap: 12px; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .egg-card { transition: none; }
+}
+
 /* ==========================================================================
    Placeholders - last, on purpose.
    These mark copy that is still to be written. They sit at the foot of the
