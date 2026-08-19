@@ -80,6 +80,23 @@
             </div>
         </section>
 
+        <!-- The ridgeline. Drawn, not loaded: flat-shaded polygons in the two
+             greys with the one red facet. The site's only landscape. -->
+        <div class="facet-band" aria-hidden="true">
+            <svg viewBox="0 0 1440 200" preserveAspectRatio="none" shape-rendering="crispEdges">
+                <rect width="1440" height="200" fill="#0a0a0a" />
+                <polygon points="0,200 0,118 168,64 336,128 452,84 628,152 748,104 902,168 1058,112 1222,164 1440,96 1440,200" fill="#141414" />
+                <polygon points="0,200 168,64 336,128 262,200" fill="#1a1a1a" />
+                <polygon points="452,84 628,152 512,200 262,200" fill="#101010" />
+                <polygon points="748,104 902,168 812,200 512,200" fill="#181818" />
+                <polygon points="1058,112 1222,164 1130,200 812,200" fill="#0e0e0e" />
+                <polygon points="1222,164 1440,96 1440,200 1130,200" fill="#161616" />
+                <polygon class="facet-hot" points="336,128 452,84 512,200 262,200" fill="#ff2d16" />
+                <polygon points="200,38 224,-6 250,40 224,56" fill="#ff2d16" opacity="0.35" />
+                <polygon points="1284,54 1302,18 1324,58 1302,72" fill="#f2f0ec" opacity="0.14" />
+            </svg>
+        </div>
+
         <section class="section about" id="about">
             <div class="wrap">
                 <div class="section-head">
@@ -133,6 +150,8 @@
 
         <section class="section" id="skills">
             <div class="wrap">
+                <span class="shard s1" style="right: 4%; top: 30px;" aria-hidden="true"><svg width="26" height="34" viewBox="0 0 26 34"><polygon points="13,0 26,22 13,34 0,24" fill="#ff2d16" opacity="0.5" /></svg></span>
+
                 <div class="section-head">
                     <span class="idx">03 &mdash;</span>
                     <h2 class="display">Skills</h2>
@@ -144,6 +163,8 @@
 
         <section class="section" id="work">
             <div class="wrap">
+                <span class="shard s2" style="left: 2%; top: 60px;" aria-hidden="true"><svg width="18" height="24" viewBox="0 0 18 24"><polygon points="9,0 18,15 9,24 0,17" fill="#f2f0ec" opacity="0.12" /></svg></span>
+
                 <div class="section-head">
                     <span class="idx">04 &mdash;</span>
                     <h2 class="display">Selected work</h2>
@@ -204,6 +225,7 @@
     <script src="durak.js"></script>
     <script src="egg.js"></script>
     <script src="extras.js"></script>
+    <script src="motion.js"></script>
 </body>
 
 </html>

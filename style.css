@@ -1032,6 +1032,101 @@ footer .col-label {
   .nav-links { margin-left: -12px; }
 }
 
+/* ==========================================================================
+   Facets and motion.
+   The one visual liberty this site takes beyond type and rule: flat-shaded
+   polygon fields, drawn inline as SVG so the zero-image rule holds. Two
+   greys and the one red, hard facet edges, no gradients.
+
+   Every hidden-until-revealed state is scoped to html.motion-ok, which only
+   motion.js sets - and it refuses to when the visitor prefers reduced
+   motion. No script, no observer, no motion: the page is simply complete.
+   ========================================================================== */
+
+/* ---------- the facet band ---------- */
+
+.facet-band {
+  display: block;
+  width: 100%;
+  height: clamp(110px, 16vw, 210px);
+  border-top: 1px solid var(--rule);
+  border-bottom: 1px solid var(--rule);
+}
+
+.facet-band.slim { height: clamp(60px, 8vw, 110px); }
+
+.facet-band svg { display: block; width: 100%; height: 100%; }
+
+/* the single saturated facet breathes - slowly, like a lamp, not a strobe */
+.facet-hot { animation: facet-breathe 7s ease-in-out infinite; }
+
+@keyframes facet-breathe {
+  0%, 100% { opacity: 0.55; }
+  50%      { opacity: 0.95; }
+}
+
+/* shards: small drifting fragments pinned inside a section */
+.shard {
+  position: absolute;
+  pointer-events: none;
+  z-index: 0;
+}
+
+.shard svg { display: block; }
+
+.shard.s1 { animation: shard-drift 26s ease-in-out infinite; }
+.shard.s2 { animation: shard-drift 34s ease-in-out infinite reverse; }
+
+@keyframes shard-drift {
+  0%, 100% { transform: translateY(0) rotate(0deg); }
+  50%      { transform: translateY(-14px) rotate(4deg); }
+}
+
+/* ---------- reveals ---------- */
+
+.motion-ok .reveal {
+  opacity: 0;
+  transform: translateY(20px);
+  transition: opacity 0.65s ease, transform 0.65s cubic-bezier(0.2, 0.7, 0.3, 1);
+}
+
+.motion-ok .reveal.in-view {
+  opacity: 1;
+  transform: none;
+}
+
+/* the red rule under a section head draws in left-to-right as it arrives */
+.motion-ok .section-head::after {
+  transform: scaleX(0);
+  transform-origin: left;
+  transition: transform 0.9s cubic-bezier(0.2, 0.7, 0.2, 1) 0.15s;
+}
+
+.motion-ok .section-head.in-view::after { transform: scaleX(1); }
+
+/* ---------- the press breathes ---------- */
+
+/* Every so often the overprint slips a fraction further and snaps back -
+   a press holding registration, not a glitch effect. Steps, not easing:
+   machines move mechanically. */
+.motion-ok .overprint::before {
+  animation: press-hold 9s steps(1) infinite;
+}
+
+@keyframes press-hold {
+  0%, 88%  { transform: translate(0.016em, 0.012em); }
+  90%      { transform: translate(0.034em, 0.004em); }
+  93%      { transform: translate(0.010em, 0.018em); }
+  95%      { transform: translate(0.016em, 0.012em); }
+}
+
+/* misprint mode overrules the breathing - the plates have already gone */
+.misprint .overprint::before { animation: none; }
+
+@media (prefers-reduced-motion: reduce) {
+  .facet-hot, .shard.s1, .shard.s2 { animation: none !important; }
+}
+
 /* ---------- misprint mode (the Konami code) ----------
    The overprint plate drifts well out of register and the red rules slip a
    couple of pixels. Purely presentational: toggled as a class on <html> from
