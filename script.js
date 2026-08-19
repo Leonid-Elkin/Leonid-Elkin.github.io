@@ -15,7 +15,6 @@ const projects = [
     cat: "software",
     caption:
       "The elkwork library, the neural scaling laws paper, and the models it produced. It has its own page.",
-    image: "Images/neurons.png",
     tags: ["Python", "NumPy", "LaTeX"],
     links: [{ name: "the ML page", url: "MlProjects.html" }],
     featured: true,
@@ -26,7 +25,6 @@ const projects = [
     status: "live",
     caption:
       "Hold a coastal fortress against a campaign of named capital ships. You lay the guns yourself and mark what to hit; the enemy keeps sailing. Released as Penumbra.",
-    image: "Images/shellfall.png",
     tags: ["Python", "pygame"],
     links: [
       { name: "play on itch.io", url: "https://elkyy.itch.io/penumbra" },
@@ -40,7 +38,6 @@ const projects = [
     status: "live",
     caption:
       "Every reported drone and missile strike in the Russia-Ukraine war, day by day, with the outlet behind each figure. Reads a few dozen sources every morning and runs on its own server.",
-    image: "Images/dronestrikemap.png",
     tags: ["Python", "SQLite", "systemd", "Leaflet"],
     links: [
       { name: "watch it live here", url: "live.html" },
@@ -55,7 +52,6 @@ const projects = [
     status: "wip",
     caption:
       "Give it a PDF of a score and it hands back classical-guitar tablature under the notation, with an editor for the bars it misreads. Also transcribes from a recording or a video of a page.",
-    image: "Images/sheet2tab.png",
     tags: ["Python", "PyMuPDF", "MusicXML"],
     links: [
       { name: "example output", url: "Documentation/sheet2tab_example.pdf" },
@@ -69,8 +65,6 @@ const projects = [
     status: "wip",
     caption:
       "Watches a chessboard on your screen, rebuilds the position, and says what to play. The engine now has a C++ port for speed.",
-    image: "Images/chess.png",
-    contain: true,
     tags: ["Python", "PyQt5", "python-chess", "C++"],
     links: [
       { name: "the bot", url: "", pending: true },
@@ -82,7 +76,6 @@ const projects = [
     cat: "software",
     caption:
       "Does a population of primordial binaries change how fast a globular cluster evaporates? An N-body simulation, a paper and a poster.",
-    image: "Images/N-Body Simulation.png",
     tags: ["Python", "NumPy"],
     links: [
       { name: "the paper", url: "Documentation/Physics_investigation (2).pdf" },
@@ -95,7 +88,6 @@ const projects = [
     cat: "software",
     caption:
       "A-Level coursework: both hex board games in full, with sound and a computer opponent. Yavalath was itself designed by a program.",
-    image: "Images/Yavalath.png",
     tags: ["Python"],
     links: [
       { name: "documentation", url: "Documentation/Yavalath_NEA_documentation.pdf" },
@@ -106,7 +98,6 @@ const projects = [
     title: "Project Euler",
     cat: "software",
     caption: "Solutions to the first hundred-odd problems.",
-    image: "Images/Euler.png",
     tags: ["Python"],
     links: [
       { name: "solutions", url: "Euler_source.zip" },
@@ -117,7 +108,6 @@ const projects = [
     title: "Shooting scores",
     cat: "software",
     caption: "Plots a season of club scores so you can see whether practice is working.",
-    image: "Images/kk300.png",
     tags: ["Python"],
     links: [{ name: "source", url: "Shooting score visualiser.zip" }],
   },
@@ -126,7 +116,6 @@ const projects = [
     cat: "software",
     status: "old",
     caption: "The first thing made in PyGame. Click the circles before they go.",
-    image: "Images/Aimtrainer.png",
     tags: ["Python", "pygame"],
     links: [{ name: "source", url: "Aimtrainer_source/Aimtrainer.zip" }],
   },
@@ -134,7 +123,6 @@ const projects = [
     title: "This website",
     cat: "software",
     caption: "Two-ink riso, static HTML, no build step. The commits feed pulls from GitHub in your browser.",
-    image: "Images/2fort.png",
     tags: ["HTML", "CSS", "JavaScript"],
     links: [
       { name: "source", url: "https://github.com/Leonid-Elkin/Leonid-Elkin.github.io" },
@@ -149,7 +137,6 @@ const projects = [
     status: "wip",
     caption:
       "A 14.5 dBi Yagi-Uda feeding RF transceivers off a Raspberry Pi 3 to range a target. Not finished.",
-    image: "Images/Yagi.png",
     tags: ["Raspberry Pi", "RF", "antenna"],
     links: [
       { name: "source", url: "", pending: true },
@@ -161,7 +148,6 @@ const projects = [
     cat: "hardware",
     caption:
       "A can-sized satellite for the CanSat competition, built with six others. The antenna work above started here.",
-    image: "Images/CANSAT 2025.jpg",
     tags: ["RF", "telemetry"],
     links: [
       { name: "critical design report", url: "Documentation/Tonbridge CanSat_ReLAACS_ 2024-25 CDR .pdf" },
@@ -275,40 +261,23 @@ function linkEl(link) {
 
 const STATUS_LABEL = { live: "live", wip: "in progress", old: "early", placeholder: "placeholder" };
 
-function projectCard(p) {
+/* The plate that stands in the left column of every entry: a running number
+   set large, with the category under it. This is what replaced the
+   thumbnails - the site carries no images at all, so the index is typographic
+   and the number does the work a photograph used to. */
+function plate(n, p) {
+  const box = el("div", "plate" + (p.placeholder ? " is-placeholder" : ""));
+  box.setAttribute("aria-hidden", "true");
+  box.append(String(n).padStart(2, "0"), el("span", "plate-cat", p.cat || ""));
+  return box;
+}
+
+function projectCard(p, i) {
   const card = el("article", "project-card");
   card.dataset.cat = p.cat;
   if (p.featured) card.classList.add("featured");
 
-  /* thumbnail */
-  let thumb;
-  if (p.image) {
-    thumb = el("div", "thumb duotone" + (p.contain ? " contain" : ""));
-    const img = el("img");
-    img.src = p.image;
-    img.alt = "";
-    img.loading = "lazy";
-    thumb.appendChild(img);
-  } else {
-    thumb = el("div", "thumb empty halftone");
-    thumb.setAttribute("aria-hidden", "true");
-    // a small blue register mark where the photograph will go
-    const ns = "http://www.w3.org/2000/svg";
-    const svg = document.createElementNS(ns, "svg");
-    svg.setAttribute("width", "34");
-    svg.setAttribute("height", "34");
-    svg.setAttribute("viewBox", "0 0 24 24");
-    svg.setAttribute("fill", "none");
-    svg.setAttribute("stroke", "currentColor");
-    svg.setAttribute("stroke-width", "1.5");
-    ["M12 3v18", "M3 12h18", "M12 12m-5 0a5 5 0 1 0 10 0a5 5 0 1 0-10 0"].forEach((d) => {
-      const path = document.createElementNS(ns, "path");
-      path.setAttribute("d", d);
-      svg.appendChild(path);
-    });
-    thumb.appendChild(svg);
-  }
-  card.appendChild(thumb);
+  card.appendChild(plate(i + 1, p));
 
   /* body */
   const body = el("div", "project-body");
@@ -326,11 +295,14 @@ function projectCard(p) {
     body.appendChild(ul);
   }
 
+  card.appendChild(body);
+
+  /* Links are a sibling of the body, not a child: the entry is a three-column
+     grid (number | text | links) and the links column is flush right. */
   const links = el("div", "links");
   p.links.forEach((l) => links.appendChild(linkEl(l)));
-  body.appendChild(links);
+  card.appendChild(links);
 
-  card.appendChild(body);
   return card;
 }
 
@@ -341,7 +313,7 @@ function initProjects() {
   if (!grid) return;
 
   const frag = document.createDocumentFragment();
-  projects.forEach((p) => frag.appendChild(projectCard(p)));
+  projects.forEach((p, i) => frag.appendChild(projectCard(p, i)));
   grid.appendChild(frag);
 
   const cards = Array.from(grid.children);
@@ -392,7 +364,22 @@ function initSkills() {
   });
 }
 
+/* ---------- home: the size of the index ---------- */
+
+/* The masthead strip and the hero eyebrow both quote how many entries there
+   are. Filling them from the array means adding a project can never leave a
+   stale number printed on the front page. `pad` gets a leading zero, because
+   the eyebrow reads as a range - INDEX 01-16. */
+function initCounts() {
+  const n = projects.length;
+  document.querySelectorAll("[data-project-count]").forEach((node) => {
+    node.textContent =
+      node.dataset.projectCount === "pad" ? String(n).padStart(2, "0") : String(n);
+  });
+}
+
 window.addEventListener("DOMContentLoaded", () => {
   initProjects();
   initSkills();
+  initCounts();
 });

@@ -1,13 +1,16 @@
 /* Durak - symbols only, no copy anywhere in the UI.
-   Cards are printed in the two inks: blue backs on a halftone screen, red
-   suits in the orange plate. */
+   Restyled for the Swiss editorial black stock: card faces are printed
+   off-white paper, black suits in the text ink and red suits in the one
+   accent. Backs are solid red with a hairline keyline. No shadows, no
+   gradients, no rounded corners - the cards are rectangles of paper. */
 
 .durak {
   --card-w: 76px;
   --card-h: 108px;
+  border: 1px solid var(--rule);
+  border-top: 2px solid var(--red);
   background: var(--paper-2);
-  box-shadow: var(--shadow);
-  padding: 18px;
+  padding: 20px;
   position: relative;
   overflow: hidden;
 }
@@ -28,9 +31,7 @@
   min-height: var(--card-h);
 }
 
-.durak-row.opponent {
-  justify-content: center;
-}
+.durak-row.opponent { justify-content: center; }
 
 .durak-row.mine {
   justify-content: center;
@@ -43,8 +44,8 @@
   gap: 20px;
   align-items: center;
   justify-content: center;
-  padding: 8px;
-  border: 2px dashed var(--rule);
+  padding: 10px;
+  border: 1px dashed var(--rule-hot);
 }
 
 /* --- the card --- */
@@ -52,16 +53,17 @@
 .card {
   width: var(--card-w);
   height: var(--card-h);
-  background: var(--card);
-  box-shadow: var(--shadow);
+  background: var(--ink);
+  color: var(--paper);
   display: flex;
   flex-direction: column;
   justify-content: space-between;
   padding: 7px 8px;
   position: relative;
   flex-shrink: 0;
+  -webkit-user-select: none;
   user-select: none;
-  transition: transform 0.18s ease, box-shadow 0.18s ease, opacity 0.18s;
+  transition: transform 0.18s ease, opacity 0.18s;
   animation: dealt 0.34s cubic-bezier(0.2, 0.9, 0.3, 1.2) both;
 }
 
@@ -71,11 +73,11 @@
 }
 
 .card .pip {
-  font-family: "Bricolage Grotesque", sans-serif;
+  font-family: var(--f-display);
   font-weight: 800;
   font-size: 1.05rem;
   line-height: 1;
-  letter-spacing: 0;
+  letter-spacing: -0.03em;
 }
 
 .card .suit-lg {
@@ -89,47 +91,39 @@
   transform: rotate(180deg);
 }
 
-.card.red { color: var(--orange); }
-.card.black { color: var(--ink); }
+.card.red { color: var(--red); }
+.card.black { color: var(--paper); }
 
-/* face-down: the printed back. The pale outline is load-bearing - without it
-   a fanned row of identical backs merges into one black slab. */
+/* face-down: solid accent with a keyline, so a fanned row of backs still
+   reads as separate cards. */
 .card.back {
-  background-color: var(--blue);
-  background-image: radial-gradient(rgba(255, 255, 255, 0.28) 1px, transparent 1.3px);
-  background-size: 5px 5px;
-  box-shadow: var(--shadow);
-  border: 3px solid var(--card);
-  outline: 1px solid var(--rule);
+  background: var(--red);
+  color: var(--ink);
+  box-shadow: inset 0 0 0 4px var(--red), inset 0 0 0 5px rgba(242, 240, 236, 0.55);
+  outline: 1px solid var(--paper);
 }
 
-/* trump marker in the corner of a trump card */
+/* trump marker: a hairline box inset in the card */
 .card.trump::after {
   content: "";
   position: absolute;
   inset: 3px;
-  border: 1.5px solid currentColor;
-  opacity: 0.35;
+  border: 1px solid currentColor;
+  opacity: 0.4;
   pointer-events: none;
 }
 
-/* playable cards lift */
-.card.playable {
-  cursor: pointer;
-}
+.card.playable { cursor: pointer; }
 
 .card.playable:hover,
 .card.playable:focus-visible {
   transform: translateY(-14px) rotate(0deg);
-  box-shadow: var(--shadow);
   z-index: 3;
-  outline: none;
+  outline: 2px solid var(--red);
+  outline-offset: 0;
 }
 
-.card.dimmed {
-  opacity: 0.4;
-  filter: grayscale(0.6);
-}
+.card.dimmed { opacity: 0.35; }
 
 /* the fan in hand: each card leans a little */
 .durak-row.mine .card:nth-child(3n + 1) { transform: rotate(-2deg); }
@@ -174,9 +168,9 @@
   to   { opacity: 1; }
 }
 
-/* the pair the player must answer gets a red ring */
+/* the pair the player must answer gets the accent ring */
 .pair.target .card.attack {
-  outline: 3px solid var(--orange);
+  outline: 3px solid var(--red);
   outline-offset: 2px;
 }
 
@@ -222,22 +216,21 @@
 
 .deck-count {
   position: absolute;
-  left: 2px;
-  bottom: -9px;
+  left: 0;
+  bottom: -11px;
   z-index: 3;
-  background: var(--orange);
-  color: var(--card);
-  font-family: "Bricolage Grotesque", sans-serif;
-  font-size: 0.8rem;
-  padding: 1px 7px;
-  box-shadow: var(--shadow);
+  background: var(--ink);
+  color: var(--paper);
+  font-family: var(--f-mono);
+  font-size: 0.68rem;
+  letter-spacing: 0.06em;
+  padding: 1px 8px;
 }
 
 .discard-pile {
   width: var(--card-w);
   height: var(--card-h);
-  border: 2px dashed var(--rule);
-  opacity: 0.55;
+  border: 1px dashed var(--rule-hot);
   position: relative;
 }
 
@@ -252,47 +245,47 @@
 /* Clear of the fanned hand, which lifts 14px on hover. */
 .durak-controls {
   display: flex;
-  gap: 12px;
+  gap: 10px;
   justify-content: center;
   align-items: center;
   margin-top: 22px;
-  padding-top: 16px;
-  border-top: 2px dashed var(--rule);
+  padding-top: 18px;
+  border-top: 1px solid var(--rule);
 }
 
 .durak-btn {
-  width: 52px;
-  height: 52px;
-  background: var(--card);
-  border: none;
-  box-shadow: var(--shadow);
+  width: 50px;
+  height: 50px;
+  background: none;
+  border: 1px solid var(--rule-hot);
   cursor: pointer;
   display: grid;
   place-items: center;
   color: var(--ink);
-  transition: transform 0.12s, box-shadow 0.12s, background 0.12s;
+  transition: background 0.14s, color 0.14s, border-color 0.14s;
 }
 
 .durak-btn:hover:not(:disabled) {
-  transform: translate(-1px, -2px);
-  box-shadow: var(--shadow);
   background: var(--ink);
-  color: var(--card);
+  color: var(--paper);
+  border-color: var(--ink);
 }
 
 .durak-btn:disabled {
-  opacity: 0.3;
+  opacity: 0.28;
   cursor: default;
 }
 
 .durak-btn.primary {
-  background: var(--orange);
-  color: var(--card);
+  background: var(--red);
+  border-color: var(--red);
+  color: var(--ink);
 }
 
 .durak-btn.primary:hover:not(:disabled) {
-  background: var(--orange-deep);
-  color: var(--card);
+  background: var(--ink);
+  border-color: var(--ink);
+  color: var(--paper);
 }
 
 /* --- end-of-game stamp, still wordless --- */
@@ -307,21 +300,22 @@
   inset: 0;
   display: grid;
   place-items: center;
-  background: color-mix(in srgb, var(--paper) 86%, transparent);
+  background: color-mix(in srgb, var(--paper) 88%, transparent);
   z-index: 8;
   animation: rise 0.3s ease both;
 }
 
 .durak-stamp .mark {
-  border: 6px solid var(--orange);
-  color: var(--orange);
-  padding: 14px 30px;
-  transform: rotate(-9deg);
-  font-family: "Bricolage Grotesque", sans-serif;
+  border: 4px solid var(--red);
+  color: var(--red);
+  background: var(--paper);
+  padding: 16px 32px;
+  transform: rotate(-6deg);
+  font-family: var(--f-display);
+  font-weight: 800;
   font-size: 3.4rem;
   line-height: 1;
-  box-shadow: var(--shadow);
-  background: var(--card);
+  letter-spacing: -0.04em;
   display: flex;
   align-items: center;
   gap: 14px;

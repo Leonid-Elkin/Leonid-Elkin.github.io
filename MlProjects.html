@@ -7,11 +7,13 @@
     <title>Machine learning &middot; Leonid Elkin</title>
     <meta name="description"
         content="Machine learning work by Leonid Elkin: the elkwork MLP library, the neural scaling laws paper, and trained models." />
-    <link rel="icon" href="Images/Pig.png" />
+    <meta name="theme-color" content="#0a0a0a" />
+    <link rel="icon"
+        href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' fill='%230a0a0a'/%3E%3Crect x='7' y='7' width='18' height='18' fill='%23ff2d16'/%3E%3C/svg%3E" />
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
     <link rel="stylesheet"
-        href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,700;12..96,800&family=Instrument+Sans:ital,wght@0,400;0,500;0,600;1,400&family=JetBrains+Mono:wght@400;500&display=swap" />
+        href="https://fonts.googleapis.com/css2?family=Archivo:wght@500;600;700;800&family=Inter+Tight:wght@400;500;600&family=JetBrains+Mono:wght@400;500&display=swap" />
     <link rel="stylesheet" href="style.css" />
 </head>
 
@@ -33,22 +35,26 @@
         <section class="section">
             <div class="wrap">
                 <div class="section-head">
-                    <h1 class="display overprint" data-text="Machine learning"
-                        style="font-size: clamp(2rem, 5vw, 3.2rem);">Machine learning</h1>
+                    <span class="idx">Research &mdash;</span>
+                    <h1 class="display overprint" data-text="Machine learning">Machine learning</h1>
                     <a class="mono" href="https://pypi.org/project/elkwork/" target="_blank"
-                        rel="noopener">pip install elkwork &rarr;</a>
+                        rel="noopener">pip install elkwork</a>
                 </div>
-                <p class="setup">Download and extract a model, <code>pip install -r requirements.txt</code>, then
-                    <code>python main.py</code> to train or run inference. The paper below covers the rest.</p>
+                <p class="setup">Multilayer perceptrons written from scratch in NumPy, the paper that came out of
+                    running them at different sizes, and the weights they finished on. Download and extract a model,
+                    <code>pip install -r requirements.txt</code>, then <code>python main.py</code> to train or run
+                    inference. The paper below covers the rest.
+                </p>
             </div>
         </section>
 
         <section class="section">
             <div class="wrap">
                 <div class="section-head">
-                    <h2 class="display">Investigating neural scaling laws</h2>
-                    <a class="mono" href="Documentation/Investigating_neural_scaling_laws (9).pdf"
-                        download>download the PDF &rarr;</a>
+                    <span class="idx">01 &mdash;</span>
+                    <h2 class="display">Neural scaling laws</h2>
+                    <a class="mono" href="Documentation/Investigating_neural_scaling_laws (9).pdf" download>download
+                        the PDF</a>
                 </div>
                 <iframe class="pdf-frame" src="Documentation/Investigating_neural_scaling_laws (9).pdf"
                     title="Investigating neural scaling laws"></iframe>
@@ -58,7 +64,9 @@
         <section class="section">
             <div class="wrap">
                 <div class="section-head">
+                    <span class="idx">02 &mdash;</span>
                     <h2 class="display">Code</h2>
+                    <span class="aside mono">source and write-ups</span>
                 </div>
                 <div id="projects-container" class="ml-grid"></div>
             </div>
@@ -67,7 +75,9 @@
         <section class="section">
             <div class="wrap">
                 <div class="section-head">
+                    <span class="idx">03 &mdash;</span>
                     <h2 class="display">Trained models</h2>
+                    <span class="aside mono">test-set accuracy</span>
                 </div>
                 <ul id="models-list" class="model-list"></ul>
             </div>
@@ -76,13 +86,14 @@
 
     <footer id="contact">
         <div class="wrap">
+            <p class="col-label">Contact</p>
             <ul class="foot-links">
                 <li><a href="mailto:lnd.elkn@gmail.com">lnd.elkn@gmail.com</a></li>
                 <li><a href="https://github.com/Leonid-Elkin" target="_blank" rel="noopener">GitHub</a></li>
                 <li><a href="https://elkyy.itch.io/" target="_blank" rel="noopener">itch.io</a></li>
             </ul>
-            <span class="colophon">Two inks on newsprint. Bricolage Grotesque, Instrument Sans, JetBrains
-                Mono.</span>
+            <span class="colophon">Set in Archivo, Inter Tight and JetBrains Mono. Black stock, one red. No images
+                anywhere on this site &mdash; every mark is type or rule. Static HTML, no build step.</span>
         </div>
     </footer>
 

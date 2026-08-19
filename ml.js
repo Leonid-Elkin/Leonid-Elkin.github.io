@@ -7,23 +7,20 @@
 const projects = [
   {
     title: "MLP Library (elkwork)",
-    img: "Images/neurons.png",
     link: "MLP all documents (2).zip",
-    linkText: "📁 Download code",
+    linkText: "Download code",
     download: true,
   },
   {
     title: "Supplementary Research Program",
-    img: "Images/EfficiencyFrontier.png",
     link: "Documentation/Physics_investigation (2).pdf",
-    linkText: "📄 Research paper",
+    linkText: "Research paper",
     download: false,
   },
   {
     title: "Drawer Program",
-    img: "Images/DrawerExample.png",
     link: "Drawer_source.zip",
-    linkText: "📁 Download code",
+    linkText: "Download code",
     download: true,
   },
 ];
@@ -80,17 +77,15 @@ function createProjectBoxes() {
   const container = document.getElementById("projects-container");
   if (!container) return;
 
-  projects.forEach((project) => {
+  projects.forEach((project, i) => {
     const card = document.createElement("article");
     card.className = "ml-card";
 
-    const thumb = document.createElement("div");
-    thumb.className = "thumb duotone";
-    const img = document.createElement("img");
-    img.src = project.img;
-    img.alt = "";
-    img.loading = "lazy";
-    thumb.appendChild(img);
+    /* A running number, not a screenshot. The site carries no images. */
+    const plate = document.createElement("div");
+    plate.className = "plate";
+    plate.setAttribute("aria-hidden", "true");
+    plate.textContent = String(i + 1).padStart(2, "0");
 
     const body = document.createElement("div");
     body.className = "ml-card-body";
@@ -106,7 +101,7 @@ function createProjectBoxes() {
       })
     );
 
-    card.appendChild(thumb);
+    card.appendChild(plate);
     card.appendChild(body);
     container.appendChild(card);
   });
@@ -130,7 +125,7 @@ function createModelsList() {
     li.appendChild(name);
     li.appendChild(acc);
     li.appendChild(
-      buildLink(model.link, "⬇ Download", {
+      buildLink(model.link, "Download", {
         download: true,
         pending: model.pending,
       })
