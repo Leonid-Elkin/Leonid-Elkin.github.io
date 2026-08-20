@@ -111,25 +111,17 @@
     const far = document.createElementNS(NS, "g");
     buildRange(rnd, far, { top: 118, amp: 84, step: 96, base: "#1a1b20", lit: "#23252d", dark: "#131419" });
     svg.appendChild(far);
-    layers.push({ g: far, fy: 8, fx: -4 });
+    layers.push({ g: far, fy: 8, fx: 0 });
 
     const mid = document.createElementNS(NS, "g");
     buildRange(rnd, mid, { top: 186, amp: 76, step: 120, base: "#121317", lit: "#1a1c22", dark: "#0c0d11" });
     svg.appendChild(mid);
-    layers.push({ g: mid, fy: 22, fx: -11 });
+    layers.push({ g: mid, fy: 22, fx: 0 });
 
     const near = document.createElementNS(NS, "g");
-    const tris = buildRange(rnd, near, { top: 252, amp: 70, step: 150, base: "#0c0d10", lit: "#14161c", dark: "#060708" });
+    buildRange(rnd, near, { top: 252, amp: 70, step: 150, base: "#0c0d10", lit: "#14161c", dark: "#060708" });
     svg.appendChild(near);
-    layers.push({ g: near, fy: 40, fx: -19 });
-
-    /* the one red facet: a lit upward face on the near range, mid-left */
-    const ups = tris.filter((t) => t.up);
-    const chosen = ups[Math.floor(ups.length * 0.3)];
-    if (chosen && chosen.el) {
-      chosen.el.setAttribute("fill", "#ff2d16");
-      chosen.el.setAttribute("class", "facet-hot");
-    }
+    layers.push({ g: near, fy: 40, fx: 0 });
 
     if (old) old.replaceWith(svg);
     else band.insertBefore(svg, band.firstChild);
@@ -143,8 +135,9 @@
 
   if (still) return;
 
-  /* parallax: each range translates by its own factor of the band's travel
-     through the viewport, so the valley opens up as you scroll past it */
+  /* parallax, vertical only: each range rises and falls by its own factor
+     of the band's travel through the viewport, so depth comes from the
+     scroll direction the reader is actually moving in */
   let ticking = false;
   function apply() {
     const vh = window.innerHeight;

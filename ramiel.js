@@ -56,7 +56,7 @@
     return [v[0] / n, v[1] / n, v[2] / n];
   })();
 
-  const TILT = 0.42; /* the resting lean; scrolling leans him further */
+  const TILT = -0.18; /* resting view: slightly from above - never from below */
 
   function build(mount) {
     const size = parseInt(mount.dataset.size, 10) || mount.clientWidth || 96;
@@ -128,15 +128,13 @@
     let running = false;
     function loop(t) {
       if (!running) return;
-      /* time gives the idle turn; scroll adds spin on top, so the wheel
-         is also a hand on the solid */
-      const yaw = t / 4200 + (window.scrollY || 0) * 0.0016;
-      /* viewing angle: level with him you see his waist; scrolling past
-         looks increasingly down on (or up at) the octahedron */
+      /* the idle turn is time's alone; the scroll only changes the
+         VERTICAL viewing angle, easing between seen-from-above and level
+         as he moves through the viewport - never from underneath */
       const r = mount.getBoundingClientRect();
       const p = (r.top + r.height / 2 - innerHeight / 2) / innerHeight;
-      const tilt = Math.max(0.08, Math.min(0.95, TILT + p * 0.75));
-      pose(yaw, tilt);
+      const tilt = Math.max(-0.4, Math.min(0.08, TILT - p * 0.28));
+      pose(t / 4200, tilt);
       requestAnimationFrame(loop);
     }
     function start() {
