@@ -1129,10 +1129,11 @@ footer .col-label {
   50%      { opacity: 0.95; }
 }
 
-/* the visitor: a mount ramiel.js fills with a turning octahedron */
+/* The visitor: a mount ramiel.js fills with a turning octahedron.
+   Clickable on purpose - a click is what makes him fire. */
 .ramiel {
   display: block;
-  pointer-events: none;
+  cursor: crosshair;
   animation: ramiel-bob 9s ease-in-out infinite;
 }
 

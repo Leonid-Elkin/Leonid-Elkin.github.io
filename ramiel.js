@@ -12,11 +12,12 @@
  * bending the same mesh (an octahedron subdivided twice: 66 vertices, 128
  * faces), so he flows between bodies rather than swapping models.
  *
- * The firing sequence, on a long cycle: he stops spinning, comes about to
- * face LEFT, deforms into the cannon, his core appears at the centre and
- * splits in four as the charge peaks - then the beam fires from the core,
- * through the body, out across the country. Then he cools, closes, and
- * resumes his idle turn.
+ * Idle, he only turns and flows between his bodies. The firing sequence is
+ * yours to trigger: CLICK him and he stops spinning, comes about to face
+ * LEFT, deforms into the cannon, his core surfaces at the centre and splits
+ * in four as the charge peaks - then the beam fires from the core, through
+ * the body, out across the country. Then he cools, closes, and resumes the
+ * turn.
  *
  * Still no WebGL, no textures, no image files - arithmetic only. Under
  * prefers-reduced-motion he holds one octahedral pose and never fires.
@@ -123,9 +124,8 @@
   const HOLD = 3.2, MORPH = 1.6, PERIOD = HOLD + MORPH;
   const IDLE_TOTAL = FORMS.length * PERIOD;
 
-  /* the firing block, appended after each full idle cycle */
+  /* the firing block - entered only by a click */
   const ALIGN = 1.2, CHARGE = 1.8, FIRE = 1.05, COOL = 1.0;
-  const LOOP = IDLE_TOTAL + ALIGN + CHARGE + FIRE + COOL;
 
   const smooth = (t) => t * t * (3 - 2 * t);
   const lerpV = (a, b, t) => [
@@ -358,29 +358,43 @@
       return;
     }
 
-    /* dev hook: #fire starts the loop just before the firing block */
-    const T0 = location.hash === "#fire" ? (IDLE_TOTAL - 0.35) * 1000 : 0;
-
+    /* Two states, and only a click moves between them. Idle time and yaw
+       accumulate only while idle, so a shot never skips him ahead in his
+       own cycle - he resumes exactly the turn he left. */
     let running = false;
+    let firing = false;
+    let idleClock = 0;
+    let yaw = 0.66;
+    let fireT = 0;
     let yawAtAlign = 0;
+    let lastNow = null;
+
+    mount.addEventListener("click", () => {
+      if (firing || still) return;
+      firing = true;
+      fireT = 0;
+      yawAtAlign = yaw % (Math.PI * 2);
+    });
 
     function frame(now) {
       if (!running) return;
-      const t = ((now + T0) / 1000) % LOOP;
+      if (lastNow === null) lastNow = now;
+      const dt = Math.min((now - lastNow) / 1000, 0.05);
+      lastNow = now;
 
       const r = mount.getBoundingClientRect();
       const vp = (r.top + r.height / 2 - innerHeight / 2) / innerHeight;
       let tilt = Math.max(-0.4, Math.min(0.08, TILT - vp * 0.28));
 
-      if (t < IDLE_TOTAL) {
+      if (!firing) {
         /* idle: turning, flowing between the passive forms */
         mount.classList.remove("locked");
-        const idx = Math.floor(t / PERIOD);
-        const local = t - idx * PERIOD;
+        idleClock = (idleClock + dt) % IDLE_TOTAL;
+        yaw += dt / 4.2;
+        const idx = Math.floor(idleClock / PERIOD);
+        const local = idleClock - idx * PERIOD;
         const A = FORMS[idx], B = FORMS[(idx + 1) % FORMS.length];
         const mt = local < HOLD ? 0 : smooth((local - HOLD) / MORPH);
-        const yaw = ((now + T0) / 4200) % (Math.PI * 2);
-        yawAtAlign = yaw;
         pose(yaw, tilt, A, B, mt, 0, 0);
         setCore(0, 0);
         setBeam(false, 0);
@@ -388,7 +402,8 @@
       } else {
         /* the firing block: he stops, comes about to face left, and fires */
         mount.classList.add("locked");
-        const ft = t - IDLE_TOTAL;
+        fireT += dt;
+        const ft = fireT;
 
         if (ft < ALIGN) {
           const k = smooth(ft / ALIGN);
@@ -412,12 +427,19 @@
           setCore(1, 1);
           setBeam(true, k < 0.08 ? k / 0.08 : flicker);
           setGlow(1);
-        } else {
+        } else if (ft < ALIGN + CHARGE + FIRE + COOL) {
           const k = smooth((ft - ALIGN - CHARGE - FIRE) / COOL);
           pose(0, -0.12 * (1 - k) + tilt * k, fCannon, fOcta, k, 0, (1 - k) * 0.08);
           setCore(1 - k, 1 - k);
           setBeam(true, Math.max(0, 0.6 * (1 - k * 1.6)));
           setGlow(1 - k);
+        } else {
+          /* holstered: resume the turn from dead ahead */
+          firing = false;
+          yaw = 0;
+          setBeam(false, 0);
+          setCore(0, 0);
+          setGlow(0);
         }
       }
       requestAnimationFrame(frame);
@@ -426,6 +448,7 @@
     function start() {
       if (running) return;
       running = true;
+      lastNow = null;
       requestAnimationFrame(frame);
     }
     function stop() {
