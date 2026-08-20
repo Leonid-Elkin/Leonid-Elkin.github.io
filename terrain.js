@@ -75,6 +75,12 @@
     for (const t of tris) {
       const poly = document.createElementNS(NS, "polygon");
       poly.setAttribute("points", t.p.map((q) => q[0].toFixed(1) + "," + q[1].toFixed(1)).join(" "));
+      /* every facet edge drawn as a hairline of the page's own black, kept
+         at 1px whatever the band stretches to - the same line the rest of
+         the site rules with */
+      poly.setAttribute("stroke", "rgba(10, 10, 10, 0.75)");
+      poly.setAttribute("stroke-width", "1");
+      poly.setAttribute("vector-effect", "non-scaling-stroke");
       /* slope shading: rising-westward faces take the light */
       const s = Math.max(-1, Math.min(1, t.slope / 55));
       const grain = (rnd() - 0.5) * 0.16;
@@ -91,7 +97,9 @@
       foot.map((q) => q[0].toFixed(1) + "," + q[1].toFixed(1)).join(" ") +
         " " + (W + OVER) + "," + (H + OVER) + " " + -OVER + "," + (H + OVER)
     );
-    apron.setAttribute("fill", mix(base, dark, 0.45));
+    /* the apron resolves to the page itself, so the band's lower edge
+       dissolves instead of seaming */
+    apron.setAttribute("fill", opts.floor || mix(base, dark, 0.45));
     g.appendChild(apron);
 
     return tris;
@@ -121,7 +129,7 @@
     layers.push({ g: mid, fy: 22, fx: 0 });
 
     const near = document.createElementNS(NS, "g");
-    buildRange(rnd, near, { top: 252, amp: 70, step: 150, base: "#0c0d10", lit: "#14161c", dark: "#060708" });
+    buildRange(rnd, near, { top: 252, amp: 70, step: 150, base: "#0c0d10", lit: "#14161c", dark: "#060708", floor: "#0a0a0a" });
     svg.appendChild(near);
     layers.push({ g: near, fy: 40, fx: 0 });
 

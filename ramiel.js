@@ -69,6 +69,11 @@
     svg.setAttribute("shape-rendering", "geometricPrecision");
     const polys = F.map(() => {
       const p = document.createElementNS(ns, "polygon");
+      /* every facet edge is drawn: a fine line in the deepest cobalt, so
+         adjacent faces separate cleanly however the light sits */
+      p.setAttribute("stroke", "#081840");
+      p.setAttribute("stroke-width", "0.9");
+      p.setAttribute("stroke-linejoin", "round");
       svg.appendChild(p);
       return p;
     });
