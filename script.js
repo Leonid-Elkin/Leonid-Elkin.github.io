@@ -332,12 +332,28 @@ function plate(n, p) {
   return box;
 }
 
+/* the drawn vignette, or the honest hatched slot when there is none */
+function previewEl(p) {
+  const box = el("div", "pv");
+  const svg = window.projectPreview && window.projectPreview(p.title);
+  if (svg) box.innerHTML = svg;
+  else box.classList.add("pv-empty");
+  box.setAttribute("aria-hidden", "true");
+  return box;
+}
+
+/* first real destination a card can take you to */
+function primaryLink(p) {
+  return (p.links || []).find((l) => l.url && !l.pending) || null;
+}
+
 function projectCard(p, i) {
   const card = el("article", "project-card");
   card.dataset.cat = p.cat;
   if (p.featured) card.classList.add("featured");
 
   card.appendChild(plate(i + 1, p));
+  card.appendChild(previewEl(p));
 
   const body = el("div", "project-body");
   const top = el("div", "top");
@@ -358,11 +374,27 @@ function projectCard(p, i) {
 
   card.appendChild(body);
 
-  /* Links are a sibling of the body, not a child: the entry is a three-column
-     grid (number | text | links) and the links column is flush right. */
+  /* Links are a sibling of the body, not a child: the entry is a grid
+     (number | preview | text | links) and the links column is flush right. */
   const links = el("div", "links");
   p.links.forEach((l) => links.appendChild(linkEl(l)));
   card.appendChild(links);
+
+  /* The whole entry is the door, not just the small link: a cover anchor
+     stretches over the card, pointing where the first real link points.
+     The individual links sit above it and still work on their own. */
+  const first = primaryLink(p);
+  if (first) {
+    const cover = el("a", "card-cover");
+    cover.href = first.url;
+    if (isExternal(first.url)) {
+      cover.target = "_blank";
+      cover.rel = "noopener";
+    }
+    cover.setAttribute("aria-label", p.title + " — " + first.name);
+    card.appendChild(cover);
+    card.classList.add("has-cover");
+  }
 
   return card;
 }
@@ -414,6 +446,7 @@ function initSelected() {
   projects.slice(0, 3).forEach((p, i) => {
     const row = el("article", "select-row");
     row.appendChild(plate(i + 1, p));
+    row.appendChild(previewEl(p));
 
     const body = el("div", "project-body");
     const top = el("div", "top");
@@ -429,6 +462,16 @@ function initSelected() {
     const links = el("div", "links");
     links.appendChild(linkEl(p.links[0]));
     row.appendChild(links);
+
+    const first = primaryLink(p);
+    if (first) {
+      const cover = el("a", "card-cover");
+      cover.href = first.url;
+      if (isExternal(first.url)) { cover.target = "_blank"; cover.rel = "noopener"; }
+      cover.setAttribute("aria-label", p.title + " — " + first.name);
+      row.appendChild(cover);
+      row.classList.add("has-cover");
+    }
 
     root.appendChild(row);
   });

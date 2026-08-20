@@ -82,22 +82,25 @@
 
     window.addEventListener("resize", place);
 
+    /* The board is a drawer now: it slides in beside the page rather than
+       replacing it, and the page keeps scrolling underneath. */
     function openPanel() {
       if (!panel) return;
       panel.hidden = false;
       egg.hidden = true;
-      /* durak.js exposes this; the board builds itself the first time only. */
       if (typeof window.startDurak === "function") window.startDurak();
-      document.body.style.overflow = "hidden";
+      requestAnimationFrame(() => panel.classList.add("open"));
       if (closeBtn) closeBtn.focus();
     }
 
     function closePanel() {
       if (!panel) return;
-      panel.hidden = true;
-      egg.hidden = false;
-      document.body.style.overflow = "";
-      egg.focus();
+      panel.classList.remove("open");
+      setTimeout(() => {
+        panel.hidden = true;
+        egg.hidden = false;
+        egg.focus();
+      }, 400);
     }
 
     egg.addEventListener("click", () => {
@@ -117,13 +120,6 @@
     document.addEventListener("keydown", (e) => {
       if (e.key === "Escape" && panel && !panel.hidden) closePanel();
     });
-
-    /* Clicking the backdrop, but not the board itself, closes it. */
-    if (panel) {
-      panel.addEventListener("click", (e) => {
-        if (e.target === panel) closePanel();
-      });
-    }
 
     setDealt(false);
   }
