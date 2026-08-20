@@ -64,6 +64,24 @@
     setTimeout(() => arm(document), 120);
   }
 
+  /* the reading-progress hairline over the masthead */
+  const bar = document.querySelector(".progress");
+  if (bar) {
+    let ticking = false;
+    const set = () => {
+      const max = document.documentElement.scrollHeight - innerHeight;
+      bar.style.transform = "scaleX(" + (max > 0 ? Math.min(scrollY / max, 1) : 0) + ")";
+      ticking = false;
+    };
+    addEventListener("scroll", () => {
+      if (!ticking) {
+        ticking = true;
+        requestAnimationFrame(set);
+      }
+    }, { passive: true });
+    set();
+  }
+
   if (document.readyState === "loading") {
     document.addEventListener("DOMContentLoaded", start);
   } else {
