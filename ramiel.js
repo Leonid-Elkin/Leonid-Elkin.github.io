@@ -6,9 +6,11 @@
  * he does not shake:
  *
  *   1. The turn decays and he comes about to face LEFT.
- *   2. The body stretches toward the target into a long spindle.
- *   3. The spindle SPLITS into five prolonged octahedrons that part
- *      radially, exposing the red core at the centre.
+ *   2. Only the front - the bit facing the firing line - extends.
+ *   3. The body SPLITS into five prolonged octahedrons that PIVOT about
+ *      a point near the tail, so the noses fan open toward the target
+ *      while the back stays gathered and roughly octahedral, exposing
+ *      the red core at the centre.
  *   4. The beam fires from the core, out across the country.
  *   5. The petals close, merge, and the octahedron resumes its turn.
  *
@@ -109,8 +111,14 @@
 
   const smooth = (t) => t * t * (3 - 2 * t);
 
-  /* the prolonged petal: stretched along the beam axis, thinned across it */
-  const STRETCH_X = 1.78, THIN_YZ = 0.54, SPREAD = 0.52;
+  /* The prolonged petal. Only vertices AHEAD of centre stretch - the tail
+     keeps its octahedral extent - and the thinning tapers toward the nose,
+     so the rear half stays full-bodied. The split is a PIVOT: each petal
+     rotates about a point near the tail, fanning the noses apart. */
+  const STRETCH_X = 1.8;   /* how far the nose reaches */
+  const THIN_YZ = 0.5;     /* nose cross-section at full stretch */
+  const FAN = 0.4;         /* radians of pivot at full spread */
+  const PIVOT_X = 0.85;    /* the hinge, just short of the tail tip */
 
   /* ================= glass shading ================= */
 
@@ -274,21 +282,34 @@
       renderScene(MAIN.V, MAIN.F, MAIN.E, yaw, tilt);
     }
 
-    /* the five petals: stretch 0..1 prolongs them in place; spread 0..1
-       parts their centres radially, exposing the core */
+    /* the five petals: stretch 0..1 extends the noses in place; spread
+       0..1 pivots each petal about the tail hinge, fanning the front open
+       while the back stays gathered */
     const petalModel = PSCENE.V.map(() => [0, 0, 0]);
     function drawPetals(stretch, spread, tilt) {
       const sx = 1 + (STRETCH_X - 1) * stretch;
-      const syz = 1 + (THIN_YZ - 1) * stretch;
-      const r = SPREAD * spread;
+      const phi = FAN * spread;
+      const cph = Math.cos(phi), sph = Math.sin(phi);
       for (let k = 0; k < PETALS; k++) {
-        const dir = PETAL_DIR[k];
+        const dy = PETAL_DIR[k][1], dz = PETAL_DIR[k][2];
         for (let i = 0; i < 6; i++) {
           const v = OCTA_V[i];
+          /* only the front extends; thinning tapers toward the nose */
+          const x = v[0] < 0 ? v[0] * sx : v[0];
+          const nose = Math.max(0, -v[0]);
+          const syz = 1 - (1 - THIN_YZ) * stretch * nose;
+          const y = v[1] * syz, z = v[2] * syz;
+          /* pivot in the (x, d) plane about the tail hinge: the nose
+             (ahead of the hinge) swings outward along +d */
+          const b = y * dy + z * dz;       /* component along the petal's d */
+          const c = -y * dz + z * dy;      /* component across it */
+          const u = x - PIVOT_X;
+          const u2 = u * cph + b * sph;
+          const b2 = -u * sph + b * cph;
           const m = petalModel[k * 6 + i];
-          m[0] = v[0] * sx;
-          m[1] = v[1] * syz + dir[1] * r;
-          m[2] = v[2] * syz + dir[2] * r;
+          m[0] = u2 + PIVOT_X;
+          m[1] = b2 * dy - c * dz;
+          m[2] = b2 * dz + c * dy;
         }
       }
       renderScene(petalModel, PSCENE.F, PSCENE.E, 0, tilt);
