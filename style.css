@@ -1050,7 +1050,7 @@ footer .col-label {
 .facet-band {
   display: block;
   width: 100%;
-  height: clamp(110px, 16vw, 210px);
+  height: clamp(190px, 26vw, 360px);
   border-top: 1px solid var(--rule);
   border-bottom: 1px solid var(--rule);
 }
@@ -1081,13 +1081,16 @@ footer .col-label {
   50%      { transform: translateY(-12px); }
 }
 
-.facet-band .ramiel,
-.hero-band-ramiel {
+.facet-band .ramiel {
   position: absolute;
-  right: 12%;
-  bottom: 34px;
+  right: 9%;
+  bottom: 30%;
   z-index: 2;
+  width: clamp(150px, 20vw, 300px);
 }
+
+/* the stylesheet owns the on-screen size; the svg scales to its mount */
+.ramiel svg { width: 100%; height: auto; }
 
 .facet-band { position: relative; }
 

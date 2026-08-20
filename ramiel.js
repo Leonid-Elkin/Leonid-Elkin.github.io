@@ -30,9 +30,24 @@
     [3, 4, 0], [3, 1, 4], [3, 5, 1], [3, 0, 5],
   ];
 
-  /* cobalt ramp, dark to lit - flat fills, hard facet edges, like the rest
-     of the site's polygons */
-  const RAMP = ["#0a1d4a", "#10306e", "#1a4494", "#2458c2", "#3f79e8", "#6ea3ff"];
+  /* Continuous cobalt shading: each face's brightness interpolates through
+     dark -> mid -> lit rather than snapping between a handful of swatches,
+     so the light rolls over the solid instead of popping. A touch of
+     ambient keeps the darkest faces navy rather than void. */
+  const DARK = [8, 24, 64];      /* #081840 */
+  const MID  = [36, 88, 194];    /* #2458c2 */
+  const LIT  = [126, 176, 255];  /* #7eb0ff */
+
+  function shade(lit) {
+    const t = Math.pow(0.12 + 0.88 * lit, 0.9);
+    let a, b, k;
+    if (t < 0.55) { a = DARK; b = MID; k = t / 0.55; }
+    else { a = MID; b = LIT; k = (t - 0.55) / 0.45; }
+    const r = Math.round(a[0] + (b[0] - a[0]) * k);
+    const g = Math.round(a[1] + (b[1] - a[1]) * k);
+    const bl = Math.round(a[2] + (b[2] - a[2]) * k);
+    return "rgb(" + r + "," + g + "," + bl + ")";
+  }
 
   /* light from upper left, toward the viewer */
   const L = (() => {
@@ -45,12 +60,13 @@
 
   function build(mount) {
     const size = parseInt(mount.dataset.size, 10) || mount.clientWidth || 96;
+    /* width/height attributes are a fallback; stylesheet widths win */
     const ns = "http://www.w3.org/2000/svg";
     const svg = document.createElementNS(ns, "svg");
     svg.setAttribute("width", size);
     svg.setAttribute("height", size);
     svg.setAttribute("viewBox", "0 0 100 100");
-    svg.setAttribute("shape-rendering", "crispEdges");
+    svg.setAttribute("shape-rendering", "geometricPrecision");
     const polys = F.map(() => {
       const p = document.createElementNS(ns, "polygon");
       svg.appendChild(p);
@@ -95,8 +111,7 @@
           continue;
         }
         const lit = Math.max(0, nx * L[0] + ny * L[1] + nz * L[2]);
-        const shade = RAMP[Math.min(RAMP.length - 1, Math.floor(lit * RAMP.length))];
-        p.setAttribute("fill", shade);
+        p.setAttribute("fill", shade(lit));
         p.setAttribute(
           "points",
           [a, b, c].map(([x, y]) => (50 + x * 42) + "," + (50 - y * 42)).join(" ")
