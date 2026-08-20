@@ -1110,23 +1110,6 @@ footer .col-label {
   .ramiel { animation: none; }
 }
 
-/* shards: small drifting fragments pinned inside a section */
-.shard {
-  position: absolute;
-  pointer-events: none;
-  z-index: 0;
-}
-
-.shard svg { display: block; }
-
-.shard.s1 { animation: shard-drift 26s ease-in-out infinite; }
-.shard.s2 { animation: shard-drift 34s ease-in-out infinite reverse; }
-
-@keyframes shard-drift {
-  0%, 100% { transform: translateY(0) rotate(0deg); }
-  50%      { transform: translateY(-14px) rotate(4deg); }
-}
-
 /* ---------- the cluster band ---------- */
 
 /* The N-body simulation from the globular-cluster paper, running live.
@@ -1221,7 +1204,7 @@ footer .col-label {
 .misprint .overprint::before { animation: none; }
 
 @media (prefers-reduced-motion: reduce) {
-  .facet-hot, .shard.s1, .shard.s2 { animation: none !important; }
+  .facet-hot { animation: none !important; }
 }
 
 /* ---------- misprint mode (the Konami code) ----------
