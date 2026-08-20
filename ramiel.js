@@ -1,22 +1,33 @@
-/* The visitor. Maximum effort.
+/* The visitor.
  *
- * Passive, he is what he is in the show: a featureless, glassy, deep-blue
- * octahedron - so flat faces carry NO drawn lines. Edges are detected per
- * frame instead: a line is drawn only where two faces meet at a real crease
- * or along the silhouette, and it is drawn in pale luminous blue, never
- * black, which is what gives him the lit-from-within glass look.
+ * Idle, he is the octahedron, turning. Nothing more.
  *
- * He has exactly two bodies. Idle, he is the octahedron, turning, nothing
- * more. CLICK him and he becomes the other one: he stops, comes about to
- * face LEFT, opens into the cannon, his core surfaces at the centre and
- * splits in four as the charge peaks - then the beam fires from the core,
- * through the body, out across the country. Then he cools, closes, and
- * resumes the turn. Both bodies are the same mesh (an octahedron subdivided
- * twice - 66 vertices, 128 faces) with its vertices bent, so the change is
- * continuous arithmetic, not a model swap.
+ * CLICK him and the film's firing sequence runs, still and deliberate -
+ * he does not shake:
  *
- * Still no WebGL, no textures, no image files - arithmetic only. Under
- * prefers-reduced-motion he holds one octahedral pose and never fires.
+ *   1. The turn decays and he comes about to face LEFT.
+ *   2. The body stretches toward the target into a long spindle.
+ *   3. The spindle SPLITS into five prolonged octahedrons that part
+ *      radially, exposing the red core at the centre.
+ *   4. The beam fires from the core, out across the country.
+ *   5. The petals close, merge, and the octahedron resumes its turn.
+ *
+ * The trick that keeps the split honest: from the moment the stretch
+ * begins, the body is ALREADY five coincident octahedrons. Coincident,
+ * they render as one solid to the pixel; stretching is all five
+ * elongating in place, and the split is only their centres parting. No
+ * crossfade, no model swap, no seam.
+ *
+ * Flat faces carry no drawn lines: edges are detected per frame and drawn
+ * only along silhouettes and true creases, in pale luminous blue. Faces
+ * are stroked in their own fill to close antialiasing seams. All of it is
+ * arithmetic in an SVG - no WebGL, no textures, no image files.
+ *
+ * Every phase is a pure function of absolute elapsed time, never of frame
+ * deltas, so a throttled or coalesced frame schedule cannot stall the
+ * sequence - the delta-integrated version demonstrably could.
+ *
+ * Under prefers-reduced-motion he holds one octahedral pose, unprovokable.
  */
 
 (function () {
@@ -26,92 +37,95 @@
   const still = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
   const NS = "http://www.w3.org/2000/svg";
 
-  /* ================= mesh: octahedron, subdivided twice ================= */
+  /* ================= meshes ================= */
 
-  let VERTS = [
+  const OCTA_V = [
     [1, 0, 0], [-1, 0, 0],
     [0, 1, 0], [0, -1, 0],
     [0, 0, 1], [0, 0, -1],
   ];
-  let FACES = [
+  const OCTA_F = [
     [2, 0, 4], [2, 4, 1], [2, 1, 5], [2, 5, 0],
     [3, 4, 0], [3, 1, 4], [3, 5, 1], [3, 0, 5],
   ];
 
-  function subdivide() {
-    const mid = {};
-    const nf = [];
-    const midpoint = (a, b) => {
-      const key = a < b ? a + "_" + b : b + "_" + a;
-      if (key in mid) return mid[key];
-      const va = VERTS[a], vb = VERTS[b];
-      VERTS.push([(va[0] + vb[0]) / 2, (va[1] + vb[1]) / 2, (va[2] + vb[2]) / 2]);
-      return (mid[key] = VERTS.length - 1);
-    };
-    for (const [a, b, c] of FACES) {
-      const ab = midpoint(a, b), bc = midpoint(b, c), ca = midpoint(c, a);
-      nf.push([a, ab, ca], [b, bc, ab], [c, ca, bc], [ab, bc, ca]);
+  /* the idle body: subdivided twice for a fine silhouette */
+  function subdivided(verts, faces, times) {
+    let V = verts.map((v) => v.slice());
+    let F = faces.map((f) => f.slice());
+    for (let s = 0; s < times; s++) {
+      const mid = {};
+      const nf = [];
+      const midpoint = (a, b) => {
+        const key = a < b ? a + "_" + b : b + "_" + a;
+        if (key in mid) return mid[key];
+        const va = V[a], vb = V[b];
+        V.push([(va[0] + vb[0]) / 2, (va[1] + vb[1]) / 2, (va[2] + vb[2]) / 2]);
+        return (mid[key] = V.length - 1);
+      };
+      for (const [a, b, c] of F) {
+        const ab = midpoint(a, b), bc = midpoint(b, c), ca = midpoint(c, a);
+        nf.push([a, ab, ca], [b, bc, ab], [c, ca, bc], [ab, bc, ca]);
+      }
+      F = nf;
     }
-    FACES = nf;
+    return { V, F };
   }
-  subdivide();
-  subdivide(); /* 66 vertices, 128 faces */
 
-  /* edge -> the two faces that share it, for crease/silhouette detection */
-  const EDGES = (() => {
+  function edgesOf(F) {
     const map = {};
-    FACES.forEach((f, fi) => {
+    F.forEach((f, fi) => {
       for (let k = 0; k < 3; k++) {
         const a = f[k], b = f[(k + 1) % 3];
         const key = a < b ? a + "_" + b : b + "_" + a;
         (map[key] = map[key] || { a, b, f: [] }).f.push(fi);
       }
     });
-    return Object.values(map);
-  })();
-
-  /* ================= the forms =================
-     Each form bends a base vertex [x,y,z] (octahedron surface, |x|+|y|+|z|=1)
-     into a new position. Sources: passive octahedron; the Rebuild attack
-     bodies - needle ring, drill, hexagonal pyramid - and the firing cannon,
-     which opens toward -x (screen left, once he has come about). */
-
-  function fOcta(v) { return v; }
-
-  /* the cannon, opening toward -x: flared crown behind, barrel ahead */
-  function fCannon(v) {
-    let [x, y, z] = v;
-    if (x > 0) return [x * 1.12 + 0.16, y * 1.32, z * 1.32];
-    return [x * 1.3, y * 0.48, z * 0.48];
+    return Object.values(map).filter((e) => e.f.length === 2);
   }
 
-  /* the firing block - entered only by a click */
-  const ALIGN = 1.7, CHARGE = 1.8, FIRE = 1.05, COOL = 1.0;
+  const MAIN = subdivided(OCTA_V, OCTA_F, 2);
+  MAIN.E = edgesOf(MAIN.F);
+
+  /* the petal scene: five octahedrons in one topology. Petal k owns
+     vertices [k*6, k*6+6); its parting direction around the beam axis is
+     fixed at build time. */
+  const PETALS = 5;
+  const PETAL_DIR = [];
+  const PSCENE = { V: [], F: [] };
+  for (let k = 0; k < PETALS; k++) {
+    const th = Math.PI / 2 + (k * 2 * Math.PI) / PETALS;
+    PETAL_DIR.push([0, Math.cos(th), Math.sin(th)]);
+    for (const v of OCTA_V) PSCENE.V.push(v.slice());
+    for (const f of OCTA_F) PSCENE.F.push([f[0] + k * 6, f[1] + k * 6, f[2] + k * 6]);
+  }
+  PSCENE.E = edgesOf(PSCENE.F);
+
+  /* ================= timing ================= */
+
   const SPIN = 1 / 4.2; /* idle angular velocity, rad/s */
+  const ALIGN = 1.7, STRETCH = 0.9, SPLIT = 1.0, FIRE = 1.05, CLOSE = 1.2;
+  const T1 = ALIGN, T2 = T1 + STRETCH, T3 = T2 + SPLIT, T4 = T3 + FIRE, T5 = T4 + CLOSE;
 
   const smooth = (t) => t * t * (3 - 2 * t);
-  const lerpV = (a, b, t) => [
-    a[0] + (b[0] - a[0]) * t,
-    a[1] + (b[1] - a[1]) * t,
-    a[2] + (b[2] - a[2]) * t,
-  ];
+
+  /* the prolonged petal: stretched along the beam axis, thinned across it */
+  const STRETCH_X = 1.78, THIN_YZ = 0.54, SPREAD = 0.52;
 
   /* ================= glass shading ================= */
 
-  const DEEP = [7, 22, 66];      /* the body of the glass */
-  const MID  = [30, 82, 196];
+  const DEEP = [7, 22, 66];
+  const MIDC = [30, 82, 196];
   const LITC = [132, 182, 255];
-  const SHEEN = [214, 232, 255]; /* the mirror catch */
+  const SHEEN = [214, 232, 255];
 
   function shade(diffuse, fresnel) {
-    /* diffuse light plus a fresnel rim - faces edge-on to the viewer go
-       pale, which is what sells translucency without transparency */
     let t = Math.pow(0.10 + 0.90 * diffuse, 0.95) + fresnel * 0.30;
     t = Math.min(1.18, t);
     let a, b, k;
-    if (t < 0.5)      { a = DEEP; b = MID;   k = t / 0.5; }
-    else if (t < 0.95) { a = MID;  b = LITC;  k = (t - 0.5) / 0.45; }
-    else              { a = LITC; b = SHEEN; k = Math.min(1, (t - 0.95) / 0.23); }
+    if (t < 0.5)       { a = DEEP; b = MIDC;  k = t / 0.5; }
+    else if (t < 0.95) { a = MIDC; b = LITC;  k = (t - 0.5) / 0.45; }
+    else               { a = LITC; b = SHEEN; k = Math.min(1, (t - 0.95) / 0.23); }
     return "rgb(" +
       Math.round(a[0] + (b[0] - a[0]) * k) + "," +
       Math.round(a[1] + (b[1] - a[1]) * k) + "," +
@@ -125,7 +139,8 @@
   })();
 
   const TILT = -0.18;
-  const SC = 27; /* mesh scale inside the 100-unit viewBox */
+  const FIRE_TILT = -0.12;
+  const SC = 27;
 
   /* ================= per-mount ================= */
 
@@ -138,17 +153,17 @@
     svg.setAttribute("shape-rendering", "geometricPrecision");
     svg.style.filter = "drop-shadow(0 0 16px rgba(100, 150, 255, 0.22))";
 
-    const polys = FACES.map(() => {
+    /* one polygon pool serves both scenes */
+    const POOL = Math.max(MAIN.F.length, PSCENE.F.length);
+    const polys = [];
+    for (let i = 0; i < POOL; i++) {
       const p = document.createElementNS(NS, "polygon");
-      /* stroked in its own fill colour: this closes the antialiasing seams
-         between coplanar neighbours without drawing a visible line */
       p.setAttribute("stroke-width", "0.5");
       p.setAttribute("stroke-linejoin", "round");
       svg.appendChild(p);
-      return p;
-    });
+      polys.push(p);
+    }
 
-    /* one path carries every lit edge; no polygon carries a stroke */
     const edgePath = document.createElementNS(NS, "path");
     edgePath.setAttribute("fill", "none");
     edgePath.setAttribute("stroke", "#bcd6ff");
@@ -157,22 +172,20 @@
     edgePath.setAttribute("stroke-linecap", "round");
     svg.appendChild(edgePath);
 
-    /* the core: invisible until the charge calls it up; splits in four at
-       the peak, as it does in Rebuild */
-    const core = [0, 1, 2, 3].map(() => {
-      const c = document.createElementNS(NS, "circle");
-      c.setAttribute("fill", "#ffd7ef");
-      c.setAttribute("r", "0");
+    /* the core: RED - the site's own red, with a hot centre */
+    const coreOuter = document.createElementNS(NS, "circle");
+    coreOuter.setAttribute("fill", "#ff2d16");
+    const coreInner = document.createElementNS(NS, "circle");
+    coreInner.setAttribute("fill", "#ffb3a0");
+    [coreOuter, coreInner].forEach((c) => {
       c.setAttribute("cx", "50");
       c.setAttribute("cy", "50");
+      c.setAttribute("r", "0");
       svg.appendChild(c);
-      return c;
     });
 
     mount.appendChild(svg);
 
-    /* the beam lives in the band, behind the body, so it reads as fired
-       from the core THROUGH the face */
     const band = mount.closest(".facet-band");
     let beam = null, muzzle = null;
     if (band) {
@@ -183,27 +196,25 @@
       band.append(beam, muzzle);
     }
 
-    const scratch = new Array(VERTS.length);
-    const normals = new Array(FACES.length);
-    const depths = new Array(FACES.length);
+    const scratch = [];
+    const normals = [];
+    const depths = [];
 
-    function pose(yaw, tilt, morphA, morphB, morphT, jitter, recoil) {
+    /* project a prepared model-space vertex list and paint it */
+    function renderScene(model, faces, edges, yaw, tilt) {
       const ct = Math.cos(tilt), st = Math.sin(tilt);
       const cy = Math.cos(yaw), sy = Math.sin(yaw);
 
-      for (let i = 0; i < VERTS.length; i++) {
-        const bent = morphT <= 0 ? morphA(VERTS[i])
-          : morphT >= 1 ? morphB(VERTS[i])
-          : lerpV(morphA(VERTS[i]), morphB(VERTS[i]), morphT);
-        const x = bent[0], y = bent[1], z = bent[2];
+      for (let i = 0; i < model.length; i++) {
+        const x = model[i][0], y = model[i][1], z = model[i][2];
         const x1 = x * cy + z * sy;
         const z1 = -x * sy + z * cy;
-        scratch[i] = [x1 + recoil, y * ct - z1 * st, y * st + z1 * ct];
+        scratch[i] = [x1, y * ct - z1 * st, y * st + z1 * ct];
       }
 
       const order = [];
-      for (let fi = 0; fi < FACES.length; fi++) {
-        const [ia, ib, ic] = FACES[fi];
+      for (let fi = 0; fi < faces.length; fi++) {
+        const [ia, ib, ic] = faces[fi];
         const a = scratch[ia], b = scratch[ib], c = scratch[ic];
         const ux = b[0] - a[0], uy = b[1] - a[1], uz = b[2] - a[2];
         const vx = c[0] - a[0], vy = c[1] - a[1], vz = c[2] - a[2];
@@ -217,70 +228,75 @@
       }
       order.sort((p, q) => depths[p] - depths[q]);
 
+      let used = 0;
       for (const fi of order) {
         const n = normals[fi];
-        const p = polys[fi];
-        if (n[2] <= 0) {
-          p.setAttribute("points", "");
-          continue;
-        }
+        if (n[2] <= 0) continue;
+        const p = polys[used++];
         const diffuse = Math.max(0, n[0] * L[0] + n[1] * L[1] + n[2] * L[2]);
-        const fresnel = 1 - n[2];
-        const col = shade(diffuse, fresnel);
+        const col = shade(diffuse, 1 - n[2]);
         p.setAttribute("fill", col);
         p.setAttribute("stroke", col);
-        const [ia, ib, ic] = FACES[fi];
+        const [ia, ib, ic] = faces[fi];
         p.setAttribute(
           "points",
           [scratch[ia], scratch[ib], scratch[ic]]
-            .map(([x, y]) => (50 + jitter + x * SC).toFixed(2) + "," + (50 - y * SC).toFixed(2))
+            .map(([x, y]) => (50 + x * SC).toFixed(2) + "," + (50 - y * SC).toFixed(2))
             .join(" ")
         );
         svg.appendChild(p);
       }
-      /* the core and the edges paint over the faces */
-      core.forEach((c) => svg.appendChild(c));
+      for (let i = used; i < POOL; i++) polys[i].setAttribute("points", "");
+      svg.appendChild(coreOuter);
+      svg.appendChild(coreInner);
       svg.appendChild(edgePath);
 
-      /* edges: silhouette, and true creases only - a flat face shows nothing */
       let d = "";
-      for (const e of EDGES) {
+      for (const e of edges) {
         const [f1, f2] = e.f;
         const front1 = normals[f1][2] > 0, front2 = normals[f2][2] > 0;
         let draw = false;
-        if (front1 !== front2) draw = true; /* silhouette */
+        if (front1 !== front2) draw = true;
         else if (front1 && front2) {
           const n1 = normals[f1], n2 = normals[f2];
-          const dot = n1[0] * n2[0] + n1[1] * n2[1] + n1[2] * n2[2];
-          if (dot < 0.995) draw = true;     /* a real crease */
+          if (n1[0] * n2[0] + n1[1] * n2[1] + n1[2] * n2[2] < 0.995) draw = true;
         }
         if (draw) {
           const A = scratch[e.a], B = scratch[e.b];
-          d += "M" + (50 + jitter + A[0] * SC).toFixed(2) + " " + (50 - A[1] * SC).toFixed(2) +
-               "L" + (50 + jitter + B[0] * SC).toFixed(2) + " " + (50 - B[1] * SC).toFixed(2);
+          d += "M" + (50 + A[0] * SC).toFixed(2) + " " + (50 - A[1] * SC).toFixed(2) +
+               "L" + (50 + B[0] * SC).toFixed(2) + " " + (50 - B[1] * SC).toFixed(2);
         }
       }
       edgePath.setAttribute("d", d);
     }
 
-    /* ---------- core + beam dressing ---------- */
+    function drawMain(yaw, tilt) {
+      renderScene(MAIN.V, MAIN.F, MAIN.E, yaw, tilt);
+    }
 
-    function setCore(strength, split) {
-      /* strength 0..1; split 0..1 spreads the four fragments */
-      const r = 3.4 * strength;
-      const off = 4.6 * split;
-      const at = [[-off, 0], [off, 0], [0, -off], [0, off]];
-      core.forEach((c, i) => {
-        c.setAttribute("r", (i === 0 || split > 0 ? r * (split > 0 ? 0.62 : 1) : 0).toFixed(2));
-        c.setAttribute("cx", (50 + at[i][0]).toFixed(2));
-        c.setAttribute("cy", (50 + at[i][1]).toFixed(2));
-        c.setAttribute("fill-opacity", String(0.25 + 0.75 * strength));
-      });
-      if (split === 0) {
-        core[1].setAttribute("r", "0");
-        core[2].setAttribute("r", "0");
-        core[3].setAttribute("r", "0");
+    /* the five petals: stretch 0..1 prolongs them in place; spread 0..1
+       parts their centres radially, exposing the core */
+    const petalModel = PSCENE.V.map(() => [0, 0, 0]);
+    function drawPetals(stretch, spread, tilt) {
+      const sx = 1 + (STRETCH_X - 1) * stretch;
+      const syz = 1 + (THIN_YZ - 1) * stretch;
+      const r = SPREAD * spread;
+      for (let k = 0; k < PETALS; k++) {
+        const dir = PETAL_DIR[k];
+        for (let i = 0; i < 6; i++) {
+          const v = OCTA_V[i];
+          const m = petalModel[k * 6 + i];
+          m[0] = v[0] * sx;
+          m[1] = v[1] * syz + dir[1] * r;
+          m[2] = v[2] * syz + dir[2] * r;
+        }
       }
+      renderScene(petalModel, PSCENE.F, PSCENE.E, 0, tilt);
+    }
+
+    function setCore(k) {
+      coreOuter.setAttribute("r", (3.6 * k).toFixed(2));
+      coreInner.setAttribute("r", (1.5 * k).toFixed(2));
     }
 
     function setBeam(on, intensity) {
@@ -297,7 +313,8 @@
       beam.style.width = Math.max(0, cx) + "px";
       beam.style.top = cyy - 2 + "px";
       beam.style.opacity = String(intensity);
-      muzzle.style.left = cx - mr.width * 0.34 + "px";
+      /* the flash sits on the core - the beam is fired FROM it */
+      muzzle.style.left = cx + "px";
       muzzle.style.top = cyy + "px";
       muzzle.style.opacity = String(intensity);
       muzzle.style.transform =
@@ -305,7 +322,6 @@
     }
 
     function setGlow(k) {
-      /* k 0 = idle, 1 = full charge */
       const blur = 16 + 26 * k;
       const a = 0.22 + 0.45 * k;
       svg.style.filter =
@@ -316,25 +332,20 @@
     /* ---------- the clock ---------- */
 
     if (still) {
-      pose(0.66, TILT, fOcta, fOcta, 0, 0, 0);
+      drawMain(0.66, TILT);
       return;
     }
 
-    /* Two states, and only a click moves between them. Every phase is a
-       pure function of ABSOLUTE elapsed time - never of frame deltas - so
-       the sequence runs to completion at the same pace whether the browser
-       gives it 120 frames a second or three: a coalesced or throttled
-       frame schedule cannot freeze him mid-draw. */
     let running = false;
     let firing = false;
-    let idleStart = null;   /* perf.now() when the current idle run began */
-    let yawBase = 0.66;     /* yaw at that moment */
+    let idleStart = null;
+    let yawBase = 0.66;
     let fireStart = 0;
     let yawAtAlign = 0;
 
     function idleYaw(now) {
       if (idleStart === null) idleStart = now;
-      return yawBase + (now - idleStart) / 1000 * SPIN;
+      return yawBase + ((now - idleStart) / 1000) * SPIN;
     }
 
     mount.addEventListener("click", () => {
@@ -348,27 +359,23 @@
       if (!running) return;
       const now = performance.now();
 
-      const r = mount.getBoundingClientRect();
-      const vp = (r.top + r.height / 2 - innerHeight / 2) / innerHeight;
-      let tilt = Math.max(-0.4, Math.min(0.08, TILT - vp * 0.28));
+      const rect = mount.getBoundingClientRect();
+      const vp = (rect.top + rect.height / 2 - innerHeight / 2) / innerHeight;
+      const scrollTilt = Math.max(-0.4, Math.min(0.08, TILT - vp * 0.28));
 
       if (!firing) {
-        /* idle: the octahedron, turning. That is all. */
         mount.classList.remove("locked");
-        pose(idleYaw(now), tilt, fOcta, fOcta, 0, 0, 0);
-        setCore(0, 0);
+        drawMain(idleYaw(now), scrollTilt);
+        setCore(0);
         setBeam(false, 0);
         setGlow(0);
       } else {
-        /* the firing block: he stops, comes about to face left, and fires */
         mount.classList.add("locked");
         const ft = (now - fireStart) / 1000;
 
-        if (ft < ALIGN) {
-          /* Gradual spin-down: a Hermite curve from his current heading to
-             the next full turn ahead, whose slope STARTS at his live spin
-             rate and ENDS at zero - so the turn decays into the stop
-             instead of snapping. */
+        if (ft < T1) {
+          /* the turn decays into the stop: a Hermite curve whose slope
+             starts at the live spin rate and ends at zero */
           const k = ft / ALIGN;
           const from = yawAtAlign % (Math.PI * 2);
           const target = Math.PI * 2 * Math.ceil((from + 0.35) / (Math.PI * 2));
@@ -377,36 +384,42 @@
           const h01 = -2 * k * k * k + 3 * k * k;
           const y = from * h00 + SPIN * ALIGN * h10 + target * h01;
           const kk = smooth(k);
-          pose(y, tilt * (1 - kk) + -0.12 * kk, fOcta, fOcta, 0, 0, 0);
-          setCore(0, 0);
+          drawMain(y, scrollTilt * (1 - kk) + FIRE_TILT * kk);
+          setCore(0);
           setGlow(0);
-        } else if (ft < ALIGN + CHARGE) {
-          const k = smooth((ft - ALIGN) / CHARGE);
-          const jitter = Math.sin(now / 14) * 0.65 * k;
-          pose(0, -0.12, fOcta, fCannon, k, jitter, 0);
-          setCore(Math.min(1, k * 1.3), k > 0.72 ? (k - 0.72) / 0.28 : 0);
-          setGlow(k);
-        } else if (ft < ALIGN + CHARGE + FIRE) {
-          const k = (ft - ALIGN - CHARGE) / FIRE;
+        } else if (ft < T2) {
+          /* the front stretches toward the target */
+          const k = smooth((ft - T1) / STRETCH);
+          drawPetals(k, 0, FIRE_TILT);
+          setCore(0);
+          setGlow(k * 0.4);
+        } else if (ft < T3) {
+          /* the spindle splits into five; the red core is exposed */
+          const k = smooth((ft - T2) / SPLIT);
+          drawPetals(1, k, FIRE_TILT);
+          setCore(k);
+          setGlow(0.4 + 0.6 * k);
+        } else if (ft < T4) {
+          /* the beam, from the core. He holds perfectly still. */
+          const k = (ft - T3) / FIRE;
           const flicker = 0.82 + 0.18 * Math.sin(now / 9);
-          const jitter = Math.sin(now / 8) * 0.9;
-          pose(0, -0.12, fCannon, fCannon, 0, jitter, 0.14);
-          setCore(1, 1);
+          drawPetals(1, 1, FIRE_TILT);
+          setCore(1);
           setBeam(true, k < 0.08 ? k / 0.08 : flicker);
           setGlow(1);
-        } else if (ft < ALIGN + CHARGE + FIRE + COOL) {
-          const k = smooth((ft - ALIGN - CHARGE - FIRE) / COOL);
-          pose(0, -0.12 * (1 - k) + tilt * k, fCannon, fOcta, k, 0, (1 - k) * 0.08);
-          setCore(1 - k, 1 - k);
-          setBeam(true, Math.max(0, 0.6 * (1 - k * 1.6)));
+        } else if (ft < T5) {
+          /* the petals close and merge */
+          const k = smooth((ft - T4) / CLOSE);
+          drawPetals(1 - k, 1 - k, FIRE_TILT * (1 - k) + scrollTilt * k);
+          setCore(1 - k);
+          setBeam(true, Math.max(0, 0.5 * (1 - k * 2.2)));
           setGlow(1 - k);
         } else {
-          /* holstered: resume the turn from dead ahead */
           firing = false;
           yawBase = 0;
           idleStart = now;
           setBeam(false, 0);
-          setCore(0, 0);
+          setCore(0);
           setGlow(0);
         }
       }
@@ -416,13 +429,11 @@
     function start() {
       if (running) return;
       running = true;
-      /* returning from off-screen must not fast-forward the turn */
       idleStart = null;
       requestAnimationFrame(frame);
     }
     function stop() {
       if (running && !firing) {
-        /* bank the heading, so the turn resumes where it paused */
         yawBase = idleYaw(performance.now()) % (Math.PI * 2);
         idleStart = null;
       }
@@ -430,7 +441,7 @@
       setBeam(false, 0);
     }
 
-    pose(0.66, TILT, fOcta, fOcta, 0, 0, 0);
+    drawMain(0.66, TILT);
     if ("IntersectionObserver" in window) {
       new IntersectionObserver(
         (es) => es.forEach((e) => (e.isIntersecting ? start() : stop())),
