@@ -6,18 +6,14 @@
  * or along the silhouette, and it is drawn in pale luminous blue, never
  * black, which is what gives him the lit-from-within glass look.
  *
- * The forms are the Rebuild set: a ring of needle-like diamonds, the drill
- * that drips from the bottom point and coils, the flattened hexagonal
- * pyramid, and - before firing - the cannon. Every form is one function
- * bending the same mesh (an octahedron subdivided twice: 66 vertices, 128
- * faces), so he flows between bodies rather than swapping models.
- *
- * Idle, he only turns and flows between his bodies. The firing sequence is
- * yours to trigger: CLICK him and he stops spinning, comes about to face
- * LEFT, deforms into the cannon, his core surfaces at the centre and splits
- * in four as the charge peaks - then the beam fires from the core, through
- * the body, out across the country. Then he cools, closes, and resumes the
- * turn.
+ * He has exactly two bodies. Idle, he is the octahedron, turning, nothing
+ * more. CLICK him and he becomes the other one: he stops, comes about to
+ * face LEFT, opens into the cannon, his core surfaces at the centre and
+ * splits in four as the charge peaks - then the beam fires from the core,
+ * through the body, out across the country. Then he cools, closes, and
+ * resumes the turn. Both bodies are the same mesh (an octahedron subdivided
+ * twice - 66 vertices, 128 faces) with its vertices bent, so the change is
+ * continuous arithmetic, not a model swap.
  *
  * Still no WebGL, no textures, no image files - arithmetic only. Under
  * prefers-reduced-motion he holds one octahedral pose and never fires.
@@ -82,37 +78,6 @@
 
   function fOcta(v) { return v; }
 
-  /* a symmetric ring of needle-like diamonds: spikes along all six axes,
-     the webs between them drawn thin */
-  function fNeedles(v) {
-    const m = Math.max(Math.abs(v[0]), Math.abs(v[1]), Math.abs(v[2]));
-    const s = 0.5 + 1.15 * Math.pow(m, 4);
-    return [v[0] * s, v[1] * s, v[2] * s];
-  }
-
-  /* the drill: the bottom point drips like melting glass and coils */
-  function fDrill(v) {
-    let [x, y, z] = v;
-    if (y < 0) {
-      const d = -y;               /* how far down the drip we are */
-      const taper = Math.max(0.06, 1 - d * 0.95);
-      const ang = d * 6.5;        /* the coil */
-      const c = Math.cos(ang), s = Math.sin(ang);
-      const nx = (x * c + z * s) * taper;
-      const nz = (-x * s + z * c) * taper;
-      return [nx, y * 2.25, nz];
-    }
-    return [x * 0.92, y * 0.9, z * 0.92];
-  }
-
-  /* the flattened hexagonal pyramid: cap above, cone below */
-  function fPyramid(v) {
-    let [x, y, z] = v;
-    if (y >= 0) return [x * 1.22, y * 0.22, z * 1.22];
-    const taper = Math.max(0.08, 1 + y * 0.9);
-    return [x * taper, y * 1.45, z * taper];
-  }
-
   /* the cannon, opening toward -x: flared crown behind, barrel ahead */
   function fCannon(v) {
     let [x, y, z] = v;
@@ -120,12 +85,9 @@
     return [x * 1.3, y * 0.48, z * 0.48];
   }
 
-  const FORMS = [fOcta, fNeedles, fOcta, fDrill, fOcta, fPyramid];
-  const HOLD = 3.2, MORPH = 1.6, PERIOD = HOLD + MORPH;
-  const IDLE_TOTAL = FORMS.length * PERIOD;
-
   /* the firing block - entered only by a click */
-  const ALIGN = 1.2, CHARGE = 1.8, FIRE = 1.05, COOL = 1.0;
+  const ALIGN = 1.7, CHARGE = 1.8, FIRE = 1.05, COOL = 1.0;
+  const SPIN = 1 / 4.2; /* idle angular velocity, rad/s */
 
   const smooth = (t) => t * t * (3 - 2 * t);
   const lerpV = (a, b, t) => [
@@ -358,59 +320,64 @@
       return;
     }
 
-    /* Two states, and only a click moves between them. Idle time and yaw
-       accumulate only while idle, so a shot never skips him ahead in his
-       own cycle - he resumes exactly the turn he left. */
+    /* Two states, and only a click moves between them. Every phase is a
+       pure function of ABSOLUTE elapsed time - never of frame deltas - so
+       the sequence runs to completion at the same pace whether the browser
+       gives it 120 frames a second or three: a coalesced or throttled
+       frame schedule cannot freeze him mid-draw. */
     let running = false;
     let firing = false;
-    let idleClock = 0;
-    let yaw = 0.66;
-    let fireT = 0;
+    let idleStart = null;   /* perf.now() when the current idle run began */
+    let yawBase = 0.66;     /* yaw at that moment */
+    let fireStart = 0;
     let yawAtAlign = 0;
-    let lastNow = null;
+
+    function idleYaw(now) {
+      if (idleStart === null) idleStart = now;
+      return yawBase + (now - idleStart) / 1000 * SPIN;
+    }
 
     mount.addEventListener("click", () => {
       if (firing || still) return;
       firing = true;
-      fireT = 0;
-      yawAtAlign = yaw % (Math.PI * 2);
+      fireStart = performance.now();
+      yawAtAlign = idleYaw(fireStart) % (Math.PI * 2);
     });
 
-    function frame(now) {
+    function frame() {
       if (!running) return;
-      if (lastNow === null) lastNow = now;
-      const dt = Math.min((now - lastNow) / 1000, 0.05);
-      lastNow = now;
+      const now = performance.now();
 
       const r = mount.getBoundingClientRect();
       const vp = (r.top + r.height / 2 - innerHeight / 2) / innerHeight;
       let tilt = Math.max(-0.4, Math.min(0.08, TILT - vp * 0.28));
 
       if (!firing) {
-        /* idle: turning, flowing between the passive forms */
+        /* idle: the octahedron, turning. That is all. */
         mount.classList.remove("locked");
-        idleClock = (idleClock + dt) % IDLE_TOTAL;
-        yaw += dt / 4.2;
-        const idx = Math.floor(idleClock / PERIOD);
-        const local = idleClock - idx * PERIOD;
-        const A = FORMS[idx], B = FORMS[(idx + 1) % FORMS.length];
-        const mt = local < HOLD ? 0 : smooth((local - HOLD) / MORPH);
-        pose(yaw, tilt, A, B, mt, 0, 0);
+        pose(idleYaw(now), tilt, fOcta, fOcta, 0, 0, 0);
         setCore(0, 0);
         setBeam(false, 0);
         setGlow(0);
       } else {
         /* the firing block: he stops, comes about to face left, and fires */
         mount.classList.add("locked");
-        fireT += dt;
-        const ft = fireT;
+        const ft = (now - fireStart) / 1000;
 
         if (ft < ALIGN) {
-          const k = smooth(ft / ALIGN);
-          /* shortest way round to yaw 0 */
-          let from = yawAtAlign % (Math.PI * 2);
-          if (from > Math.PI) from -= Math.PI * 2;
-          pose(from * (1 - k), tilt * (1 - k) + -0.12 * k, fOcta, fOcta, 0, 0, 0);
+          /* Gradual spin-down: a Hermite curve from his current heading to
+             the next full turn ahead, whose slope STARTS at his live spin
+             rate and ENDS at zero - so the turn decays into the stop
+             instead of snapping. */
+          const k = ft / ALIGN;
+          const from = yawAtAlign % (Math.PI * 2);
+          const target = Math.PI * 2 * Math.ceil((from + 0.35) / (Math.PI * 2));
+          const h00 = 2 * k * k * k - 3 * k * k + 1;
+          const h10 = k * k * k - 2 * k * k + k;
+          const h01 = -2 * k * k * k + 3 * k * k;
+          const y = from * h00 + SPIN * ALIGN * h10 + target * h01;
+          const kk = smooth(k);
+          pose(y, tilt * (1 - kk) + -0.12 * kk, fOcta, fOcta, 0, 0, 0);
           setCore(0, 0);
           setGlow(0);
         } else if (ft < ALIGN + CHARGE) {
@@ -436,7 +403,8 @@
         } else {
           /* holstered: resume the turn from dead ahead */
           firing = false;
-          yaw = 0;
+          yawBase = 0;
+          idleStart = now;
           setBeam(false, 0);
           setCore(0, 0);
           setGlow(0);
@@ -448,10 +416,16 @@
     function start() {
       if (running) return;
       running = true;
-      lastNow = null;
+      /* returning from off-screen must not fast-forward the turn */
+      idleStart = null;
       requestAnimationFrame(frame);
     }
     function stop() {
+      if (running && !firing) {
+        /* bank the heading, so the turn resumes where it paused */
+        yawBase = idleYaw(performance.now()) % (Math.PI * 2);
+        idleStart = null;
+      }
       running = false;
       setBeam(false, 0);
     }
