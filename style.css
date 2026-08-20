@@ -32,8 +32,10 @@
   --ink-3: #6e6b67;
   --ink-4: #45423f;
 
-  /* one accent, and one only */
+  /* one accent - and one visitor. The red is the site's ink; the blue
+     belongs to the octahedron alone and appears nowhere else. */
   --red: #ff2d16;
+  --blue: #2f6fe0;
 
   /* rules */
   --rule: #242424;
@@ -1063,6 +1065,46 @@ footer .col-label {
 @keyframes facet-breathe {
   0%, 100% { opacity: 0.55; }
   50%      { opacity: 0.95; }
+}
+
+/* the visitor: a mount ramiel.js fills with a turning octahedron */
+.ramiel {
+  display: block;
+  pointer-events: none;
+  animation: ramiel-bob 9s ease-in-out infinite;
+}
+
+.ramiel svg { display: block; }
+
+@keyframes ramiel-bob {
+  0%, 100% { transform: translateY(0); }
+  50%      { transform: translateY(-12px); }
+}
+
+.facet-band .ramiel,
+.hero-band-ramiel {
+  position: absolute;
+  right: 12%;
+  bottom: 34px;
+  z-index: 2;
+}
+
+.facet-band { position: relative; }
+
+.ramiel-caption {
+  position: absolute;
+  right: 12%;
+  bottom: 12px;
+  font-family: var(--f-mono);
+  font-size: 0.58rem;
+  letter-spacing: 0.24em;
+  text-transform: uppercase;
+  color: var(--blue);
+  z-index: 2;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .ramiel { animation: none; }
 }
 
 /* shards: small drifting fragments pinned inside a section */
