@@ -56,7 +56,7 @@
     return [v[0] / n, v[1] / n, v[2] / n];
   })();
 
-  const TILT = 0.42; /* constant lean, so the spin reads as 3D */
+  const TILT = 0.42; /* the resting lean; scrolling leans him further */
 
   function build(mount) {
     const size = parseInt(mount.dataset.size, 10) || mount.clientWidth || 96;
@@ -74,9 +74,8 @@
     });
     mount.appendChild(svg);
 
-    const ct = Math.cos(TILT), st = Math.sin(TILT);
-
-    function pose(yaw) {
+    function pose(yaw, tilt) {
+      const ct = Math.cos(tilt), st = Math.sin(tilt);
       const cy = Math.cos(yaw), sy = Math.sin(yaw);
       /* rotate each vertex: yaw about Y, then tilt about X */
       const pts = V.map(([x, y, z]) => {
@@ -122,14 +121,22 @@
     }
 
     if (still) {
-      pose(0.66);
+      pose(0.66, TILT);
       return;
     }
 
     let running = false;
     function loop(t) {
       if (!running) return;
-      pose(t / 4200); /* one turn roughly every 26 seconds */
+      /* time gives the idle turn; scroll adds spin on top, so the wheel
+         is also a hand on the solid */
+      const yaw = t / 4200 + (window.scrollY || 0) * 0.0016;
+      /* viewing angle: level with him you see his waist; scrolling past
+         looks increasingly down on (or up at) the octahedron */
+      const r = mount.getBoundingClientRect();
+      const p = (r.top + r.height / 2 - innerHeight / 2) / innerHeight;
+      const tilt = Math.max(0.08, Math.min(0.95, TILT + p * 0.75));
+      pose(yaw, tilt);
       requestAnimationFrame(loop);
     }
     function start() {
@@ -139,7 +146,7 @@
     }
     function stop() { running = false; }
 
-    pose(0.66);
+    pose(0.66, TILT);
     if ("IntersectionObserver" in window) {
       new IntersectionObserver(
         (es) => es.forEach((e) => (e.isIntersecting ? start() : stop())),
