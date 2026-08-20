@@ -103,7 +103,9 @@
     svg.setAttribute("viewBox", "0 0 " + W + " " + H);
     svg.setAttribute("preserveAspectRatio", "none");
     svg.setAttribute("shape-rendering", "crispEdges");
-    svg.style.cssText = "display:block;width:100%;height:100%;";
+    /* the SVG clips its own overdraw; the band must NOT clip, or anything
+       rising above the horizon - the visitor - loses its head */
+    svg.style.cssText = "display:block;width:100%;height:100%;overflow:hidden;";
 
     const rnd = mulberry32(1995);
     const layers = [];
@@ -125,7 +127,6 @@
 
     if (old) old.replaceWith(svg);
     else band.insertBefore(svg, band.firstChild);
-    band.style.overflow = "hidden";
 
     return layers;
   }

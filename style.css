@@ -1051,8 +1051,8 @@ footer .col-label {
   display: block;
   width: 100%;
   height: clamp(190px, 26vw, 360px);
-  border-top: 1px solid var(--rule);
-  border-bottom: 1px solid var(--rule);
+  /* no rules above or below: the country is part of the page, not a strip
+     boxed into it, and the visitor may rise past its top edge */
 }
 
 .facet-band.slim { height: clamp(60px, 8vw, 110px); }
@@ -1117,8 +1117,6 @@ footer .col-label {
    rather than sitting empty. */
 .cluster-band {
   position: relative;
-  border-top: 1px solid var(--rule);
-  border-bottom: 1px solid var(--rule);
   height: 0;
   overflow: hidden;
 }
