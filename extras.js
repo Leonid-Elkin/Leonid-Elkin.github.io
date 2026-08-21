@@ -83,11 +83,4 @@
       } catch (err) { /* fine */ }
     }
   });
-
-  /* ---------- the title misses you ---------- */
-
-  const realTitle = document.title;
-  document.addEventListener("visibilitychange", () => {
-    document.title = document.hidden ? "■ still printing…" : realTitle;
-  });
 })();
