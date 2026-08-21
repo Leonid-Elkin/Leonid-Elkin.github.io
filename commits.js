@@ -15,7 +15,8 @@ const GH_USER = "Leonid-Elkin";
 const REPO_COUNT = 5; // most recently pushed repos to look at
 const PER_REPO = 5; // commits to pull from each
 const SHOW = 8; // commits displayed after merging
-const CACHE_KEY = "commits-v1";
+const CACHE_KEY = "commits-v2";
+const FRESH_MS = 30 * 60 * 1000; // a cached list younger than this is shown without asking GitHub
 
 async function ghJson(url) {
   const res = await fetch(url, {
@@ -131,28 +132,32 @@ window.addEventListener("DOMContentLoaded", async () => {
 
   into.appendChild(statusLine("Loading recent commits…"));
 
-  // Six requests per view is rude against a 60/hour unauthenticated limit,
-  // so a visitor clicking around only pays for them once per session.
-  try {
-    const cached = sessionStorage.getItem(CACHE_KEY);
-    if (cached) {
-      renderCommits(JSON.parse(cached), into);
-      return;
-    }
-  } catch (e) {
-    /* sessionStorage unavailable (private mode) - just fetch */
+  // Six requests per view is rude against a 60/hour unauthenticated limit
+  // shared by everyone behind the same IP, so the list is kept in localStorage
+  // for half an hour: a visitor clicking around, or coming back after lunch,
+  // pays for it once. When GitHub does say no, a stale copy beats an empty
+  // section - it is shown, and says how old it is.
+  const cached = readCache();
+  if (cached && Date.now() - cached.at < FRESH_MS) {
+    renderCommits(cached.list, into);
+    return;
   }
 
   try {
     const commits = await fetchRecentCommits();
     renderCommits(commits, into);
-    try {
-      sessionStorage.setItem(CACHE_KEY, JSON.stringify(commits));
-    } catch (e) {
-      /* over quota or blocked - not worth surfacing */
-    }
+    writeCache(commits);
   } catch (err) {
     into.textContent = "";
+    if (cached) {
+      renderCommits(cached.list, into);
+      into.appendChild(
+        statusLine(
+          `GitHub is not answering just now, so this is the list from ${minutesAgo(cached.at)}.`
+        )
+      );
+      return;
+    }
     into.appendChild(
       statusLine(
         err.status === 403
@@ -169,3 +174,30 @@ window.addEventListener("DOMContentLoaded", async () => {
     into.appendChild(link);
   }
 });
+
+/* localStorage, guarded: private mode and full quotas both just mean "no cache". */
+function readCache() {
+  try {
+    const raw = localStorage.getItem(CACHE_KEY);
+    if (!raw) return null;
+    const c = JSON.parse(raw);
+    return c && Array.isArray(c.list) && typeof c.at === "number" ? c : null;
+  } catch (e) {
+    return null;
+  }
+}
+
+function writeCache(list) {
+  try {
+    localStorage.setItem(CACHE_KEY, JSON.stringify({ at: Date.now(), list }));
+  } catch (e) {
+    /* over quota or blocked - not worth surfacing */
+  }
+}
+
+function minutesAgo(ts) {
+  const m = Math.max(1, Math.round((Date.now() - ts) / 60000));
+  if (m < 60) return `${m} minute${m > 1 ? "s" : ""} ago`;
+  const h = Math.round(m / 60);
+  return `${h} hour${h > 1 ? "s" : ""} ago`;
+}
