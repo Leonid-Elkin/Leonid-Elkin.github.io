@@ -1,5 +1,9 @@
 /* The cluster, still evaporating.
  *
+ * Now also a laboratory: CLICK anywhere in the band and a heavy red
+ * intruder drops in where you clicked, and the cluster has to live with
+ * the consequences. This is, give or take, the paper's actual question.
+ *
  * A little N-body globular cluster, the subject of the physics paper, running
  * live in a canvas band. Softened pairwise gravity, leapfrog integration,
  * stars in bone, the primordial binaries of the paper's question in red.
@@ -36,6 +40,9 @@
   let escaped = 0;
   let W = 0, H = 0, dpr = 1;
 
+  /* the footer reads these; anyone else is welcome to */
+  window.clusterStats = { escaped: 0, intruders: 0 };
+
   function size() {
     dpr = Math.min(window.devicePixelRatio || 1, 2);
     W = root.clientWidth;
@@ -64,6 +71,7 @@
         x, y,
         vx: -Math.sin(a) * v,
         vy: Math.cos(a) * v * 0.55,
+        m: 1,
         red: false,
         gone: false,
       });
@@ -76,7 +84,7 @@
       stars.push({
         x: s.x + 4, y: s.y + 3,
         vx: s.vx, vy: s.vy - 1.4,
-        red: true, gone: false,
+        m: 1, red: true, gone: false,
       });
     }
   }
@@ -94,7 +102,7 @@
         const b = live[j];
         const dx = b.x - a.x, dy = b.y - a.y;
         const d2 = dx * dx + dy * dy + SOFT2;
-        const f = G / (d2 * Math.sqrt(d2));
+        const f = (G * (b.m || 1)) / (d2 * Math.sqrt(d2));
         ax += dx * f;
         ay += dy * f;
       }
@@ -109,6 +117,7 @@
       if (dx * dx + dy * dy > lim2) {
         s.gone = true;
         escaped++;
+        window.clusterStats.escaped++;
       }
     }
 
@@ -122,7 +131,7 @@
     for (const s of stars) {
       if (s.gone) continue;
       ctx.fillStyle = s.red ? "#ff2d16" : "rgba(242, 240, 236, 0.75)";
-      const r = s.red ? 1.8 : 1.2;
+      const r = s.m > 1 ? 3 : s.red ? 1.8 : 1.2;
       ctx.fillRect(s.x - r, s.y - r, r * 2, r * 2);
     }
     if (readout) {
@@ -168,6 +177,22 @@
   } else if (!still) {
     start();
   }
+
+  /* the perturbation experiment: a click drops a heavy intruder */
+  root.addEventListener("click", (e) => {
+    const rc = root.getBoundingClientRect();
+    const live = stars.filter((st) => st.m > 1 && !st.gone).length;
+    if (live >= 3) return; /* three rogue masses is plenty of science */
+    stars.push({
+      x: e.clientX - rc.left,
+      y: e.clientY - rc.top,
+      vx: (Math.random() - 0.5) * 6,
+      vy: (Math.random() - 0.5) * 4,
+      m: 7, red: true, gone: false,
+    });
+    window.clusterStats.intruders++;
+    start();
+  });
 
   let resizeAt = 0;
   window.addEventListener("resize", () => {

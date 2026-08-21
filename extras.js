@@ -84,6 +84,65 @@
     }
   });
 
+  /* ---------- the strip knows what time it is ---------- */
+
+  /* One ticker item becomes the visitor's own clock - a static site that
+     still manages to be right twice a day everywhere. */
+  (function () {
+    const items = document.querySelectorAll(".ticker-track > span");
+    if (!items.length) return;
+    const hh = new Date();
+    const stamp = "printed at " +
+      String(hh.getHours()).padStart(2, "0") + ":" +
+      String(hh.getMinutes()).padStart(2, "0") + " your time";
+    /* the strip is printed twice for the loop - restamp both copies */
+    items.forEach((it) => {
+      if (/no images on this site/i.test(it.textContent)) {
+        it.textContent = stamp;
+      }
+    });
+  })();
+
+  /* ---------- the footer counts your visit in lost stars ---------- */
+
+  (function () {
+    const el = document.getElementById("dwell");
+    if (!el) return;
+    const t0 = Date.now();
+    setInterval(() => {
+      const s = Math.floor((Date.now() - t0) / 1000);
+      const mm = String(Math.floor(s / 60)).padStart(2, "0");
+      const ss = String(s % 60).padStart(2, "0");
+      let line = "You have been here " + mm + ":" + ss;
+      const cs = window.clusterStats;
+      if (cs && cs.escaped) line += " · the cluster has lost " + cs.escaped + " star" + (cs.escaped === 1 ? "" : "s") + " in that time";
+      if (cs && cs.intruders) line += " · " + cs.intruders + " of the intruders " + (cs.intruders === 1 ? "was" : "were") + " you";
+      el.textContent = line;
+    }, 1000);
+  })();
+
+  /* ---------- registration debris (the 404 only) ---------- */
+
+  /* On the misprinted page, the cursor sheds little squares of loose ink. */
+  if (
+    document.documentElement.classList.contains("misprint") &&
+    !window.matchMedia("(prefers-reduced-motion: reduce)").matches
+  ) {
+    let last = 0;
+    document.addEventListener("pointermove", (e) => {
+      const now = performance.now();
+      if (now - last < 70) return;
+      last = now;
+      const d = document.createElement("span");
+      d.className = "debris";
+      d.style.left = e.clientX + (Math.random() - 0.5) * 14 + "px";
+      d.style.top = e.clientY + (Math.random() - 0.5) * 14 + "px";
+      document.body.appendChild(d);
+      requestAnimationFrame(() => d.classList.add("gone"));
+      setTimeout(() => d.remove(), 700);
+    });
+  }
+
   /* ---------- the title misses you ---------- */
 
   const realTitle = document.title;
