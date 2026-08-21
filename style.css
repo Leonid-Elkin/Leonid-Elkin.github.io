@@ -41,6 +41,15 @@
   --rule: #242424;
   --rule-hot: #3a3a3a;
 
+  /* The commit heatmap quotes GitHub's own dark ramp rather than inventing a
+     green. It is the only borrowed palette on the site, and it stays inside
+     that one grid. */
+  --gh-0: #16181a;
+  --gh-1: #0e4429;
+  --gh-2: #006d32;
+  --gh-3: #26a641;
+  --gh-4: #39d353;
+
   /* measure */
   --wrap: 1440px;
   --gut: clamp(20px, 4.2vw, 72px);
@@ -546,6 +555,103 @@ iframe { max-width: 100%; }
   font-size: 0.65rem;
   color: var(--ink-3);
   letter-spacing: 0.01em;
+}
+
+/* ---------- commit heatmap ---------- */
+
+/* Fifty-two columns of seven. Built in SVG so it stays type-and-vector like
+   the rest of the page - see commits.js for where the counts come from. */
+
+.commit-graph { min-height: 150px; }
+
+.gh-scroll {
+  border-top: 1px solid var(--rule);
+  padding: 20px 0 4px;
+  overflow-x: auto;
+  overflow-y: hidden;
+  scrollbar-width: thin;
+  scrollbar-color: var(--rule-hot) transparent;
+}
+
+/* Scales to the measure rather than sitting at its natural 751 units - the
+   rules above and below run the full width and a grid stopping halfway across
+   reads as unfinished. */
+.gh-grid {
+  display: block;
+  width: 100%;
+  min-width: 620px; /* below this the squares get too small - scroll instead */
+  height: auto;
+}
+
+.gh-axis {
+  font-family: var(--f-mono);
+  font-size: 8px;
+  letter-spacing: 0.06em;
+  fill: var(--ink-3);
+}
+
+.gh-cell {
+  fill: var(--gh-0);
+  transition: fill 0.12s ease;
+}
+
+.gh-cell.l1 { fill: var(--gh-1); }
+.gh-cell.l2 { fill: var(--gh-2); }
+.gh-cell.l3 { fill: var(--gh-3); }
+.gh-cell.l4 { fill: var(--gh-4); }
+
+.gh-grid .gh-cell:hover {
+  stroke: var(--ink);
+  stroke-width: 1;
+}
+
+/* The year arrives left to right, a week per frame. */
+.gh-cell {
+  opacity: 0;
+  animation: gh-in 0.45s ease forwards;
+  animation-delay: calc(var(--c, 0) * 9ms);
+}
+
+@keyframes gh-in {
+  to { opacity: 1; }
+}
+
+.gh-foot {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px 24px;
+  padding: 12px 0 26px;
+}
+
+.gh-readout {
+  font-family: var(--f-mono);
+  font-size: 0.68rem;
+  color: var(--ink-3);
+  transition: color 0.12s ease;
+}
+
+.gh-readout.is-hot { color: var(--ink); }
+
+.gh-legend {
+  display: flex;
+  align-items: center;
+  gap: 9px;
+  font-family: var(--f-mono);
+  font-size: 0.6rem;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--ink-3);
+}
+
+.gh-key { display: block; }
+
+@media (prefers-reduced-motion: reduce) {
+  .gh-cell {
+    opacity: 1;
+    animation: none;
+  }
 }
 
 /* ---------- commits ---------- */

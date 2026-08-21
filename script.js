@@ -108,7 +108,7 @@ const projects = [
     title: "This website",
     cat: "software",
     caption:
-      "Swiss editorial on black, static HTML, no build step and no images anywhere - every mark is type, rule or inline SVG. The commits feed pulls from GitHub in your browser.",
+      "Swiss editorial on black, static HTML, no build step and no images anywhere - every mark is type, rule or inline SVG. The commit heatmap and the feed under it pull from GitHub in your browser.",
     tags: ["HTML", "CSS", "JavaScript"],
     links: [
       { name: "source", url: "https://github.com/Leonid-Elkin/Leonid-Elkin.github.io" },
