@@ -79,6 +79,43 @@
                         </div>
                     </div>
                 </div>
+
+                <!-- ===== the docket =====
+                     A public pad with a private latch: anyone may press Edit
+                     and type, but Save asks for the plate, so nothing but my
+                     own copy ever survives a reload. See notepad.js. -->
+                <div class="hero-deck pad-deck">
+                    <p class="col-label">Currently</p>
+                    <div class="pad" data-pad>
+                        <div class="pad-head">
+                            <span class="mono pad-title">On the bench <b data-pad-count>03</b></span>
+                            <span class="pad-tools">
+                                <button class="pad-btn" type="button" data-pad-add hidden>+ line</button>
+                                <button class="pad-btn" type="button" data-pad-cancel hidden>Discard</button>
+                                <button class="pad-btn" type="button" data-pad-save hidden>Save</button>
+                                <button class="pad-btn" type="button" data-pad-edit>Edit</button>
+                            </span>
+                        </div>
+
+                        <!-- The canonical copy. Everything a first-time visitor
+                             sees is these lines; a saved pad only ever overrides
+                             them in the browser that saved it. -->
+                        <ol class="pad-list" data-pad-list>
+                            <li><span class="pad-line">Sheet2Tab &mdash; the editor for the bars it still misreads</span></li>
+                            <li><span class="pad-line">Yagi-Uda radar &mdash; ranging a target off the Pi. Not finished.</span></li>
+                            <li><span class="pad-line">Chess Vision Bot &mdash; the C++ port of the engine</span></li>
+                        </ol>
+
+                        <div class="pad-plate" data-pad-plate hidden>
+                            <label class="mono" for="pad-pw">Plate</label>
+                            <input id="pad-pw" type="password" autocomplete="off" spellcheck="false"
+                                aria-label="Password" data-pad-pw />
+                            <button class="pad-btn" type="button" data-pad-print>Print</button>
+                        </div>
+
+                        <p class="pad-foot mono"><span data-pad-status>Anyone may type here</span></p>
+                    </div>
+                </div>
             </div>
         </section>
 
@@ -168,7 +205,7 @@
              band its height; no script, no empty hole. -->
         <div class="cluster-band" id="cluster" aria-hidden="true">
             <canvas></canvas>
-            <p class="cluster-readout"><span>Globular cluster &middot; softened pairwise gravity</span><b>N 140</b></p>
+            <p class="cluster-readout"><span>Globular cluster &middot; softened pairwise gravity &middot; click to perturb</span><b>N 140</b></p>
         </div>
 
         <section class="section" id="skills">
@@ -237,7 +274,8 @@
                 <li><a href="https://elkyy.itch.io/" target="_blank" rel="noopener">itch.io</a></li>
             </ul>
             <span class="colophon">Set in Archivo, Inter Tight and JetBrains Mono. Black stock, one red &mdash; and one visitor in blue. No images
-                anywhere on this site &mdash; every mark is type or rule. Static HTML, no build step.</span>
+                anywhere on this site &mdash; every mark is type or rule. Static HTML, no build step.
+                <span class="dwell" id="dwell"></span></span>
         </div>
     </footer>
 
@@ -269,6 +307,9 @@
     <script src="cluster.js"></script>
     <script src="ramiel.js"></script>
     <script src="terrain.js"></script>
+    <script src="notepad.js"></script>
+    <script src="meteors.js"></script>
+    <script src="arcade.js"></script>
 </body>
 
 </html>
