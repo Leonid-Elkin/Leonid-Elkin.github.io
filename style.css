@@ -1971,92 +1971,6 @@ dd.placeholder {
   max-width: none;
 }
 
-/* ---------- the ground station (mine; type  c a n s a t) ----------
-   A downlink panel, one packet a second from the machine the page is open
-   on. Shown only where the latch is set - see downlink.js. */
-
-.downlink {
-  position: fixed;
-  top: 70px;
-  right: var(--gut);
-  z-index: 800;
-  width: 300px;
-  max-width: calc(100vw - 2 * var(--gut));
-  background: var(--paper);
-  border: 1px solid var(--rule-hot);
-  font-family: var(--f-mono);
-  font-size: 0.68rem;
-  letter-spacing: 0.06em;
-  color: var(--ink-2);
-  opacity: 0;
-  transform: translateX(16px);
-  transition: opacity 0.3s, transform 0.3s cubic-bezier(0.2, 0.7, 0.2, 1);
-}
-.downlink.up { opacity: 1; transform: none; }
-
-.dl-head {
-  display: flex;
-  align-items: center;
-  gap: 10px;
-  padding: 8px 12px;
-  border-bottom: 1px solid var(--rule);
-  color: var(--ink);
-  letter-spacing: 0.18em;
-  text-transform: uppercase;
-}
-.dl-pkt { margin-left: auto; color: var(--ink-3); }
-.dl-lamp { width: 8px; height: 8px; background: var(--ink-4); flex: none; }
-.dl-lamp.on { animation: lamp 0.9s ease-out; }
-@keyframes lamp { from { background: var(--red); } to { background: var(--ink-4); } }
-
-.downlink dl {
-  display: grid;
-  grid-template-columns: 58px 1fr;
-  gap: 7px 12px;
-  margin: 0;
-  padding: 10px 12px;
-}
-.downlink dt { color: var(--ink-3); }
-.downlink dd {
-  margin: 0;
-  color: var(--ink);
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
-}
-
-
-@media (max-width: 720px) {
-  .downlink { top: 58px; left: var(--gut); right: var(--gut); width: auto; }
-}
-
-@media (prefers-reduced-motion: reduce) {
-  .downlink { transition: none; }
-  .dl-lamp.on { animation: none; }
-}
-
-/* beside the name: on the front page the panel sits in the hero, under the
-   title and flush right, in flow - nothing is covered. Elsewhere (no name to
-   sit beside) it keeps the corner. */
-.downlink.in-hero {
-  position: static;
-  width: 300px;
-  margin: 18px 0 6px auto;
-  opacity: 1;
-  transform: none;
-  transition: none;
-}
-
-/* the plate, asked for in the same place */
-.dl-ask { width: 300px; margin: 18px 0 6px auto; }
-.dl-ask:not(.in-hero) { position: fixed; top: 70px; right: var(--gut); z-index: 800; background: var(--paper); }
-.dl-note { margin: 8px 0 0; font-size: 0.62rem; letter-spacing: 0.14em; text-transform: uppercase; color: var(--ink-3); }
-.dl-note.bad { color: var(--red); }
-
-@media (max-width: 720px) {
-  .downlink.in-hero, .dl-ask { width: auto; }
-}
-
 /* ---------- the proof sheet (print) ----------
    White stock, black ink, the one red kept. The toys stay on screen: no
    ticker, no map, no cards, no cluster, no range. Every outbound link is
@@ -2078,8 +1992,7 @@ dd.placeholder {
   html, body { background: #fff !important; color: #000; }
 
   .ticker, .progress, .nav, .facet-band, canvas, iframe, .live-frame,
-  .egg, #egg, #durak-panel, .ramiel, .range-hud, .aim-target,
-  .downlink, .meteor, .debris, .dwell,
+  .egg, #egg, #durak-panel, .ramiel, .range-hud, .aim-target, .meteor, .debris, .dwell,
   [data-pad-edit], [data-pad-add], [data-pad-save], [data-pad-cancel],
   [data-pad-plate], [data-pad-status], .commit-fallback {
     display: none !important;
