@@ -10,10 +10,9 @@
  * this site, so "mine" is decided the same way the notepad decides who may
  * print: a plate. Type  c a n s a t  and the plate is asked for; a match
  * sets a latch in this browser's localStorage, and from then on the panel
- * is simply there whenever the page opens on this machine. Nobody else's
- * browser has the latch, so nobody else sees the panel - they see the page
- * exactly as before. Escape puts it away until the next open; the word
- * brings it back.
+ * is simply there, part of the page, whenever it opens on this machine.
+ * Nobody else's browser has the latch, so nobody else sees the panel - they
+ * see the page exactly as before.
  *
  * Everything shown is read from the browser and goes nowhere. A row that
  * cannot be read says so rather than pretending. The plate is a latch, not a
@@ -68,9 +67,7 @@
     at = k === WORD[at] ? at + 1 : k === WORD[0] ? 1 : 0;
     if (at === WORD.length) {
       at = 0;
-      if (panel) close();
-      else if (latched()) open();
-      else askPlate();
+      if (!panel && !latched()) askPlate();
     }
   });
 
@@ -198,13 +195,8 @@
     });
     panel.appendChild(dl);
 
-    const foot = document.createElement("div");
-    foot.className = "dl-foot";
-    foot.textContent = "mine · read locally · sent nowhere · esc";
-    panel.appendChild(foot);
-
     m.parent.insertBefore(panel, m.before);
-    requestAnimationFrame(() => panel.classList.add("up"));
+    panel.classList.add("up");
 
     if (navigator.getBattery) {
       navigator.getBattery().then((b) => { battery = b; }, () => { battery = false; });
@@ -212,7 +204,6 @@
       battery = false;
     }
     window.addEventListener("deviceorientation", onAtt);
-    document.addEventListener("keydown", esc);
 
     tick();
     timer = setInterval(tick, 1000);
@@ -237,19 +228,6 @@
     lamp.classList.add("on");
   }
 
-  function esc(e) {
-    if (e.key === "Escape") close();
-  }
-
-  function close() {
-    clearInterval(timer);
-    window.removeEventListener("deviceorientation", onAtt);
-    document.removeEventListener("keydown", esc);
-    const p = panel;
-    panel = null;
-    p.classList.remove("up");
-    setTimeout(() => p.remove(), 320);
-  }
 
   /* ---------- on this machine, it is simply there ---------- */
 

@@ -2025,14 +2025,6 @@ dd.placeholder {
   text-overflow: ellipsis;
 }
 
-.dl-foot {
-  padding: 8px 12px;
-  border-top: 1px solid var(--rule);
-  color: var(--ink-4);
-  font-size: 0.58rem;
-  letter-spacing: 0.14em;
-  text-transform: uppercase;
-}
 
 @media (max-width: 720px) {
   .downlink { top: 58px; left: var(--gut); right: var(--gut); width: auto; }
@@ -2050,9 +2042,10 @@ dd.placeholder {
   position: static;
   width: 300px;
   margin: 18px 0 6px auto;
-  transform: translateY(-6px);
+  opacity: 1;
+  transform: none;
+  transition: none;
 }
-.downlink.in-hero.up { transform: none; }
 
 /* the plate, asked for in the same place */
 .dl-ask { width: 300px; margin: 18px 0 6px auto; }
