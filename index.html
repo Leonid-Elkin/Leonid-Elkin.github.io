@@ -8,6 +8,13 @@
     <meta name="description"
         content="Leonid Elkin builds software and hardware: a live strike record, naval simulation, sheet music to tablature, radar on a Yagi-Uda antenna." />
     <meta name="theme-color" content="#0a0a0a" />
+    <meta property="og:type" content="website" />
+    <meta property="og:title" content="Leonid Elkin" />
+    <meta property="og:description"
+        content="Software and hardware, mostly in Python, some in C++: a live strike record, naval simulation, sheet music to tablature, radar on a Yagi-Uda antenna." />
+    <meta property="og:url" content="https://leonid-elkin.github.io/" />
+    <meta property="og:site_name" content="Leonid Elkin" />
+    <meta name="twitter:card" content="summary" />
     <!-- The favicon is a red square drawn inline. There are no image files on
          this site, and that includes this one. -->
     <link rel="icon"
@@ -257,8 +264,10 @@
                     <h2 class="display">Recent commits</h2>
                     <a class="mono" href="https://github.com/Leonid-Elkin?tab=repositories" target="_blank" rel="noopener">all repositories</a>
                 </div>
-                <p class="setup">Pulled live from the GitHub API in your browser, newest first, across the five
-                    repositories pushed to most recently. Only the first line of each message is shown.</p>
+                <p class="setup">A year of work, one square a day, then the newest of it in longhand &mdash; both
+                    pulled live from the GitHub API in your browser, across the ten repositories pushed to most
+                    recently. Only the first line of each message is shown.</p>
+                <div id="commit-graph" class="commit-graph"></div>
                 <div id="commit-feed"></div>
             </div>
         </section>
@@ -310,6 +319,7 @@
     <script src="notepad.js"></script>
     <script src="meteors.js"></script>
     <script src="arcade.js"></script>
+    <script src="proof.js"></script>
 </body>
 
 </html>

@@ -1,12 +1,13 @@
 /* The cluster, still evaporating.
  *
- * Now also a laboratory: CLICK anywhere in the band and a heavy red
+ * Now also a laboratory: CLICK anywhere in the band and a heavy
  * intruder drops in where you clicked, and the cluster has to live with
  * the consequences. This is, give or take, the paper's actual question.
  *
  * A little N-body globular cluster, the subject of the physics paper, running
  * live in a canvas band. Softened pairwise gravity, leapfrog integration,
- * stars in bone, the primordial binaries of the paper's question in red.
+ * every star in bone - the primordial binaries of the paper's question are
+ * told apart by size alone, not colour.
  * Stars that reach escape distance are gone for good and the readout counts
  * them - the band is literally demonstrating the paper's result while you
  * read about it.
@@ -31,7 +32,7 @@
   const still = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
 
   const N = 140;        // stars at dealing time
-  const PAIRS = 6;      // primordial binaries, in red
+  const PAIRS = 6;      // primordial binaries, drawn a touch larger
   const SOFT2 = 90;     // softening length squared - keeps close passes sane
   const G = 14;         // tuned for pace, not units
   const ESCAPE = 1.5;   // multiples of the band's half-diagonal
@@ -77,7 +78,7 @@
       });
     }
 
-    /* binaries: pick stars and give each a close red companion */
+    /* binaries: pick stars and give each a close companion */
     for (let p = 0; p < PAIRS; p++) {
       const s = stars[p * 3];
       s.red = true;
@@ -130,7 +131,7 @@
     ctx.clearRect(0, 0, W, H);
     for (const s of stars) {
       if (s.gone) continue;
-      ctx.fillStyle = s.red ? "#ff2d16" : "rgba(242, 240, 236, 0.75)";
+      ctx.fillStyle = "rgba(242, 240, 236, 0.75)";
       const r = s.m > 1 ? 3 : s.red ? 1.8 : 1.2;
       ctx.fillRect(s.x - r, s.y - r, r * 2, r * 2);
     }
