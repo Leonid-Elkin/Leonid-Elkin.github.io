@@ -1971,75 +1971,9 @@ dd.placeholder {
   max-width: none;
 }
 
-/* ---------- the guitar (type  t u n e) ----------
-   Six strings across the foot of the page, high E at the top. Each is a
-   button whose <i> is the string: a rule that thickens towards the bass and,
-   when struck, flashes red and fattens for a moment as if it were vibrating.
-   Built and removed by strings.js; no markup is required. */
-
-.strings {
-  position: fixed;
-  left: 0;
-  right: 0;
-  bottom: 0;
-  z-index: 800;
-  display: grid;
-  gap: 8px;
-  padding: 12px var(--gut) 18px;
-  background: var(--paper);
-  border-top: 1px solid var(--rule-hot);
-  transform: translateY(100%);
-  transition: transform 0.3s cubic-bezier(0.2, 0.7, 0.2, 1);
-}
-.strings.up { transform: none; }
-
-.strings-hint {
-  font-family: var(--f-mono);
-  font-size: 0.62rem;
-  letter-spacing: 0.18em;
-  text-transform: uppercase;
-  color: var(--ink-3);
-  text-align: right;
-  margin-bottom: 2px;
-}
-
-.string {
-  display: grid;
-  grid-template-columns: 28px 1fr 72px;
-  align-items: center;
-  gap: 14px;
-  height: 22px;
-  padding: 0;
-  margin: 0;
-  background: none;
-  border: 0;
-  color: var(--ink-2);
-  font-family: var(--f-mono);
-  font-size: 0.7rem;
-  letter-spacing: 0.12em;
-  text-align: left;
-  cursor: pointer;
-}
-.string b { order: 1; font-weight: 500; color: var(--ink); }
-.string i { order: 2; display: block; height: 1px; background: var(--ink-3); transform-origin: center; }
-.string u { order: 3; text-decoration: none; color: var(--ink-3); text-align: right; }
-.string:nth-of-type(3) i,
-.string:nth-of-type(4) i { height: 2px; }
-.string:nth-of-type(5) i,
-.string:nth-of-type(6) i { height: 3px; }
-.string:hover i { background: var(--ink-2); }
-.string:focus-visible { outline: 1px solid var(--red); outline-offset: 4px; }
-.string.rings i { animation: string-rings 0.7s ease-out; }
-
-@keyframes string-rings {
-  0%   { transform: scaleY(5); background: var(--red); }
-  30%  { transform: scaleY(2.5); background: var(--red); }
-  100% { transform: none; }
-}
-
-/* ---------- the ground station (type  c a n s a t) ----------
-   A downlink panel in the corner, one packet a second from the visitor's own
-   machine. Built and removed by downlink.js. */
+/* ---------- the ground station (mine; type  c a n s a t) ----------
+   A downlink panel, one packet a second from the machine the page is open
+   on. Shown only where the latch is set - see downlink.js. */
 
 .downlink {
   position: fixed;
@@ -2102,12 +2036,32 @@ dd.placeholder {
 
 @media (max-width: 720px) {
   .downlink { top: 58px; left: var(--gut); right: var(--gut); width: auto; }
-  .string { grid-template-columns: 22px 1fr 60px; gap: 10px; }
 }
 
 @media (prefers-reduced-motion: reduce) {
-  .strings, .downlink { transition: none; }
-  .string.rings i, .dl-lamp.on { animation: none; }
+  .downlink { transition: none; }
+  .dl-lamp.on { animation: none; }
+}
+
+/* beside the name: on the front page the panel sits in the hero, under the
+   title and flush right, in flow - nothing is covered. Elsewhere (no name to
+   sit beside) it keeps the corner. */
+.downlink.in-hero {
+  position: static;
+  width: 300px;
+  margin: 18px 0 6px auto;
+  transform: translateY(-6px);
+}
+.downlink.in-hero.up { transform: none; }
+
+/* the plate, asked for in the same place */
+.dl-ask { width: 300px; margin: 18px 0 6px auto; }
+.dl-ask:not(.in-hero) { position: fixed; top: 70px; right: var(--gut); z-index: 800; background: var(--paper); }
+.dl-note { margin: 8px 0 0; font-size: 0.62rem; letter-spacing: 0.14em; text-transform: uppercase; color: var(--ink-3); }
+.dl-note.bad { color: var(--red); }
+
+@media (max-width: 720px) {
+  .downlink.in-hero, .dl-ask { width: auto; }
 }
 
 /* ---------- the proof sheet (print) ----------
@@ -2131,7 +2085,7 @@ dd.placeholder {
   html, body { background: #fff !important; color: #000; }
 
   .ticker, .progress, .nav, .facet-band, canvas, iframe, .live-frame,
-  .egg, #egg, #durak-panel, .ramiel, .range-hud, .aim-target, .strings,
+  .egg, #egg, #durak-panel, .ramiel, .range-hud, .aim-target,
   .downlink, .meteor, .debris, .dwell,
   [data-pad-edit], [data-pad-add], [data-pad-save], [data-pad-cancel],
   [data-pad-plate], [data-pad-status], .commit-fallback {
