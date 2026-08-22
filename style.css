@@ -1970,3 +1970,202 @@ dd.placeholder {
   padding: 0 0 2px;
   max-width: none;
 }
+
+/* ---------- the guitar (type  t u n e) ----------
+   Six strings across the foot of the page, high E at the top. Each is a
+   button whose <i> is the string: a rule that thickens towards the bass and,
+   when struck, flashes red and fattens for a moment as if it were vibrating.
+   Built and removed by strings.js; no markup is required. */
+
+.strings {
+  position: fixed;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  z-index: 800;
+  display: grid;
+  gap: 8px;
+  padding: 12px var(--gut) 18px;
+  background: var(--paper);
+  border-top: 1px solid var(--rule-hot);
+  transform: translateY(100%);
+  transition: transform 0.3s cubic-bezier(0.2, 0.7, 0.2, 1);
+}
+.strings.up { transform: none; }
+
+.strings-hint {
+  font-family: var(--f-mono);
+  font-size: 0.62rem;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  color: var(--ink-3);
+  text-align: right;
+  margin-bottom: 2px;
+}
+
+.string {
+  display: grid;
+  grid-template-columns: 28px 1fr 72px;
+  align-items: center;
+  gap: 14px;
+  height: 22px;
+  padding: 0;
+  margin: 0;
+  background: none;
+  border: 0;
+  color: var(--ink-2);
+  font-family: var(--f-mono);
+  font-size: 0.7rem;
+  letter-spacing: 0.12em;
+  text-align: left;
+  cursor: pointer;
+}
+.string b { order: 1; font-weight: 500; color: var(--ink); }
+.string i { order: 2; display: block; height: 1px; background: var(--ink-3); transform-origin: center; }
+.string u { order: 3; text-decoration: none; color: var(--ink-3); text-align: right; }
+.string:nth-of-type(3) i,
+.string:nth-of-type(4) i { height: 2px; }
+.string:nth-of-type(5) i,
+.string:nth-of-type(6) i { height: 3px; }
+.string:hover i { background: var(--ink-2); }
+.string:focus-visible { outline: 1px solid var(--red); outline-offset: 4px; }
+.string.rings i { animation: string-rings 0.7s ease-out; }
+
+@keyframes string-rings {
+  0%   { transform: scaleY(5); background: var(--red); }
+  30%  { transform: scaleY(2.5); background: var(--red); }
+  100% { transform: none; }
+}
+
+/* ---------- the ground station (type  c a n s a t) ----------
+   A downlink panel in the corner, one packet a second from the visitor's own
+   machine. Built and removed by downlink.js. */
+
+.downlink {
+  position: fixed;
+  top: 70px;
+  right: var(--gut);
+  z-index: 800;
+  width: 300px;
+  max-width: calc(100vw - 2 * var(--gut));
+  background: var(--paper);
+  border: 1px solid var(--rule-hot);
+  font-family: var(--f-mono);
+  font-size: 0.68rem;
+  letter-spacing: 0.06em;
+  color: var(--ink-2);
+  opacity: 0;
+  transform: translateX(16px);
+  transition: opacity 0.3s, transform 0.3s cubic-bezier(0.2, 0.7, 0.2, 1);
+}
+.downlink.up { opacity: 1; transform: none; }
+
+.dl-head {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 8px 12px;
+  border-bottom: 1px solid var(--rule);
+  color: var(--ink);
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+}
+.dl-pkt { margin-left: auto; color: var(--ink-3); }
+.dl-lamp { width: 8px; height: 8px; background: var(--ink-4); flex: none; }
+.dl-lamp.on { animation: lamp 0.9s ease-out; }
+@keyframes lamp { from { background: var(--red); } to { background: var(--ink-4); } }
+
+.downlink dl {
+  display: grid;
+  grid-template-columns: 58px 1fr;
+  gap: 7px 12px;
+  margin: 0;
+  padding: 10px 12px;
+}
+.downlink dt { color: var(--ink-3); }
+.downlink dd {
+  margin: 0;
+  color: var(--ink);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.dl-foot {
+  padding: 8px 12px;
+  border-top: 1px solid var(--rule);
+  color: var(--ink-4);
+  font-size: 0.58rem;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+}
+
+@media (max-width: 720px) {
+  .downlink { top: 58px; left: var(--gut); right: var(--gut); width: auto; }
+  .string { grid-template-columns: 22px 1fr 60px; gap: 10px; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .strings, .downlink { transition: none; }
+  .string.rings i, .dl-lamp.on { animation: none; }
+}
+
+/* ---------- the proof sheet (print) ----------
+   White stock, black ink, the one red kept. The toys stay on screen: no
+   ticker, no map, no cards, no cluster, no range. Every outbound link is
+   followed by its address, and the foot of the sheet says when it was
+   pulled - proof.js stamps the date onto <body> on the way to the printer. */
+
+@media print {
+  :root {
+    --paper: #fff;
+    --paper-2: #f4f3f0;
+    --ink: #000;
+    --ink-2: #222;
+    --ink-3: #555;
+    --ink-4: #777;
+    --rule: #c8c6c2;
+    --rule-hot: #999;
+  }
+  @page { margin: 18mm; }
+  html, body { background: #fff !important; color: #000; }
+
+  .ticker, .progress, .nav, .facet-band, canvas, iframe, .live-frame,
+  .egg, #egg, #durak-panel, .ramiel, .range-hud, .aim-target, .strings,
+  .downlink, .meteor, .debris, .dwell,
+  [data-pad-edit], [data-pad-add], [data-pad-save], [data-pad-cancel],
+  [data-pad-plate], [data-pad-status], .commit-fallback {
+    display: none !important;
+  }
+
+  /* whatever has not scrolled into view yet is still on the page */
+  .motion-ok .reveal { opacity: 1 !important; transform: none !important; }
+  .overprint::before { animation: none !important; }
+
+  .section, .hero { padding-top: 0; }
+  h1, h2, h3, .section-head { break-after: avoid; }
+  li, .commit-list li, .selected > *, dl > div { break-inside: avoid; }
+
+  a { color: #000; text-decoration: none; }
+  a[href^="http"]::after {
+    content: " (" attr(href) ")";
+    font-family: var(--f-mono);
+    font-size: 0.72em;
+    letter-spacing: 0;
+    color: #555;
+    word-break: break-all;
+  }
+
+  body::after {
+    content: "Proof pulled from leonid-elkin.github.io · " attr(data-pulled);
+    display: block;
+    margin: 28px var(--gut) 0;
+    padding-top: 8px;
+    border-top: 1px solid #c8c6c2;
+    font-family: var(--f-mono);
+    font-size: 0.62rem;
+    letter-spacing: 0.18em;
+    text-transform: uppercase;
+    color: #555;
+  }
+}
