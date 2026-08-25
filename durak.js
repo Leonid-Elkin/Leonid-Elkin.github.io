@@ -72,6 +72,8 @@ function canTransfer(c, receiver) {
   return receiver.length >= G.table.length + 1;
 }
 
+const sfx = (k) => { if (window.durakSfx && window.durakSfx[k]) window.durakSfx[k](); };
+
 const cheapFirst = (a, b) => {
   const ta = isTrump(a) ? 1 : 0;
   const tb = isTrump(b) ? 1 : 0;
@@ -143,6 +145,7 @@ function checkOver() {
 /* ---------- turn resolution ---------- */
 
 function endBout(taken) {
+  sfx(taken ? "take" : "done");
   if (taken) {
     // Defender picks the table up.
     const cards = [];
@@ -164,7 +167,7 @@ function endBout(taken) {
   // A defender who took the cards is attacked again.
   if (!taken) G.youAttack = !G.youAttack;
 
-  if (checkOver()) return render();
+  if (checkOver()) { sfx(G.over === "win" ? "win" : "lose"); return render(); }
   render();
   if (!G.youAttack) setTimeout(foeAttack, 560);
 }
@@ -192,6 +195,7 @@ function foeAttack() {
 
   G.foe.splice(G.foe.indexOf(pick), 1);
   G.table.push({ attack: pick, defence: null });
+  sfx("play");
   render();
 }
 
@@ -219,6 +223,7 @@ function foeDefend() {
     G.foe.splice(G.foe.indexOf(pick), 1);
     atk.defence = pick;
   }
+  sfx("beat");
   G.busy = false;
   render();
 
@@ -245,6 +250,7 @@ function playCard(i) {
   const c = G.you[i];
   if (!playable(c)) return;
   G.you.splice(i, 1);
+  sfx(G.youAttack ? "play" : "beat");
 
   if (G.youAttack) {
     G.table.push({ attack: c, defence: null });

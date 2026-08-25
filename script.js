@@ -93,10 +93,10 @@ const projects = [
     cat: "software",
     status: "wip",
     caption:
-      "A browser sword-arena .io game. Swing, parry, level up, and fight bots that use the same combat rules you do. Canvas rendering and TypeScript, no engine.",
+      "A browser sword-arena .io game. Swing, parry, level up, and fight bots that use the same combat rules you do. Canvas rendering and TypeScript, no engine. Playable right here.",
     tags: ["TypeScript", "Canvas", "Vite"],
     links: [
-      { name: "play", url: "", pending: true },
+      { name: "play", url: "bladefall/index.html" },
       { name: "source", url: "", pending: true },
     ],
   },

@@ -53,7 +53,7 @@ const CASES = {
   "bladefall": {
     picture: "Level 1, one bot in view, the arena's stone cubes casting their shadow.",
     sections: [
-      ["What it is", "A browser sword-arena .io game. Slash, stab, overhead and a special; parry and riposte; dash once you have earned it. Every kill without dying levels you up, the strongest fighter is crowned king, and dying resets you to level one."],
+      ["What it is", "A browser sword-arena .io game, playable on this site. Slash, stab, overhead and a special; parry and riposte; dash once you have earned it. Every kill without dying levels you up, the strongest fighter is crowned king, and dying resets you to level one."],
       ["How it is built", "TypeScript on a canvas, no engine. The world is a grid of pseudo-3D stone cubes; the fighters are circles with a sword, which turned out to read better than any sprite. The bots run the same combat rules as the player - same windups, same stamina, same parry window."],
       ["Design constants", "Everything that tunes the feel lives in one file: swing timings in milliseconds, movement multipliers while committed to an action, stamina regen and its delay, spawn protection. Changing the game is changing numbers."],
     ],
@@ -96,6 +96,7 @@ const CASES = {
   "project-euler": {
     sections: [
       ["What it is", "Solutions to the first hundred-odd Project Euler problems, in Python. Each one is on its own page: pick a number and read the code."],
+      ["Run it here", "Every solution can be run in the browser - Pyodide loads a full CPython into a web worker, the input files are fetched alongside, and the output appears under the code with the time it took. Nothing is sent anywhere; the page does the computing."],
     ],
     facts: [["Stack", "Python"]],
   },

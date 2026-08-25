@@ -51,6 +51,34 @@
     return a;
   }
 
+  /* A small Python tokeniser - enough to colour keywords, strings, numbers,
+     comments and the names being defined. Everything else stays ink. */
+  const KW = new Set("and as assert async await break class continue def del elif else except finally for from global if import in is lambda nonlocal not or pass raise return try while with yield True False None print range len int str list dict set sum max min abs sorted enumerate zip map filter open".split(" "));
+  const TOKEN = /(#.*)|("""[\s\S]*?"""|'''[\s\S]*?'''|"(?:\\.|[^"\\\n])*"|'(?:\\.|[^'\\\n])*')|(\b\d+(?:\.\d+)?(?:e[+-]?\d+)?\b)|(\b(?:def|class)\s+)([A-Za-z_]\w*)|([A-Za-z_]\w*)/g;
+
+  function highlight(src, into) {
+    let last = 0, m;
+    TOKEN.lastIndex = 0;
+    const push = (text, cls) => {
+      if (!text) return;
+      if (!cls) return into.append(text);
+      const s = document.createElement("span");
+      s.className = cls;
+      s.textContent = text;
+      into.appendChild(s);
+    };
+    while ((m = TOKEN.exec(src))) {
+      push(src.slice(last, m.index));
+      if (m[1]) push(m[1], "tk-com");
+      else if (m[2]) push(m[2], "tk-str");
+      else if (m[3]) push(m[3], "tk-num");
+      else if (m[4]) { push(m[4], "tk-kw"); push(m[5], "tk-def"); }
+      else push(m[6], KW.has(m[6]) ? "tk-kw" : null);
+      last = TOKEN.lastIndex;
+    }
+    push(src.slice(last));
+  }
+
   /* line numbers in the gutter, the source untouched */
   function renderCode(src) {
     code.textContent = "";
@@ -62,10 +90,57 @@
       const n = document.createElement("span");
       n.className = "n";
       n.textContent = String(i + 1).padStart(pad, " ");
-      row.append(n, ln + "\n");
+      row.appendChild(n);
+      highlight(ln, row);
+      row.append("\n");
       code.appendChild(row);
     });
   }
+
+  /* ---------- run it here: Pyodide in a worker ---------- */
+
+  const runBtn = document.getElementById("euler-run");
+  const stopBtn = document.getElementById("euler-stop");
+  const runStatus = document.getElementById("euler-run-status");
+  const out = document.getElementById("euler-out");
+  let worker = null;
+
+  function stopRun(msg) {
+    if (worker) { worker.terminate(); worker = null; }
+    stopBtn.hidden = true;
+    runBtn.disabled = false;
+    if (msg) runStatus.textContent = msg;
+  }
+
+  async function run() {
+    const p = data[cur];
+    if (!p || worker) return;
+    out.hidden = false;
+    out.textContent = "";
+    runBtn.disabled = true;
+    stopBtn.hidden = false;
+    runStatus.textContent = "fetching…";
+    const files = [];
+    for (const path of p.data || []) {
+      try {
+        const r = await fetch(path);
+        files.push({ name: path.split("/").pop(), text: await r.text() });
+      } catch (e) { /* the run will report the missing file itself */ }
+    }
+    worker = new Worker("euler-worker.js");
+    worker.onmessage = (e) => {
+      const m = e.data;
+      if (m.kind === "out") { out.textContent += m.text; out.scrollTop = out.scrollHeight; }
+      else if (m.kind === "status") runStatus.textContent = m.text;
+      else if (m.kind === "done") stopRun("finished in " + (m.ms < 1000 ? m.ms + " ms" : (m.ms / 1000).toFixed(1) + " s"));
+      else if (m.kind === "err") { out.textContent += m.text + "\n"; stopRun("stopped on an error"); }
+    };
+    worker.onerror = (e) => { out.textContent += (e.message || "worker error") + "\n"; stopRun("could not start"); };
+    worker.postMessage({ code: p.code, files });
+  }
+
+  runBtn.addEventListener("click", run);
+  stopBtn.addEventListener("click", () => stopRun("stopped"));
 
   let cur = -1;
 
@@ -95,6 +170,9 @@
     }
 
     renderCode(p.code);
+    stopRun("");
+    out.hidden = true;
+    out.textContent = "";
 
     prev.disabled = i === 0;
     next.disabled = i === data.length - 1;

@@ -321,9 +321,24 @@
     return svg;
   }
 
+  /* sounds come from the difference between the last state drawn and this one */
+  let lastSeen = null;
+  function soundFor(S) {
+    const sfx = window.durakSfx;
+    if (!sfx) return;
+    const prev = lastSeen;
+    lastSeen = { table: S.table.length, beaten: S.table.filter((p) => p.defence).length, discard: S.discard, over: S.over, hands: S.hands[0].length + S.hands[1].length };
+    if (!prev) return;
+    if (S.over !== null && prev.over === null) return sfx[S.over === me ? "win" : "lose"]();
+    if (S.table.length === 0 && prev.table > 0) return sfx[S.discard > prev.discard ? "done" : "take"]();
+    if (lastSeen.beaten > prev.beaten) return sfx.beat();
+    if (S.table.length > prev.table) return sfx.play();
+  }
+
   function render() {
     const root = $("durak");
     if (!root || !S) return;
+    soundFor(S);
     root.textContent = "";
     const L = legal(S, me);
     const foe = other(me);

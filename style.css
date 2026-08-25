@@ -2312,3 +2312,26 @@ pre.code .n { display: inline-block; width: 3ch; margin-right: 18px; color: var(
 
 /* the attribute must beat the display rules above */
 .lobby[hidden], .online-head[hidden], .durak[hidden] { display: none; }
+
+/* ---------- euler: colour and the run box ---------- */
+
+pre.code .tk-kw  { color: var(--red); }
+pre.code .tk-def { color: var(--ink); font-weight: 600; }
+pre.code .tk-str { color: #c9b98a; }
+pre.code .tk-num { color: #8fb4c9; }
+pre.code .tk-com { color: var(--ink-3); font-style: italic; }
+
+.euler-run { display: flex; align-items: center; gap: 10px; margin-top: 14px; flex-wrap: wrap; }
+.euler-run-status { color: var(--ink-3); font-size: 0.7rem; letter-spacing: 0.1em; text-transform: uppercase; }
+
+pre.code.out {
+  margin-top: 10px;
+  padding: 14px 18px;
+  border-top-color: var(--ink-3);
+  color: var(--ink-2);
+  max-height: 40vh;
+  overflow: auto;
+  white-space: pre-wrap;
+  min-height: 3em;
+}
+pre.code.out:empty::before { content: "…"; color: var(--ink-4); }
