@@ -2335,3 +2335,6 @@ pre.code.out {
   min-height: 3em;
 }
 pre.code.out:empty::before { content: "…"; color: var(--ink-4); }
+
+/* the arena embed: shorter than the map, and it wants the pointer */
+.arena-frame iframe { height: min(70vh, 640px); cursor: crosshair; }

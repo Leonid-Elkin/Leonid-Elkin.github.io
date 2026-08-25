@@ -182,6 +182,12 @@
   prev.addEventListener("click", () => cur > 0 && show(data[cur - 1].n, true));
   next.addEventListener("click", () => cur < data.length - 1 && show(data[cur + 1].n, true));
   window.addEventListener("hashchange", () => show(parseInt(location.hash.slice(1), 10), false));
+  window.addEventListener("keydown", (e) => {
+    if (e.target && /input|textarea/i.test(e.target.tagName)) return;
+    if (e.key === "ArrowLeft" || e.key === "k") prev.click();
+    else if (e.key === "ArrowRight" || e.key === "j") next.click();
+    else if (e.key === "r" && !runBtn.disabled) run();
+  });
 
   show(parseInt(location.hash.slice(1), 10) || data[0].n, false);
 })();
