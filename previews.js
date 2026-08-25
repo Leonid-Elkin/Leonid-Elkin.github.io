@@ -12,6 +12,7 @@
     "Drone Strike Map": "previews/drone-strike-map.jpg",
     "SHELLFALL": "previews/shellfall.jpg",
     "Sheet2Tab": "previews/sheet2tab.jpg",
+    "Chess Vision Bot": "previews/chess-vision-bot.jpg",
     "BLADEFALL": "previews/bladefall.jpg",
     "YT Grab": "previews/yt-grab.jpg",
     "Durak": "previews/durak.jpg",

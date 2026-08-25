@@ -127,6 +127,11 @@
     refill(S);
     if (!taken) S.attacker = def;
     checkOver(S);
+    if (S.over !== null && !S.scored) {
+      S.scored = true;
+      S.score = S.score || [0, 0];
+      if (S.over !== "draw") S.score[S.over]++;
+    }
   }
 
   /* Apply a move from player p. Returns an error string, or null. */
@@ -256,7 +261,7 @@
         send({ t: "state", S });
         render();
       }
-      else if (msg.t === "again" && me === 0) { S = newState(); send({ t: "state", S }); render(); }
+      else if (msg.t === "again" && me === 0) { redeal(); send({ t: "state", S }); render(); }
       else if (msg.t === "nope") { $("turn-text").textContent = msg.err; }
     });
     conn.on("close", () => { $("peer-text").textContent = "the other player left"; });
@@ -284,8 +289,18 @@
     }
   }
 
+  /* a new deal keeps the running score; the loser of the last hand leads the next */
+  function redeal() {
+    const score = S && S.score;
+    const loser = S && typeof S.over === "number" ? other(S.over) : null;
+    S = newState();
+    if (score) S.score = score;
+    if (loser !== null) S.attacker = other(loser);
+    return S;
+  }
+
   function again() {
-    if (me === 0) { S = newState(); send({ t: "state", S }); render(); }
+    if (me === 0) { redeal(); send({ t: "state", S }); render(); }
     else send({ t: "again" });
   }
 
@@ -424,6 +439,11 @@
     redo.addEventListener("click", again);
     ctl.appendChild(redo);
     root.appendChild(ctl);
+
+    /* the running score, once there is one */
+    if (S.score && (S.score[0] || S.score[1])) {
+      $("peer-text").textContent = "you " + S.score[me] + " — " + S.score[foe] + " them";
+    }
 
     /* whose move, in words - this page is allowed them */
     const t = $("turn-text");

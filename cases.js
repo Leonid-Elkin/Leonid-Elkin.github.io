@@ -35,6 +35,7 @@ const CASES = {
     facts: [["Role", "Solo"], ["Stack", "Python, PyMuPDF, MusicXML, LilyPond"], ["Status", "in progress"]],
   },
   "chess-vision-bot": {
+    picture: "The control panel, engine idle, waiting for a board to appear on screen.",
     sections: [
       ["What it is", "Watches a chessboard on your screen, rebuilds the position, and says what to play. It draws a line over the board for the suggested move and keeps an opening book for the first moves."],
       ["How it works", "A screen reader calibrated to the board's corners samples each square and matches it against the piece set; the position goes to an engine written in Python, which now has a C++ port for speed, and the suggested move is overlaid on the screen with PyQt5."],
