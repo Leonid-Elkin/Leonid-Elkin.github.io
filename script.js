@@ -24,7 +24,6 @@ const projects = [
       "Every reported drone and missile strike in the Russia-Ukraine war, day by day, with the outlet behind each figure. Reads a few dozen sources every morning and runs on its own server.",
     tags: ["Python", "SQLite", "systemd", "Leaflet"],
     links: [
-      { name: "case study", url: "project.html" },
       { name: "open the map", url: "https://dronestrikemap.com/" },
       { name: "public API", url: "https://dronestrikemap.com/api/strikes" },
       { name: "source", url: "", pending: true },
@@ -168,7 +167,7 @@ const projects = [
     title: "This website",
     cat: "software",
     caption:
-      "Swiss editorial on black, static HTML, no build step and no images anywhere - every mark is type, rule or inline SVG. The commit heatmap and the feed under it pull from GitHub in your browser.",
+      "Swiss editorial on black, static HTML, no build step. Every project gets its own page; the previews are real screenshots. The commit heatmap and the feed under it pull from GitHub in your browser.",
     tags: ["HTML", "CSS", "JavaScript"],
     links: [
       { name: "source", url: "https://github.com/Leonid-Elkin/Leonid-Elkin.github.io" },
@@ -411,9 +410,29 @@ function previewEl(p) {
   return box;
 }
 
+/* Every project has a page. Most are case.html?p=<slug>; a few have a page
+   of their own. The slug is the title, lower-cased, non-letters to hyphens. */
+const PAGE = {
+  "Drone Strike Map": "project.html",
+  "Project Euler": "euler.html",
+};
+
+function slugFor(p) {
+  return p.title.toLowerCase().replace(/&/g, " ").replace(/[^a-z0-9]+/g, "-").replace(/^-|-$/g, "");
+}
+
+function pageFor(p) {
+  return PAGE[p.title] || "case.html?p=" + slugFor(p);
+}
+
+/* the page first, then whatever the entry lists */
+function allLinks(p) {
+  return [{ name: "about", url: pageFor(p) }].concat(p.links || []);
+}
+
 /* first real destination a card can take you to */
 function primaryLink(p) {
-  return (p.links || []).find((l) => l.url && !l.pending) || null;
+  return allLinks(p).find((l) => l.url && !l.pending) || null;
 }
 
 function projectCard(p, i) {
@@ -446,7 +465,7 @@ function projectCard(p, i) {
   /* Links are a sibling of the body, not a child: the entry is a grid
      (number | preview | text | links) and the links column is flush right. */
   const links = el("div", "links");
-  p.links.forEach((l) => links.appendChild(linkEl(l)));
+  allLinks(p).forEach((l) => links.appendChild(linkEl(l)));
   card.appendChild(links);
 
   /* The whole entry is the door, not just the small link: a cover anchor
@@ -529,7 +548,7 @@ function initSelected() {
     row.appendChild(body);
 
     const links = el("div", "links");
-    links.appendChild(linkEl(p.links[0]));
+    links.appendChild(linkEl(allLinks(p)[0]));
     row.appendChild(links);
 
     const first = primaryLink(p);

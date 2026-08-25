@@ -4,15 +4,9 @@
 <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <title>Projects &middot; Leonid Elkin</title>
-    <meta name="description" content="Software, hardware and research projects by Leonid Elkin, with source, downloads and write-ups." />
+    <title>Project &middot; Leonid Elkin</title>
+    <meta name="description" content="A project by Leonid Elkin: what it is, how it was built, and where it lives." />
     <meta name="theme-color" content="#0a0a0a" />
-    <meta property="og:type" content="website" />
-    <meta property="og:title" content="Projects · Leonid Elkin" />
-    <meta property="og:description" content="Software, hardware and research projects by Leonid Elkin, with source, downloads and write-ups." />
-    <meta property="og:url" content="https://leonid-elkin.github.io/projects.html" />
-    <meta property="og:site_name" content="Leonid Elkin" />
-    <meta name="twitter:card" content="summary" />
     <link rel="icon"
         href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' fill='%230a0a0a'/%3E%3Crect x='7' y='7' width='18' height='18' fill='%23ff2d16'/%3E%3C/svg%3E" />
     <link rel="preconnect" href="https://fonts.googleapis.com" />
@@ -37,7 +31,6 @@
         </div>
     </nav>
 
-
     <div class="facet-band slim" aria-hidden="true">
         <svg viewBox="0 0 1440 100" preserveAspectRatio="none" shape-rendering="crispEdges">
             <rect width="1440" height="100" fill="#0a0a0a" />
@@ -53,31 +46,28 @@
         <section class="section">
             <div class="wrap">
                 <div class="section-head">
-                    <span class="idx">Index &mdash;</span>
-                    <h1 class="display overprint" data-text="Projects">Projects</h1>
-                    <span class="aside mono" id="project-count"></span>
+                    <span class="idx" id="case-idx">&mdash;</span>
+                    <h1 class="display overprint" id="case-title" data-text="">&nbsp;</h1>
+                    <a class="mono" href="projects.html">&larr; all projects</a>
                 </div>
 
-                <p class="setup">Everything is listed, not curated: shipped work, work in progress, and a few slots
-                    still to be filled. Each entry carries what it is written in and where the source or the
-                    write-up lives. Anything not yet published is marked <em>soon</em> rather than linked to a page
-                    that would 404.</p>
+                <p class="setup" id="case-setup"></p>
 
-                <!-- The filter is the one piece of functionality this page has, so it
-                     is a set of pressed/unpressed buttons rather than links: the URL
-                     hash tracks it (#product, #tooling) so a view can be linked to.
-                     Category names come from `cat` in script.js. -->
-                <div class="filter-row" role="group" aria-label="Filter projects">
-                    <button class="filter" data-filter="all" aria-pressed="true">All <span class="count"></span></button>
-                    <button class="filter" data-filter="software" aria-pressed="false">Software <span
-                            class="count"></span></button>
-                    <button class="filter" data-filter="hardware" aria-pressed="false">Hardware <span
-                            class="count"></span></button>
-                    <button class="filter" data-filter="research" aria-pressed="false">Research <span
-                            class="count"></span></button>
+                <figure class="case-hero" id="case-hero" hidden>
+                    <img id="case-img" alt="" decoding="async" />
+                    <figcaption class="mono" id="case-cap"></figcaption>
+                </figure>
+
+                <div class="about-body">
+                    <p class="col-label">Write-up</p>
+                    <div class="about-copy" id="case-copy"></div>
+                    <dl class="fact-list" id="case-facts"></dl>
                 </div>
 
-                <div id="project-grid" class="project-grid"></div>
+                <nav class="case-nav" aria-label="Neighbouring projects">
+                    <a class="mono" id="case-prev" href="projects.html"></a>
+                    <a class="mono" id="case-next" href="projects.html"></a>
+                </nav>
             </div>
         </section>
     </main>
@@ -90,16 +80,16 @@
                 <li><a href="https://github.com/Leonid-Elkin" target="_blank" rel="noopener">GitHub</a></li>
                 <li><a href="https://elkyy.itch.io/" target="_blank" rel="noopener">itch.io</a></li>
             </ul>
-            <span class="colophon">Set in Archivo, Inter Tight and JetBrains Mono. Black stock, one red &mdash; and one visitor in blue. Static HTML, no build step.</span>
+            <span class="colophon">Set in Archivo, Inter Tight and JetBrains Mono. Black stock, one red &mdash; and one visitor in blue.
+                Static HTML, no build step.</span>
         </div>
     </footer>
 
     <script src="previews.js"></script>
     <script src="script.js"></script>
+    <script src="cases.js"></script>
     <script src="extras.js"></script>
     <script src="motion.js"></script>
-    <script src="arcade.js"></script>
-    <script src="proof.js"></script>
 </body>
 
 </html>
