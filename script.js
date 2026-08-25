@@ -110,6 +110,18 @@ const projects = [
     links: [{ name: "source", url: "YTGrab_source.zip" }],
   },
   {
+    title: "Durak",
+    cat: "software",
+    status: "live",
+    caption:
+      "The Russian card game, with transfers. Play the machine from the card stack in the corner of the home page, or open a table and play a friend browser to browser - no server, no account.",
+    tags: ["JavaScript", "WebRTC"],
+    links: [
+      { name: "play online", url: "durak-online.html" },
+      { name: "source", url: "https://github.com/Leonid-Elkin/Leonid-Elkin.github.io/blob/main/durak-online.js" },
+    ],
+  },
+  {
     title: "Yavalath & Pentalath",
     cat: "software",
     caption:

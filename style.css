@@ -2254,3 +2254,61 @@ pre.code .n { display: inline-block; width: 3ch; margin-right: 18px; color: var(
   .euler-layout { grid-template-columns: 1fr; }
   .euler-pick { position: static; max-height: 30vh; grid-template-columns: repeat(auto-fill, minmax(40px, 1fr)); }
 }
+
+/* ---------- durak online (durak-online.html) ---------- */
+
+.panel-link { margin-left: auto; margin-right: 18px; color: var(--ink-3); }
+.panel-link:hover { color: var(--red); }
+
+.lobby {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: clamp(20px, 3vw, 40px);
+  padding: clamp(20px, 3vw, 32px);
+  border: 1px solid var(--rule-hot);
+  border-top: 2px solid var(--red);
+  background: var(--paper-2);
+  margin-bottom: 18px;
+}
+
+.lobby-col { display: flex; flex-direction: column; gap: 14px; align-items: flex-start; }
+
+.room-code { display: flex; align-items: center; gap: 14px; flex-wrap: wrap; }
+.room-code strong {
+  font-family: var(--f-mono);
+  font-size: 1.6rem;
+  letter-spacing: 0.3em;
+  color: var(--red);
+  padding: 4px 10px;
+  border: 1px solid var(--rule-hot);
+}
+
+.join-form { display: flex; gap: 10px; align-items: stretch; }
+.join-input {
+  width: 9ch;
+  padding: 10px 12px;
+  background: var(--paper);
+  border: 1px solid var(--rule-hot);
+  color: var(--ink);
+  font-family: var(--f-mono);
+  font-size: 1.1rem;
+  letter-spacing: 0.25em;
+  text-transform: lowercase;
+}
+.join-input:focus { outline: 2px solid var(--red); outline-offset: 0; }
+
+.lobby-status { grid-column: 1 / -1; color: var(--ink-3); min-height: 1.2em; }
+
+.online-head {
+  display: flex;
+  justify-content: space-between;
+  gap: 16px;
+  padding: 8px 0 12px;
+  color: var(--ink-2);
+}
+.online-head #turn-text { color: var(--ink); }
+
+@media (max-width: 640px) { .lobby { grid-template-columns: 1fr; } }
+
+/* the attribute must beat the display rules above */
+.lobby[hidden], .online-head[hidden], .durak[hidden] { display: none; }

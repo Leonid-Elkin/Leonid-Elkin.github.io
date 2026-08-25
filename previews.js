@@ -14,6 +14,7 @@
     "Sheet2Tab": "previews/sheet2tab.jpg",
     "BLADEFALL": "previews/bladefall.jpg",
     "YT Grab": "previews/yt-grab.jpg",
+    "Durak": "previews/durak.jpg",
     "Yavalath & Pentalath": "previews/yavalath.jpg",
     "Project Euler": "previews/project-euler.jpg",
     "Shooting scores": "previews/shooting-scores.jpg",

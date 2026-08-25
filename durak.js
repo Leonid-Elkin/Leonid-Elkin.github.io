@@ -10,6 +10,12 @@
  * already sits on the table; a defender who cannot or will not beat picks
  * everything up and loses the next attack; hands refill to six, attacker
  * first; the last player holding cards is the durak.
+ *
+ * Transfers (perevodnoy durak): a defender who has not beaten anything yet
+ * may lay a card of the same rank beside the attack and hand the whole bout
+ * back - the attacker becomes the defender. Only while the table is all
+ * unbeaten, only if the other side holds enough cards to answer everything,
+ * and never past six cards on the table. The machine transfers too.
  */
 
 const SUITS = [
@@ -57,6 +63,20 @@ function tableRanks() {
 function unbeaten() {
   return G.table.filter((p) => !p.defence);
 }
+
+/* May `c` be laid down as a transfer, handing the bout to `receiver`? */
+function canTransfer(c, receiver) {
+  if (!G.table.length || G.table.length >= HAND) return false;
+  if (G.table.some((p) => p.defence)) return false;
+  if (c.r !== G.table[0].attack.r) return false;
+  return receiver.length >= G.table.length + 1;
+}
+
+const cheapFirst = (a, b) => {
+  const ta = isTrump(a) ? 1 : 0;
+  const tb = isTrump(b) ? 1 : 0;
+  return ta - tb || val(a) - val(b);
+};
 
 /* Sort a hand: non-trumps by rank, then trumps. */
 function sortHand(h) {
@@ -177,30 +197,32 @@ function foeAttack() {
 
 function foeDefend() {
   if (G.over) return;
-  const open = unbeaten();
-  if (!open.length) return;
-  const atk = open[0];
+  if (!unbeaten().length) return;
 
-  const options = G.foe
-    .filter((c) => beats(c, atk.attack))
-    .sort((a, b) => {
-      const ta = isTrump(a) ? 1 : 0;
-      const tb = isTrump(b) ? 1 : 0;
-      return ta - tb || val(a) - val(b);
-    });
-
-  // Hold trumps back when the attack is cheap and the deck is thin.
-  const pick = options[0];
-  if (!pick) {
+  // Pass it back if it can: a non-trump of the table's rank, else a trump.
+  const pass = G.foe.filter((c) => canTransfer(c, G.you)).sort(cheapFirst)[0];
+  if (pass) {
+    G.foe.splice(G.foe.indexOf(pass), 1);
+    G.table.push({ attack: pass, defence: null });
+    G.youAttack = false;
     G.busy = false;
-    return endBout(true);
+    return render();
   }
-  G.foe.splice(G.foe.indexOf(pick), 1);
-  atk.defence = pick;
+
+  // Otherwise answer every open card in turn, cheapest card that beats it.
+  for (const atk of unbeaten()) {
+    const pick = G.foe.filter((c) => beats(c, atk.attack)).sort(cheapFirst)[0];
+    if (!pick) {
+      G.busy = false;
+      return endBout(true);
+    }
+    G.foe.splice(G.foe.indexOf(pick), 1);
+    atk.defence = pick;
+  }
   G.busy = false;
   render();
 
-  if (!unbeaten().length && G.table.length >= HAND) setTimeout(() => endBout(false), 520);
+  if (G.table.length >= HAND || !G.foe.length) setTimeout(() => endBout(false), 520);
 }
 
 /* ---------- your moves ---------- */
@@ -215,6 +237,7 @@ function playable(c) {
   }
   const open = unbeaten();
   if (!open.length) return false;
+  if (canTransfer(c, G.foe)) return true;
   return beats(c, open[0].attack);
 }
 
@@ -228,9 +251,17 @@ function playCard(i) {
     render();
     G.busy = true;
     setTimeout(foeDefend, 620);
+  } else if (canTransfer(c, G.foe)) {
+    // Same rank, nothing beaten yet: the bout is theirs now.
+    G.table.push({ attack: c, defence: null });
+    G.youAttack = true;
+    render();
+    G.busy = true;
+    setTimeout(foeDefend, 620);
   } else {
     unbeaten()[0].defence = c;
     render();
+    if (unbeaten().length) return; // more to answer before they may add
     // Opponent may add another card to the bout.
     setTimeout(() => {
       if (G.over) return;

@@ -68,6 +68,16 @@ const CASES = {
     ],
     facts: [["Role", "Solo"], ["Stack", "PowerShell 5.1, WPF, yt-dlp, ffmpeg, NAudio"], ["Status", "live"]],
   },
+  "durak": {
+    picture: "A table open, a bout in progress.",
+    sections: [
+      ["What it is", "Durak - thirty-six cards, trump from the bottom of the deck, the last one holding cards loses. Two ways to play: against the machine, hidden behind the stack of cards in the corner of the home page, or against a friend on the online table."],
+      ["Transfers", "Both games play perevodnoy durak. A defender who has not beaten anything yet may lay a card of the same rank beside the attack and hand the whole bout back; the attacker is now the defender. Only while everything on the table is unbeaten, only if the other side has enough cards to answer, never past six on the table. The machine transfers when it can."],
+      ["How the online game works", "There is no server. One player hosts and reads out a six-letter code; the other joins with it and the two browsers talk directly over WebRTC (PeerJS handles the introduction). The host owns the game: every move from either side goes through the same rules function on the host, which then sends the whole state to both. The guest only proposes."],
+      ["Why wordless", "The machine game has no copy at all - ranks and suits carry the state, two icon buttons carry the only two decisions, and the result is a stamp of suits or a skull. The online table allows itself one line, because you need to know whose move it is."],
+    ],
+    facts: [["Role", "Solo"], ["Stack", "JavaScript, WebRTC (PeerJS)"], ["Status", "live"]],
+  },
   "yavalath-pentalath": {
     picture: "Yavalath in play: four in a row wins, three in a row loses.",
     sections: [
