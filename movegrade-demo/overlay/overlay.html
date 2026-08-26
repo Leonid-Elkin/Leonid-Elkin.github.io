@@ -1,0 +1,65 @@
+<!doctype html>
+<html>
+<head>
+  <meta charset="utf-8" />
+  <title>MoveGrade</title>
+  <link rel="stylesheet" href="overlay.css" />
+</head>
+<body>
+  <div id="panel">
+    <div id="bar">
+      <span id="logo">♞</span>
+      <span id="title">MoveGrade</span>
+      <span id="status">loading engine…</span>
+      <button id="gear" title="Settings">⚙</button>
+      <button id="close" title="Hide this panel (the badge stays on the board; click the toolbar icon to show the panel again)">⊡</button>
+    </div>
+
+    <div id="settings" hidden>
+      <div class="row">
+        <span>Depth</span>
+        <input id="depth" type="range" min="4" max="24" step="1" />
+        <span id="depthVal" class="val"></span>
+      </div>
+      <div class="row">
+        <span>Pieces</span>
+        <select id="pieceSet"></select>
+      </div>
+      <div class="row">
+        <span>Board</span>
+        <select id="boardTheme">
+          <option value="green">Green</option>
+          <option value="brown">Brown</option>
+          <option value="blue">Blue</option>
+          <option value="grey">Grey</option>
+        </select>
+      </div>
+      <label class="row"><input id="backfill" type="checkbox" /> Grade earlier moves in background</label>
+      <label class="row"><input id="showBoard" type="checkbox" /> Show mini board</label>
+    </div>
+
+    <div id="main">
+      <div id="boardWrap">
+        <div id="evalbar"><div id="evalfill"></div><span id="evaltext">0.0</span></div>
+        <div id="board"></div>
+      </div>
+
+      <div id="info">
+        <div id="badgeRow">
+          <div id="badge" class="cat-none"><span id="glyph">·</span></div>
+          <div>
+            <div id="label" class="cat-none">Waiting for moves</div>
+            <div id="move">—</div>
+          </div>
+        </div>
+        <div id="evals"><span id="evalBefore">·</span><span class="arrow">→</span><span id="evalAfter">·</span></div>
+        <div id="detail"></div>
+        <div id="bestline"></div>
+      </div>
+    </div>
+
+    <div id="history"></div>
+  </div>
+  <script type="module" src="overlay.js"></script>
+</body>
+</html>

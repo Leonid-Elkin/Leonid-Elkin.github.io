@@ -16,6 +16,7 @@
     "Chess Vision Bot": "previews/chess-vision-bot.jpg",
     "YT Grab": "previews/yt-grab.jpg",
     "MoveGrade": "previews/movegrade.jpg",
+    "Advent of Code 2025": "previews/advent-of-code-2025.jpg",
     "Durak": "previews/durak.jpg",
     "Yavalath & Pentalath": "previews/yavalath.jpg",
     "Project Euler": "previews/project-euler.jpg",

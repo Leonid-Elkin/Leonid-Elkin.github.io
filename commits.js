@@ -479,6 +479,9 @@ window.addEventListener("DOMContentLoaded", async () => {
   const paint = (data) => {
     if (graphInto) renderGraph(data.weeks || [], graphInto, data.repoCount || 0);
     renderCommits(data.commits || [], into);
+    const lc = document.getElementById("last-change");
+    const top = (data.commits || [])[0];
+    if (lc && top) lc.textContent = "Last change " + relativeDate(top.date) + " — " + top.message.split("\n")[0];
   };
 
   if (!GH_USER) {

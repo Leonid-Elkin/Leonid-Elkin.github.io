@@ -23,7 +23,7 @@
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
     <link rel="stylesheet"
         href="https://fonts.googleapis.com/css2?family=Archivo:wght@500;600;700;800&family=Inter+Tight:wght@400;500;600&family=JetBrains+Mono:wght@400;500&display=swap" />
-    <link rel="stylesheet" href="style.css?v=2" />
+    <link rel="stylesheet" href="style.css?v=4" />
     <link rel="stylesheet" href="durak.css" />
 </head>
 
@@ -111,7 +111,7 @@
                         <ol class="pad-list" data-pad-list>
                             <li><span class="pad-line">Sheet2Tab &mdash; the editor for the bars it still misreads</span></li>
                             <li><span class="pad-line">Yagi-Uda radar &mdash; ranging a target off the Pi. Not finished.</span></li>
-                            <li><span class="pad-line">Chess Vision Bot &mdash; the C++ port of the engine</span></li>
+                            <li><span class="pad-line">MoveGrade &mdash; a smaller net than 40 MB, and chess.com live pages</span></li>
                         </ol>
 
                         <div class="pad-plate" data-pad-plate hidden>
@@ -163,7 +163,7 @@
                 <div class="section-head">
                     <span class="idx">01 &mdash;</span>
                     <h2 class="display">About</h2>
-                    <span class="aside mono">in your own words</span>
+                    <span class="aside mono">&nbsp;</span>
                 </div>
                 <div class="about-body">
                     <p class="col-label">Biography</p>
@@ -171,13 +171,18 @@
                         <!-- PLACEHOLDER: these two paragraphs are yours to write. Everything
                              drafted here before was written for you, not by you, so they stay
                              blank rather than shipped in someone else's voice. -->
-                        <p class="placeholder">[ who you are, where you are, what you are studying &mdash; two or
-                            three sentences ]</p>
-                        <p class="placeholder">[ what you build and why &mdash; a paragraph, or nothing ]</p>
+                        <p>I build things that have to meet the real world and be right about it: a public strike
+                            record that reads the news every morning and serves an API, a CanSat payload and radio
+                            that flew, a Yagi-Uda antenna that is slowly becoming a radar, a chess engine that
+                            watches games and says what it thinks of every move.</p>
+                        <p>Mostly Python, some C++ and C#, JavaScript when the thing has to live in a browser.
+                            Two research papers &mdash; one on neural scaling laws, one on globular cluster
+                            evaporation &mdash; and a habit of finishing the side projects: the games on this site
+                            play, the tools download, the extension grades.</p>
                     </div>
                     <dl class="fact-list">
-                        <div><dt class="k">Based</dt><dd class="placeholder">[ town, country ]</dd></div>
-                        <div><dt class="k">Studying</dt><dd class="placeholder">[ course, year ]</dd></div>
+                        <div><dt class="k">Languages</dt><dd>Python &middot; C++ &middot; C# &middot; JavaScript</dd></div>
+                        <div><dt class="k">Research</dt><dd>neural scaling laws &middot; globular clusters</dd></div>
                         <div><dt class="k">GitHub</dt><dd><a href="https://github.com/Leonid-Elkin" target="_blank"
                                     rel="noopener">Leonid-Elkin</a></dd></div>
                         <div><dt class="k">Email</dt><dd><a href="mailto:lnd.elkn@gmail.com">lnd.elkn@gmail.com</a>
@@ -260,13 +265,14 @@
                     <a class="mono" href="https://dronestrikemap.com/" target="_blank" rel="noopener">open in its
                         own tab</a>
                 </div>
-                <p class="setup">The Drone Strike Map, running here &mdash; the real site, served from its own
-                    box. Every figure is a claim, and each one names the outlet that made it; the arrows walk the
-                    days.</p>
-                <div class="live-frame">
-                    <iframe src="https://dronestrikemap.com/" title="Drone Strike Map" loading="lazy"
-                        referrerpolicy="strict-origin-when-cross-origin"></iframe>
-                </div>
+                <p class="setup">The Drone Strike Map, served from its own box. Every figure is a claim, and each
+                    one names the outlet that made it; the arrows walk the days. The site refuses to be framed
+                    &mdash; a deliberate header on the server &mdash; so this is a still of it: click through for
+                    the live one.</p>
+                <a class="live-still" href="https://dronestrikemap.com/" target="_blank" rel="noopener">
+                    <img src="previews/drone-strike-map.jpg" alt="The Drone Strike Map: a map of Ukraine with the day's reported strikes, and the sources behind them" loading="lazy" decoding="async" />
+                    <span class="mono">dronestrikemap.com &rarr;</span>
+                </a>
             </div>
         </section>
 
@@ -298,6 +304,7 @@
             </ul>
             <span class="colophon">Set in Archivo, Inter Tight and JetBrains Mono. Black stock, one red &mdash; and one visitor in blue. Static HTML, no build step.
                 <span class="dwell" id="dwell"></span></span>
+            <span class="colophon mono" id="last-change"></span>
         </div>
     </footer>
 
@@ -321,8 +328,8 @@
     </div>
 
     <script src="previews.js"></script>
-    <script src="script.js?v=2"></script>
-    <script src="commits.js"></script>
+    <script src="script.js?v=4"></script>
+    <script src="commits.js?v=4"></script>
     <script src="durak-sfx.js"></script>
     <script src="durak.js"></script>
     <script src="egg.js?v=2"></script>
