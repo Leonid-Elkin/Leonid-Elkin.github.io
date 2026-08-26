@@ -26,7 +26,7 @@ const LIST_REPOS = 5; // repos read for the commit list
 const PER_REPO = 5; // commits to pull from each
 const SHOW = 8; // commits displayed after merging
 const WEEKS_SHOWN = 52; // columns in the heatmap - one year
-const CACHE_KEY = "commits-v2";
+const CACHE_KEY = "commits-v3";
 const CACHE_TTL = 6 * 60 * 60 * 1000; // the graph moves once a day at most
 const CACHE_TTL_THIN = 10 * 60 * 1000; // ...unless GitHub was still adding up
 const CACHE_REUSE = 24 * 60 * 60 * 1000; // how long a fuller year may be held on to
@@ -92,6 +92,7 @@ async function fetchRecentCommits(repos) {
         .then((commits) =>
           commits.map((c) => ({
             repo: repo.name,
+            full: repo.full_name,
             message: c.commit.message.split("\n")[0],
             date: c.commit.author.date,
             url: c.html_url,
@@ -102,10 +103,36 @@ async function fetchRecentCommits(repos) {
     )
   );
 
-  return perRepo
+  const top = perRepo
     .flat()
     .sort((a, b) => new Date(b.date) - new Date(a.date))
     .slice(0, SHOW);
+
+  // What each commit touched, not what it said: the file list comes from the
+  // per-commit endpoint. One more request per shown commit, cached with the rest.
+  await Promise.all(
+    top.map((c) =>
+      ghJson(`https://api.github.com/repos/${c.full}/commits/${c.sha}`)
+        .then((d) => {
+          const files = d.files || [];
+          c.files = files.map((f) => f.filename.split("/").pop());
+          c.added = files.reduce((n, f) => n + (f.additions || 0), 0);
+          c.removed = files.reduce((n, f) => n + (f.deletions || 0), 0);
+        })
+        .catch(() => { c.files = []; })
+    )
+  );
+  return top;
+}
+
+/* "index.html, script.js, style.css +2 more · +140 −23" */
+function editedText(c) {
+  const files = c.files || [];
+  if (!files.length) return "files not listed";
+  const shown = files.slice(0, 3).join(", ");
+  const more = files.length > 3 ? ` +${files.length - 3} more` : "";
+  const delta = c.added || c.removed ? ` · +${c.added} −${c.removed}` : "";
+  return shown + more + delta;
 }
 
 async function fetchYear(repos) {
@@ -360,7 +387,7 @@ function renderCommits(list, into) {
     msg.href = c.url;
     msg.target = "_blank";
     msg.rel = "noopener";
-    msg.textContent = c.message;
+    msg.textContent = editedText(c);
     msg.title = `${c.sha} - view on GitHub`;
 
     const when = document.createElement("time");
@@ -481,7 +508,10 @@ window.addEventListener("DOMContentLoaded", async () => {
     renderCommits(data.commits || [], into);
     const lc = document.getElementById("last-change");
     const top = (data.commits || [])[0];
-    if (lc && top) lc.textContent = "Last change " + relativeDate(top.date) + " — " + top.message.split("\n")[0];
+    if (lc && top) {
+      const n = (top.files || []).length;
+      lc.textContent = "Last change " + relativeDate(top.date) + " — " + (n ? n + (n === 1 ? " file" : " files") + " in " : "") + top.repo;
+    }
   };
 
   if (!GH_USER) {
