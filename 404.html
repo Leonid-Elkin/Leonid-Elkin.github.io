@@ -14,8 +14,8 @@
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
     <link rel="stylesheet"
-        href="https://fonts.googleapis.com/css2?family=Archivo:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500&display=swap" />
-    <link rel="stylesheet" href="style.css?v=3" />
+        href="https://fonts.googleapis.com/css2?family=Archivo:wght@500;600;700;800&family=Inter+Tight:wght@400;500;600&family=JetBrains+Mono:wght@400;500&display=swap" />
+    <link rel="stylesheet" href="style.css" />
 </head>
 
 <body>
@@ -59,8 +59,34 @@
             </div>
         </section>
 
-        <div class="plate-strip" data-head="page not in the index" aria-hidden="true">
-            <span class="ramiel" data-size="300" style="right: auto; left: 20%; bottom: 18%; width: clamp(180px, 24vw, 340px);" aria-hidden="true"></span>
+        <!-- the ridge, but wrong: the red facet has slipped above the horizon -->
+        <div class="facet-band" data-terrain aria-hidden="true">
+            <svg viewBox="0 0 1440 360" preserveAspectRatio="none" shape-rendering="crispEdges">
+                <rect width="1440" height="360" fill="#0a0a0a" />
+
+                <!-- far range: palest, hazed by distance -->
+                <polygon points="0,238 92,168 158,212 262,138 344,204 434,160 522,222 642,148 734,202 834,170 924,224 1032,156 1122,208 1232,176 1322,220 1440,166 1440,360 0,360" fill="#1a1b1f" />
+                <polygon points="262,138 344,204 300,224 240,196" fill="#1f2025" />
+                <polygon points="642,148 734,202 676,222 622,192" fill="#1f2025" />
+                <polygon points="1032,156 1122,208 1068,226 1014,198" fill="#1f2025" />
+                <polygon points="92,168 158,212 118,224" fill="#15161a" />
+                <polygon points="834,170 924,224 872,236" fill="#15161a" />
+
+                <!-- mid range -->
+                <polygon points="0,306 118,224 212,278 332,204 452,286 562,230 682,296 802,220 902,282 1012,238 1132,300 1252,244 1362,296 1440,260 1440,360 0,360" fill="#121316" />
+                <polygon points="332,204 452,286 384,306 300,262" fill="#16171b" />
+                <polygon points="802,220 902,282 846,304 774,258" fill="#16171b" />
+                <polygon points="1252,244 1362,296 1300,312" fill="#16171b" />
+                <polygon points="118,224 212,278 158,300" fill="#0e0f12" />
+                <polygon points="562,230 682,296 614,312" fill="#0e0f12" />
+
+                <!-- near range: darkest, biggest facets -->
+                <polygon points="0,360 0,318 148,258 282,328 424,266 572,342 722,282 882,344 1042,286 1202,348 1332,302 1440,340 1440,360" fill="#0c0c0e" />
+                <polygon points="148,258 282,328 196,360 60,360" fill="#101114" />
+                <polygon points="722,282 882,344 792,360 668,360" fill="#101114" />
+                <polygon points="1332,302 1440,340 1440,360 1272,360" fill="#101114" />
+            </svg>
+            <span class="ramiel" data-size="300" style="right: auto; left: 20%; bottom: 32%; width: clamp(180px, 24vw, 340px);" aria-hidden="true"></span>
             <span class="ramiel-caption" style="right: auto; left: 40%;">Pattern blue</span>
         </div>
     </main>
@@ -78,6 +104,8 @@
 
     <script src="extras.js"></script>
     <script src="ramiel.js"></script>
+    <script src="terrain.js"></script>
+    <script src="meteors.js"></script>
 </body>
 
 </html>
