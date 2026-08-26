@@ -73,18 +73,6 @@ const projects = [
     links: [{ name: "source", url: "", pending: true }],
   },
   {
-    title: "BLADEFALL",
-    cat: "software",
-    status: "wip",
-    caption:
-      "A browser sword-arena .io game. Swing, parry, level up, and fight bots that use the same combat rules you do. Canvas rendering and TypeScript, no engine. Playable right here.",
-    tags: ["TypeScript", "Canvas", "Vite"],
-    links: [
-      { name: "play", url: "bladefall/index.html" },
-      { name: "source", url: "", pending: true },
-    ],
-  },
-  {
     title: "Chess Vision Bot",
     cat: "software",
     status: "wip",
@@ -101,9 +89,10 @@ const projects = [
     cat: "software",
     status: "live",
     caption:
-      "The Russian card game, with transfers. Play the machine from the card stack in the corner of the home page, or open a table and play a friend browser to browser - no server, no account.",
+      "The Russian card game, with transfers. Play the machine right here on this page, or open a table and play a friend browser to browser - no server, no account.",
     tags: ["JavaScript", "WebRTC"],
     links: [
+      { name: "play here", url: "#durak" },
       { name: "play online", url: "durak-online.html" },
       { name: "source", url: "https://github.com/Leonid-Elkin/Leonid-Elkin.github.io/blob/main/durak-online.js" },
     ],
@@ -335,7 +324,6 @@ const skills = [
       { name: "C", via: "a CMake game engine" },
       { name: "C#", via: "Unity" },
       { name: "JavaScript", via: "this site" },
-      { name: "TypeScript", via: "BLADEFALL" },
       { name: "PowerShell", via: "YT Grab" },
     ],
   },
@@ -538,11 +526,11 @@ function initProjects() {
     });
     buttons.forEach((b) => b.setAttribute("aria-pressed", b.dataset.filter === filter ? "true" : "false"));
     if (countEl) countEl.textContent = shown === 1 ? "1 project" : shown + " projects";
-    if (push) history.replaceState(null, "", filter === "all" ? location.pathname : "#" + filter);
+    if (push && grid.dataset.hash !== "off") history.replaceState(null, "", filter === "all" ? location.pathname : "#" + filter);
   }
 
   buttons.forEach((b) => b.addEventListener("click", () => apply(b.dataset.filter)));
-  apply((location.hash || "").replace("#", ""), { push: false });
+  apply(grid.dataset.hash === "off" ? "all" : (location.hash || "").replace("#", ""), { push: false });
 }
 
 /* ---------- home: selected work ---------- */

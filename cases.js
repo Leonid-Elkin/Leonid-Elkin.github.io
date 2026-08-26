@@ -52,15 +52,6 @@ const CASES = {
     ],
     facts: [["Role", "Solo"], ["Stack", "C++20, CMake"], ["Status", "in progress"]],
   },
-  "bladefall": {
-    picture: "Level 1, one bot in view, the arena's stone cubes casting their shadow.",
-    sections: [
-      ["What it is", "A browser sword-arena .io game, playable on this site. Slash, stab, overhead and a special; parry and riposte; dash once you have earned it. Every kill without dying levels you up, the strongest fighter is crowned king, and dying resets you to level one."],
-      ["How it is built", "TypeScript on a canvas, no engine. The world is a grid of pseudo-3D stone cubes; the fighters are circles with a sword, which turned out to read better than any sprite. The bots run the same combat rules as the player - same windups, same stamina, same parry window."],
-      ["Design constants", "Everything that tunes the feel lives in one file: swing timings in milliseconds, movement multipliers while committed to an action, stamina regen and its delay, spawn protection. Changing the game is changing numbers."],
-    ],
-    facts: [["Role", "Solo"], ["Stack", "TypeScript, Canvas, Vite"], ["Status", "in progress"]],
-  },
   "yt-grab": {
     picture: "The Download tab: a playlist URL, mp3 at 192 kbps, first ten items.",
     sections: [

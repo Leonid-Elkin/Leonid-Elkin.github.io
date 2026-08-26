@@ -2338,3 +2338,10 @@ pre.code.out:empty::before { content: "…"; color: var(--ink-4); }
 
 /* the arena embed: shorter than the map, and it wants the pointer */
 .arena-frame iframe { height: min(70vh, 640px); cursor: crosshair; }
+
+
+/* ---------- the full index on the home page ---------- */
+.project-grid.dense .project-card { padding: clamp(14px, 1.6vw, 20px) 0; }
+.project-grid.dense .project-card .caption { font-size: 0.97rem; }
+.project-grid.dense .project-card .tags { margin-top: 6px; }
+#work .filter-row { margin-bottom: 4px; }

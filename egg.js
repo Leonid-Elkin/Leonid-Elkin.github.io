@@ -117,6 +117,20 @@
 
     if (closeBtn) closeBtn.addEventListener("click", closePanel);
 
+    /* Every "play here" link on the page - the nav item, the project entry,
+       the line under the projects heading - opens the board directly. */
+    document.addEventListener("click", (e) => {
+      const a = e.target.closest('a[href="#durak"]');
+      if (!a) return;
+      e.preventDefault();
+      if (!dealt) setDealt(true);
+      openPanel();
+    });
+    if (location.hash === "#durak") {
+      setDealt(true);
+      openPanel();
+    }
+
     document.addEventListener("keydown", (e) => {
       if (e.key === "Escape" && panel && !panel.hidden) closePanel();
     });
