@@ -207,6 +207,7 @@ const CASES = {
     if (og) og.content = new URL(src, location.href).href;
     const fig = document.getElementById("case-hero");
     document.getElementById("case-img").src = src;
+    document.getElementById("case-img").hidden = false;
     document.getElementById("case-img").alt = p.title;
     document.getElementById("case-cap").textContent = c.picture || "";
     fig.hidden = false;
