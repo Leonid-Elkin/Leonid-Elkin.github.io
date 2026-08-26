@@ -70,6 +70,18 @@ const CASES = {
     ],
     facts: [["Role", "Solo"], ["Stack", "PowerShell 5.1, WPF, yt-dlp, ffmpeg, NAudio"], ["Status", "live"]],
   },
+  "movegrade": {
+    picture: "The panel after 5...Nxd5 in the Fried Liver: a mistake, the eval before and after, and the line the engine preferred.",
+    sections: [
+      ["What it is", "A Chrome extension for lichess and chess.com. After every move a badge says how good it was - Brilliant, Great, Best, Excellent, Good, Book, Inaccuracy, Mistake, Blunder - both in a small panel with its own board and eval bar, and pinned to the square on the site's board, the way chess.com's game review does it after the game. A dot per move along the bottom lets you go back to any earlier one."],
+      ["How the grading works", "Stockfish 16 (the WebAssembly build, with the NNUE net) evaluates the position before the move with two principal variations, so it knows the best and second-best replies, and then the position after. Both evaluations become a win probability using lichess's formula, and the drop from the mover's side decides the category. Best is the engine's own move; Brilliant is a Best move that gives up material on purpose in a position that was not already won; Great is a Best move that was the only good one."],
+      ["Depth, in stages", "Grading waits for nothing. Both positions are searched to depth four first and the badge appears from that - a fraction of a second - then every deeper iteration up to the depth you chose re-grades and updates it, with the badge drawn faintly until the search is done. Earlier moves are filled in in the background."],
+      ["Where the engine lives", "Not in the panel. Both sites serve their pages cross-origin isolated (they need it for their own multithreaded Stockfish), and a Worker started from a frame embedded in such a page never loads. The engine therefore runs in an extension offscreen document that the sites cannot touch; panels talk to it over a runtime port, and one engine serves every open tab."],
+      ["Reading the move list", "Lichess randomises the tag names in its move list, so there are no selectors to hold on to. The content script looks for the element that contains the most nodes that parse as chess notation and takes that as the move list; chess.com's list is a proper element, but writes piece letters as icons, so the figurine is folded back into the text."],
+      ["Where it stays quiet", "In a live game against a person the panel shows Paused and does nothing. Real-time engine output in that game is engine assistance under either site's rules, and the point of this was to see what the engine thinks of a game, not to play it for you."],
+    ],
+    facts: [["Role", "Solo"], ["Stack", "JavaScript, Chrome MV3, Stockfish 16 WASM, chess.js"], ["Status", "live"]],
+  },
   "durak": {
     picture: "A table open, a bout in progress.",
     sections: [

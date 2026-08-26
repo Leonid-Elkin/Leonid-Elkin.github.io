@@ -16,6 +16,7 @@
     "Chess Vision Bot": "previews/chess-vision-bot.jpg",
     "BLADEFALL": "previews/bladefall.jpg",
     "YT Grab": "previews/yt-grab.jpg",
+    "MoveGrade": "previews/movegrade.jpg",
     "Durak": "previews/durak.jpg",
     "Yavalath & Pentalath": "previews/yavalath.jpg",
     "Project Euler": "previews/project-euler.jpg",
