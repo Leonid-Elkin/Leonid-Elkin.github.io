@@ -2358,3 +2358,23 @@ pre.code.out:empty::before { content: "…"; color: var(--ink-4); }
      the fallback - no reason to reserve half a screen for it. */
   .doc-frame { height: auto; min-height: 260px; }
 }
+
+
+/* ---------- the live map, framed rather than photographed ---------- */
+
+.live-embed { margin-top: 0; }
+
+/* Matches the footprint the still occupied, so swapping one for the other
+   does not move the page. */
+.live-embed.is-live {
+  border: 1px solid var(--rule);
+  background: var(--paper-2);
+  height: clamp(460px, 72vh, 860px);
+}
+
+.live-frame { display: block; width: 100%; height: 100%; border: 0; }
+
+@media (max-width: 700px) {
+  /* A map with its own panel and chart needs the height back on a phone. */
+  .live-embed.is-live { height: clamp(420px, 78vh, 620px); }
+}

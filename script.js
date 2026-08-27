@@ -623,6 +623,36 @@ function initSkills() {
   });
 }
 
+/* ---------- home: the live map ---------- */
+
+/* The Drone Strike Map is framed here rather than photographed. Its own server
+ * decides who is allowed to do that - the content policy it serves names this
+ * site - so the frame is only mounted from an origin on that list. Anywhere
+ * else (a local preview, a fork, someone's mirror) the still underneath
+ * stands, which is also what a visitor without scripting sees. Better a
+ * picture that loads than a frame the browser refuses and leaves blank.
+ */
+const FRAME_ALLOWED = ["https://leonid-elkin.github.io"];
+
+function initLiveFrame() {
+  const box = document.querySelector(".live-embed");
+  if (!box) return;
+
+  const src = box.dataset.liveSrc;
+  if (!src) return;
+  if (FRAME_ALLOWED.indexOf(location.origin) === -1) return;
+
+  const frame = el("iframe", "live-frame");
+  frame.src = src;
+  frame.title = "The Drone Strike Map, live";
+  frame.loading = "lazy";
+  frame.setAttribute("referrerpolicy", "strict-origin-when-cross-origin");
+
+  box.textContent = "";
+  box.appendChild(frame);
+  box.classList.add("is-live");
+}
+
 /* ---------- counts quoted in the chrome ---------- */
 
 function initCounts() {
@@ -638,5 +668,6 @@ window.addEventListener("DOMContentLoaded", () => {
   initRoles();
   initEducation();
   initSkills();
+  initLiveFrame();
   initCounts();
 });
