@@ -10,7 +10,9 @@
   --excellent: #96bc4b;
   --good: #95b776;
   --book: #a88865;
+  --forced: #9c9c9c;
   --inaccuracy: #f7c631;
+  --miss: #ff7769;
   --mistake: #ffa459;
   --blunder: #fa412d;
   --mate: #e8e8e8;
@@ -175,6 +177,8 @@ html, body {
 .cat-excellent  { background: var(--excellent); }
 .cat-good       { background: var(--good); }
 .cat-book       { background: var(--book); }
+.cat-forced     { background: var(--forced); color: #222; text-shadow: none; }
+.cat-miss       { background: var(--miss); }
 .cat-inaccuracy { background: var(--inaccuracy); color: #222; text-shadow: none; }
 .cat-mistake    { background: var(--mistake); }
 .cat-blunder    { background: var(--blunder); }
@@ -187,6 +191,8 @@ html, body {
 #label.cat-excellent  { color: var(--excellent); background: none; }
 #label.cat-good       { color: var(--good); background: none; }
 #label.cat-book       { color: var(--book); background: none; }
+#label.cat-forced     { color: var(--forced); background: none; }
+#label.cat-miss       { color: var(--miss); background: none; }
 #label.cat-inaccuracy { color: var(--inaccuracy); background: none; }
 #label.cat-mistake    { color: var(--mistake); background: none; }
 #label.cat-blunder    { color: var(--blunder); background: none; }

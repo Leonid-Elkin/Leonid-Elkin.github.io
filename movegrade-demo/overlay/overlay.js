@@ -401,7 +401,7 @@ function renderGrade(g) {
   bits.push(`depth ${g.depth}${g.provisional ? "…" : ""}`);
   els.detail.textContent = bits.join(" · ");
 
-  if (!g.isEngineBest && g.before.lines[0] && g.cat !== "mate" && g.cat !== "book") {
+  if (!g.isEngineBest && g.before.lines[0] && !["mate", "book", "forced"].includes(g.cat)) {
     els.bestline.textContent = "Best was " + pvToSan(fens[g.ply], g.before.lines[0].pv, 4);
   } else {
     els.bestline.textContent = "";
