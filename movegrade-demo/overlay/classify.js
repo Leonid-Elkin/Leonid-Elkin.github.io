@@ -4,8 +4,14 @@
 // Thresholds are between lichess (lenient) and chess.com (strict).
 
 import { Chess } from "../lib/chess.js";
+import { lookupOpening } from "./book.js";
 
 const PIECE_VALUE = { p: 1, n: 3, b: 3, r: 5, q: 9, k: 100 };
+
+// How badly the mover may stand after a book move and still have it called
+// "Book". Loose enough for the pawn a gambit invests, tight enough that a named
+// but refuted line is graded on its merits instead.
+const BOOK_MIN_CP = -150;
 
 export const CATEGORIES = {
   brilliant:  { label: "Brilliant",  glyph: "!!" },
@@ -77,19 +83,26 @@ function isSacrifice(after, move) {
  * @param fenBefore
  * @param san     the move played
  * @param ply     0-based ply index of the move
+ *
+ * Returns `opening` (the ECO name of the position reached, or null) alongside
+ * the badge, so the panel can name the line even once it stops being book.
  */
 export function classify(before, after, fenBefore, san, ply) {
   const chess = new Chess(fenBefore);
   let move = null;
   try { move = chess.move(san); } catch { /* illegal / unparsable */ }
-  if (!move) return { cat: "none", loss: 0 };
+  if (!move) return { cat: "none", loss: 0, opening: null };
 
-  if (chess.isCheckmate()) return { cat: "mate", loss: 0, move };
+  // The ECO name of the position this move reaches, reported whatever the badge
+  // turns out to be.
+  const opening = lookupOpening(chess.fen());
+
+  if (chess.isCheckmate()) return { cat: "mate", loss: 0, move, opening };
 
   const bestLine = before.lines[0];
   const secondLine = before.lines[1];
   const afterLine = after.lines[0];
-  if (!bestLine) return { cat: "none", loss: 0, move };
+  if (!bestLine) return { cat: "none", loss: 0, move, opening };
 
   const cpBest = lineToCp(bestLine);
   const cpSecond = secondLine ? lineToCp(secondLine) : cpBest - 9999;
@@ -102,8 +115,22 @@ export function classify(before, after, fenBefore, san, ply) {
   const uci = move.from + move.to + (move.promotion || "");
   const isEngineBest = before.bestMove === uci;
 
+  // In book: the move reaches a named theoretical position and the game has not
+  // left theory on the way there (without that second test a pointless shuffle
+  // that transposes back into a book position would read as book again).
+  //
+  // A gambit is book even though it drops material — that is the whole point of
+  // grading against theory rather than against the engine's eval, and it is why
+  // 3. c3 in the Smith-Morra reads "Book" and not "Inaccuracy".
+  //
+  // BOOK_MIN_CP is what stops that from excusing everything with a name on it.
+  // A named line keeps the badge while it is merely worse (2... f6, the Damiano
+  // Defence, is about -0.85 and stays book); it loses the badge at the point
+  // the mover is simply lost, which for the Damiano is 3... fxe5 at about -2.3.
+  const inBook = opening && (ply === 0 || lookupOpening(fenBefore) !== null);
+
   let cat;
-  if (ply < 12 && loss < 3 && Math.abs(cpBest) < 80) {
+  if (inBook && cpAfter > BOOK_MIN_CP) {
     cat = "book";
   } else if (isEngineBest || loss < 0.5) {
     cat = "best";
@@ -117,5 +144,5 @@ export function classify(before, after, fenBefore, san, ply) {
   else if (loss < 20) cat = "mistake";
   else cat = "blunder";
 
-  return { cat, loss, move, cpBest, cpAfter, isEngineBest };
+  return { cat, loss, move, cpBest, cpAfter, isEngineBest, opening };
 }

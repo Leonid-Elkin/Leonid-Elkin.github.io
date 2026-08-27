@@ -8,6 +8,7 @@ const els = {
   status: $("status"), badge: $("badge"), glyph: $("glyph"), label: $("label"),
   move: $("move"), evalBefore: $("evalBefore"), evalAfter: $("evalAfter"),
   detail: $("detail"), bestline: $("bestline"), history: $("history"),
+  opening: $("opening"),
   settings: $("settings"), depth: $("depth"), depthVal: $("depthVal"),
   backfill: $("backfill"), showBoard: $("showBoard"), pieceSet: $("pieceSet"),
   boardTheme: $("boardTheme"), board: $("board"), boardWrap: $("boardWrap"),
@@ -387,6 +388,25 @@ function pvToSan(fen, pv, n = 5) {
   return out.join(" ");
 }
 
+/**
+ * Name the line under the badge. Once the game leaves theory the last name it
+ * had is kept, dimmed, so the panel still says which opening was played rather
+ * than going blank on the first new move.
+ */
+function renderOpening(g) {
+  let name = g.opening;
+  let stale = false;
+  for (let i = g.ply - 1; !name && i >= 0; i--) {
+    if (grades[i] && grades[i].opening) {
+      name = grades[i].opening;
+      stale = true;
+    }
+  }
+  els.opening.textContent = name || "";
+  els.opening.classList.toggle("stale", stale);
+  els.opening.title = name ? (stale ? name + " (out of book)" : name) : "";
+}
+
 function renderGrade(g) {
   setCat(g.cat);
   const white = g.ply % 2 === 0;
@@ -394,6 +414,8 @@ function renderGrade(g) {
   // engine scores are from the side to move: White before a White move, Black after it.
   els.evalBefore.textContent = fmtEval(g.before.lines[0], white);
   els.evalAfter.textContent = g.after.terminal ? (g.cat === "mate" ? "#" : "½") : fmtEval(g.after.lines[0], !white);
+
+  renderOpening(g);
 
   const bits = [];
   if (g.loss > 0.05) bits.push(`−${g.loss.toFixed(1)}% win chance`);
