@@ -403,8 +403,14 @@ function linkEl(link) {
   if (isExternal(link.url)) {
     a.target = "_blank";
     a.rel = "noopener";
-  } else if (!/\.html$/.test(link.url)) {
-    a.setAttribute("download", "");
+  } else {
+    /* An internal link that is not a page is a file, and a file is offered
+       as a download. Test the path alone: a page link carries a query
+       (case.html?p=<slug>) or is a bare fragment (#durak), and matching the
+       whole URL made those look extension-less - so the browser saved the
+       page to disk instead of opening it. */
+    const path = link.url.split(/[?#]/)[0];
+    if (path && !/\.html?$/i.test(path)) a.setAttribute("download", "");
   }
   return a;
 }
