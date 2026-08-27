@@ -71,7 +71,16 @@
 html {
   -webkit-text-size-adjust: 100%;
   scroll-behavior: smooth;
+  /* `clip` keeps the sideways bleed contained without turning the element
+     into a scroll container. `hidden` here (or on body) makes one, and a
+     scroll container swallows every in-page #anchor: the URL changes and
+     the page never moves. */
+  overflow-x: clip;
 }
+
+/* The nav is sticky and 59px tall, so an anchor landing at the exact top of
+   a section puts its heading underneath the bar. Hold the sections clear. */
+:where(section, footer)[id] { scroll-margin-top: 76px; }
 
 body {
   margin: 0;
@@ -81,7 +90,6 @@ body {
   font-size: 17px;
   line-height: 1.6;
   font-weight: 400;
-  overflow-x: hidden;
   -webkit-font-smoothing: antialiased;
   text-rendering: optimizeLegibility;
 }
