@@ -1,0 +1,199 @@
+#!/usr/bin/env python3
+"""Turn the solution folders into the two files the site loads.
+
+    Euler_source/  ->  data/euler-solutions.js
+    LeetCode/      ->  data/leetcode-solutions.js
+
+Run it by hand, or let .github/workflows/solutions.yml run it on every push
+that touches either folder. Nothing here talks to the network: LeetCode
+titles come from tools/lc_titles.json, captured once by fetch_leetcode_index.py.
+
+Layout in both folders, the shape Euler_source/ already had:
+
+    1.py                 problem 1, in Python
+    1.cpp                problem 1 again, in C++ - the page shows both
+    18/18.py             a folder when the solution reads a file
+    18/FileInfo.txt      ...that file, offered as a download beside the code
+
+Anything with no problem number in its name is skipped and reported.
+"""
+
+import io
+import json
+import os
+import re
+import sys
+
+HERE = os.path.dirname(os.path.abspath(__file__))
+SITE = os.path.dirname(HERE)
+
+# extension -> (language id, label). The id matches the highlighter in
+# solutions.js; "runs" is decided there, not here.
+LANGS = {
+    ".py": ("python", "Python"),
+    ".js": ("javascript", "JavaScript"),
+    ".ts": ("typescript", "TypeScript"),
+    ".cpp": ("cpp", "C++"), ".cc": ("cpp", "C++"), ".cxx": ("cpp", "C++"),
+    ".c": ("c", "C"),
+    ".h": ("cpp", "C++"), ".hpp": ("cpp", "C++"),
+    ".java": ("java", "Java"),
+    ".cs": ("csharp", "C#"),
+    ".go": ("go", "Go"),
+    ".rs": ("rust", "Rust"),
+    ".rb": ("ruby", "Ruby"),
+    ".kt": ("kotlin", "Kotlin"),
+    ".swift": ("swift", "Swift"),
+    ".sql": ("sql", "SQL"),
+    ".sh": ("shell", "Shell"),
+}
+
+DATA_EXT = {".txt", ".csv", ".dat", ".json", ".in"}
+
+
+def read_text(path):
+    """Solutions were written on Windows over several years; encodings vary."""
+    raw = io.open(path, "rb").read()
+    for encoding in ("utf-8-sig", "utf-8", "cp1252", "latin-1"):
+        try:
+            return raw.decode(encoding).replace("\r\n", "\n").replace("\r", "\n")
+        except UnicodeDecodeError:
+            continue
+    return raw.decode("utf-8", "replace")
+
+
+def number_of(name):
+    """The leading integer in a file or folder name, or None."""
+    match = re.match(r"^(\d+)", name)
+    return int(match.group(1)) if match else None
+
+
+def scan(folder):
+    """Walk one solution folder into {n: {"files": [...], "data": [...]}}."""
+    root = os.path.join(SITE, folder)
+    found = {}
+    skipped = []
+    if not os.path.isdir(root):
+        return found, ["%s/ does not exist" % folder]
+
+    def add_file(n, path):
+        ext = os.path.splitext(path)[1].lower()
+        if ext not in LANGS:
+            return False
+        lang, label = LANGS[ext]
+        code = read_text(path)
+        entry = found.setdefault(n, {"files": [], "data": []})
+        rel = os.path.relpath(path, SITE).replace("\\", "/")
+        # A folder copy wins over a loose file of the same name and language:
+        # if a problem reads a data file, the folder is the working version.
+        for existing in entry["files"]:
+            if existing["lang"] == lang:
+                if "/" in rel and "/" not in existing["path"]:
+                    entry["files"].remove(existing)
+                    break
+                return True
+        entry["files"].append({
+            "lang": lang, "label": label, "code": code,
+            "lines": len(code.rstrip("\n").split("\n")), "path": rel,
+        })
+        return True
+
+    for name in sorted(os.listdir(root)):
+        path = os.path.join(root, name)
+        n = number_of(name)
+        if os.path.isdir(path):
+            if n is None:
+                skipped.append("%s/%s (no problem number)" % (folder, name))
+                continue
+            for inner in sorted(os.listdir(path)):
+                inner_path = os.path.join(path, inner)
+                if os.path.isdir(inner_path):
+                    continue
+                if add_file(n, inner_path):
+                    continue
+                if os.path.splitext(inner)[1].lower() in DATA_EXT:
+                    entry = found.setdefault(n, {"files": [], "data": []})
+                    entry["data"].append(
+                        os.path.relpath(inner_path, SITE).replace("\\", "/"))
+        else:
+            if n is None or not add_file(n, path):
+                if name.lower() not in ("readme.md", ".gitkeep"):
+                    skipped.append("%s/%s" % (folder, name))
+
+    for n, entry in list(found.items()):
+        if not entry["files"]:
+            skipped.append("%s/%s (data file, no solution)" % (folder, n))
+            del found[n]
+        else:
+            entry["files"].sort(key=lambda f: f["label"].lower())
+    return found, skipped
+
+
+def write_js(path, variable, payload, note):
+    body = json.dumps(payload, ensure_ascii=False, separators=(",", ":"))
+    io.open(os.path.join(SITE, path), "w", encoding="utf-8", newline="\n").write(
+        "/* Generated by tools/build_solutions.py from %s\n"
+        "   Regenerate rather than edit - a push that touches the folder does it. */\n"
+        "window.%s = %s;\n" % (note, variable, body))
+
+
+def load_titles(name):
+    path = os.path.join(HERE, name)
+    if os.path.exists(path):
+        return json.load(io.open(path, encoding="utf-8"))
+    return {}
+
+
+def build_euler():
+    titles = load_titles("pe_titles.json")
+    found, skipped = scan("Euler_source")
+    problems = []
+    for n in sorted(found):
+        entry = found[n]
+        problems.append({
+            "n": n, "title": titles.get(str(n), ""),
+            "files": entry["files"], "data": entry["data"],
+        })
+    write_js("data/euler-solutions.js", "EULER",
+             {"track": "euler", "problems": problems}, "Euler_source/")
+    return problems, skipped
+
+
+def build_leetcode():
+    titles = load_titles("lc_titles.json")
+    found, skipped = scan("LeetCode")
+    problems = []
+    for n in sorted(found):
+        entry = found[n]
+        meta = titles.get(str(n)) or ["", "", 0]
+        problems.append({
+            "n": n, "title": meta[0], "slug": meta[1], "difficulty": meta[2],
+            "files": entry["files"], "data": entry["data"],
+        })
+        if not meta[0]:
+            skipped.append("LeetCode/%s (no title in lc_titles.json)" % n)
+    write_js("data/leetcode-solutions.js", "LEETCODE",
+             {"track": "leetcode", "problems": problems}, "LeetCode/")
+    return problems, skipped
+
+
+def main():
+    which = sys.argv[1] if len(sys.argv) > 1 else "all"
+    notes = []
+    if which in ("all", "euler"):
+        problems, skipped = build_euler()
+        langs = sorted({f["label"] for p in problems for f in p["files"]})
+        print("euler:    %d problems, %d files (%s)" % (
+            len(problems), sum(len(p["files"]) for p in problems), ", ".join(langs) or "-"))
+        notes += skipped
+    if which in ("all", "leetcode"):
+        problems, skipped = build_leetcode()
+        langs = sorted({f["label"] for p in problems for f in p["files"]})
+        print("leetcode: %d problems, %d files (%s)" % (
+            len(problems), sum(len(p["files"]) for p in problems), ", ".join(langs) or "-"))
+        notes += skipped
+    for note in notes:
+        print("  skipped:", note)
+
+
+if __name__ == "__main__":
+    main()

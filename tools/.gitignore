@@ -1,5 +1,0 @@
-# scraper caches - big, re-fetchable, and not what the site serves
-lc_cache/
-pe_cache/
-lc_meta.json
-pe_index.json

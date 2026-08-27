@@ -145,8 +145,8 @@ const projects = [
   {
     title: "Project Euler",
     cat: "software",
-    caption: "All 1,007 problems with an editor that runs Python in the browser.",
-    tags: ["Python", "Pyodide", "CodeMirror"],
+    caption: "Sixty-nine solved, each solution as it was written. The Python runs in your browser.",
+    tags: ["Python", "Pyodide"],
     links: [
       { name: "source", url: "https://github.com/Leonid-Elkin/Project-Euler" },
       { name: "solutions (zip)", url: "Euler_source.zip" },
@@ -166,8 +166,8 @@ const projects = [
   {
     title: "LeetCode",
     cat: "software",
-    caption: "The whole problem set, with a real editor, a checker and a runner.",
-    tags: ["Python", "Pyodide", "CodeMirror"],
+    caption: "The problems I have worked through, each in whichever language I reached for.",
+    tags: ["Python", "C++", "Pyodide"],
     links: [
       { name: "the problems", url: "https://leetcode.com/problemset/" },
     ],

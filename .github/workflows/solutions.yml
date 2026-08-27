@@ -1,0 +1,56 @@
+# Rebuild the solution indexes whenever a solution folder changes.
+#
+# The site is static: it reads data/euler-solutions.js and
+# data/leetcode-solutions.js, and those are generated from Euler_source/ and
+# LeetCode/. Doing that by hand means the page drifts from the folder, so this
+# does it on push and commits the result back.
+#
+# The paths filter is what stops this looping: the job only ever writes to
+# data/, and a push to data/ does not trigger it.
+
+name: solutions
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - "Euler_source/**"
+      - "LeetCode/**"
+      - "tools/build_solutions.py"
+      - "tools/lc_titles.json"
+      - "tools/pe_titles.json"
+  workflow_dispatch:
+
+# Needed for the commit back. Nothing here touches anything else.
+permissions:
+  contents: write
+
+concurrency:
+  group: solutions
+  cancel-in-progress: true
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      # No dependencies to install - the script is standard library only.
+      - name: Rebuild the indexes
+        run: python tools/build_solutions.py
+
+      - name: Commit if anything changed
+        run: |
+          if git diff --quiet -- data/; then
+            echo "indexes already match the folders - nothing to commit"
+            exit 0
+          fi
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add data/euler-solutions.js data/leetcode-solutions.js
+          git commit -m "Rebuild the solution indexes from the folders"
+          git push
