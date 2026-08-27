@@ -67,3 +67,37 @@ edited a problem, and the link is both smaller and always right.
 **Project Euler answers are not collected, stored or shown anywhere.** Project
 Euler asks that solutions are not published, and a page that hands you the
 number is not one worth visiting twice.
+
+## apply-text-edits.js — temporary
+
+Companion to `text-edit.js` at the repo root, which is a scaffold for one job:
+rewording the site while looking at it. Both come out again when the copy reads
+right.
+
+Open any page with `?edit=1` (or press Ctrl+Shift+E anywhere on the site), click
+a line, retype it. Enter or Escape commits, clicking elsewhere does too. Edits
+are held in `localStorage`, so a reload keeps them and you go on judging the
+page as a whole rather than one sentence at a time. **Save patch** downloads
+`text-edits.json` — every page you touched, not just the one in front of you.
+
+```sh
+node tools/apply-text-edits.js ~/Downloads/text-edits.json --dry   # look first
+node tools/apply-text-edits.js ~/Downloads/text-edits.json         # then write
+```
+
+The browser hands over decoded text, `Software & hardware`, while the source may
+hold `Software &amp;` broken across two lines, so each edit is matched with a
+whitespace- and entity-tolerant pattern rather than a literal string. It finds
+wording in `.html` and in the `.js` files that print cards, so a project blurb
+is reachable too.
+
+What it refuses to do matters more than what it does. Wording found in two
+different files is reported and skipped, because picking one is a guess — short
+project keys like `THUNDER` live in `script.js` and `previews.js` both, and want
+a hand. Repeats *within* one file are all rewritten, since that is the ticker
+printing its list twice. Read the summary at the end; anything skipped is still
+yours to do.
+
+To remove the feature: delete `text-edit.js`, this script, and the two-line
+`<!-- TEMPORARY -->` block above `</body>` in the seven pages
+(`grep -l text-edit.js *.html`).
