@@ -410,7 +410,14 @@ function linkEl(link) {
        whole URL made those look extension-less - so the browser saved the
        page to disk instead of opening it. */
     const path = link.url.split(/[?#]/)[0];
-    if (path && !/\.html?$/i.test(path)) a.setAttribute("download", "");
+    if (/\.pdf$/i.test(path)) {
+      /* A paper is meant to be read, so it opens in the site's own reader
+         rather than landing in the downloads folder. Saving a copy is still
+         one click away, on that page. */
+      a.href = "doc.html?f=" + encodeURIComponent(path);
+    } else if (path && !/\.html?$/i.test(path)) {
+      a.setAttribute("download", "");
+    }
   }
   return a;
 }

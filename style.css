@@ -2309,3 +2309,52 @@ pre.code.out:empty::before { content: "…"; color: var(--ink-4); }
    tab row still takes up space. */
 .filter[hidden],
 .euler-langs[hidden] { display: none; }
+
+
+
+/* ---------- doc.html: a PDF read in the page ---------- */
+
+/* Tall enough to read a page of A4 without the frame becoming its own little
+   scrolling well, but never taller than the window minus the masthead. */
+.doc-frame {
+  margin-top: 14px;
+  height: min(1100px, calc(100vh - 240px));
+  min-height: 420px;
+  border: 1px solid var(--rule);
+  background: var(--paper-2);
+}
+
+.doc-frame object,
+.doc-frame embed { display: block; width: 100%; height: 100%; border: 0; }
+
+/* What a browser that will not frame a PDF gets instead. */
+.doc-fallback {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  align-items: center;
+  justify-content: center;
+  height: 100%;
+  padding: 24px;
+  text-align: center;
+  color: var(--ink-2);
+}
+
+.doc-fallback a { color: var(--red); }
+
+.doc-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 20px 28px;
+  margin-top: clamp(18px, 2.4vw, 28px);
+  font-size: 0.82rem;
+}
+
+.doc-actions a { color: var(--ink-2); border-bottom: 1px solid var(--rule-hot); padding-bottom: 2px; }
+.doc-actions a:hover { color: var(--red); border-bottom-color: var(--red); }
+
+@media (max-width: 700px) {
+  /* A phone will not render the PDF inline, so the box is only ever holding
+     the fallback - no reason to reserve half a screen for it. */
+  .doc-frame { height: auto; min-height: 260px; }
+}
