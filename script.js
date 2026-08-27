@@ -145,8 +145,8 @@ const projects = [
   {
     title: "Project Euler",
     cat: "software",
-    caption: "Solutions to the first hundred-odd problems.",
-    tags: ["Python"],
+    caption: "All 1,007 problems with an editor that runs Python in the browser.",
+    tags: ["Python", "Pyodide", "CodeMirror"],
     links: [
       { name: "source", url: "https://github.com/Leonid-Elkin/Project-Euler" },
       { name: "solutions (zip)", url: "Euler_source.zip" },
@@ -161,6 +161,15 @@ const projects = [
     links: [
       { name: "source", url: "https://github.com/Leonid-Elkin/Advent-of-Code-2025" },
       { name: "the puzzles", url: "https://adventofcode.com/2025" },
+    ],
+  },
+  {
+    title: "LeetCode",
+    cat: "software",
+    caption: "The whole problem set, with a real editor, a checker and a runner.",
+    tags: ["Python", "Pyodide", "CodeMirror"],
+    links: [
+      { name: "the problems", url: "https://leetcode.com/problemset/" },
     ],
   },
   {
@@ -426,6 +435,7 @@ function previewEl(p) {
 const PAGE = {
   "Drone Strike Map": "project.html",
   "Project Euler": "euler.html",
+  "LeetCode": "leetcode.html",
 };
 
 function slugFor(p) {

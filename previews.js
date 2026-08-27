@@ -20,6 +20,7 @@
     "Durak": "previews/durak.jpg",
     "Yavalath & Pentalath": "previews/yavalath.jpg",
     "Project Euler": "previews/project-euler.jpg",
+    "LeetCode": "previews/leetcode.jpg",
     "Shooting scores": "previews/shooting-scores.jpg",
     "Aimtrainer": "previews/aimtrainer.jpg",
     "This website": "previews/this-website.jpg",
