@@ -47,13 +47,17 @@ const STILL_WINNING = 60;
 // "The only good move": the second-best move is this many win% worse.
 const ONLY_MOVE_GAP = 10;
 
+// Glyphs are deliberately plain text, not emoji: the badge paints them white on
+// the category colour, and a colour emoji ignores that and hides the colour --
+// which also made every history dot look identical. Plain glyphs render the same
+// on macOS and Windows.
 export const CATEGORIES = {
   brilliant:  { label: "Brilliant",  glyph: "!!" },
   great:      { label: "Great",      glyph: "!"  },
   best:       { label: "Best",       glyph: "★"  },
   excellent:  { label: "Excellent",  glyph: "✓"  },
   good:       { label: "Good",       glyph: "✓"  },
-  book:       { label: "Book",       glyph: "📖" },
+  book:       { label: "Book",       glyph: "B"  },
   forced:     { label: "Forced",     glyph: "→"  },
   inaccuracy: { label: "Inaccuracy", glyph: "?!" },
   miss:       { label: "Miss",       glyph: "✗"  },
