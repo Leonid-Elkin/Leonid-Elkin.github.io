@@ -236,13 +236,37 @@ iframe { max-width: 100%; }
 /* The headline is the page. It is set to run past the right edge on wide
    screens - clipped by the viewport, not by a container. Scoped to .hero so
    the page headings inside a .section-head keep their own, smaller size. */
+/* The headline used to run edge to edge at poster scale. Sized down so the
+   name is a strong opening line rather than the whole first impression -
+   the row it used to fill alone now carries the quick facts beside it. */
 .hero h1.display {
-  font-size: clamp(3rem, 13.4vw, 13rem);
-  line-height: 0.8;
-  letter-spacing: -0.05em;
-  margin: 0 0 clamp(26px, 4vw, 52px);
+  font-size: clamp(2.2rem, 6.4vw, 5.6rem);
+  line-height: 0.86;
+  letter-spacing: -0.03em;
   white-space: nowrap;
 }
+
+.hero-head {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: flex-end;
+  justify-content: space-between;
+  gap: clamp(20px, 4vw, 60px);
+  margin-bottom: clamp(26px, 4vw, 52px);
+}
+
+/* The two facts that used to live only on the about page - pulled up here
+   so the room the headline gave up reads as content, not a gap. Capped in
+   width so a long skills list wraps under its label instead of stretching
+   the row back out to full bleed. */
+.hero-facts {
+  flex: 0 1 auto;
+  min-width: 220px;
+  max-width: 320px;
+  border-top: none;
+}
+
+.hero-facts > div { padding: 8px 0; }
 
 /* The overprint: the same word again in red, a hair out of register.
    `isolation` is load-bearing - it gives the element its own stacking context
@@ -1132,6 +1156,8 @@ footer .col-label {
   :root { --label-col: 0px; }
 
   .hero h1.display { white-space: normal; }
+  .hero-head { flex-direction: column; align-items: flex-start; }
+  .hero-facts { max-width: none; width: 100%; }
 
   .section-head {
     grid-template-columns: 1fr;
