@@ -51,7 +51,7 @@
         <span class="mono mg-pos"></span>
       </div>
       <textarea class="mg-pgn mono" rows="3" spellcheck="false" aria-label="PGN"></textarea>
-      <div class="mg-frame"><iframe src="movegrade-demo/overlay/overlay.html?nonnue&v=2" title="MoveGrade panel"></iframe></div>
+      <div class="mg-frame"><iframe src="movegrade-demo/overlay/overlay.html?nonnue&v=3" title="MoveGrade panel"></iframe></div>
     `;
     root.appendChild(box);
 

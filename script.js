@@ -46,9 +46,9 @@ const projects = [
     cat: "software",
     status: "live",
     caption:
-      "A Chrome extension that grades every move of a chess game as it happens - Brilliant, Best, Miss, Blunder - on lichess and chess.com. Stockfish runs inside the extension; the badge appears at depth four and sharpens as the search deepens. Watching, analysing and playing the computer only: it pauses in live games against people.",
+      "A Chrome extension that grades every move of a chess game as it happens - Brilliant, Best, Miss, Blunder - on lichess and chess.com, on chess.com's own thresholds. Stockfish runs inside the extension and thinks for a fixed second per move rather than to a fixed depth; opening moves are named from a real book before the engine is asked at all. Watching, analysing and playing the computer only: it pauses in live games against people.",
     tags: ["JavaScript", "Chrome extension", "Stockfish (WASM)", "chess.js"],
-    links: [{ name: "source", url: "MoveGrade_source.zip?v=2" }],
+    links: [{ name: "source", url: "MoveGrade_source.zip?v=3" }],
   },
   {
     title: "SHELLFALL",
