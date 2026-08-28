@@ -720,6 +720,26 @@ function initCounts() {
   });
 }
 
+/* ---------- today's date in the hero eyebrow ---------- */
+
+/* The eyebrow used to number the index. It reads as a dateline instead: the
+   day and month in red, the year after it, taken from the reader's clock so
+   the page is never stale. */
+function initToday() {
+  const now = new Date();
+  const day = now.getDate();
+  const month = now.toLocaleString("en-GB", { month: "long" });
+  const year = String(now.getFullYear());
+  const iso = now.getFullYear() + "-" +
+    String(now.getMonth() + 1).padStart(2, "0") + "-" +
+    String(day).padStart(2, "0");
+
+  document.querySelectorAll("[data-today]").forEach((node) => {
+    node.textContent = node.dataset.today === "y" ? year : day + " " + month;
+    if (node.tagName === "TIME") node.setAttribute("datetime", iso);
+  });
+}
+
 window.addEventListener("DOMContentLoaded", () => {
   initProjects();
   initFeatured();
@@ -729,4 +749,5 @@ window.addEventListener("DOMContentLoaded", () => {
   initSkills();
   initLiveFrame();
   initCounts();
+  initToday();
 });
