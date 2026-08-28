@@ -16,6 +16,7 @@ export const CATEGORIES = {
   book:       { label: "Book",       glyph: "📖" },
   inaccuracy: { label: "Inaccuracy", glyph: "?!" },
   mistake:    { label: "Mistake",    glyph: "?"  },
+  miss:       { label: "Miss",       glyph: "✗"  },
   blunder:    { label: "Blunder",    glyph: "??" },
   mate:       { label: "Checkmate",  glyph: "#"  },
   none:       { label: "—",          glyph: "·"  },
@@ -71,6 +72,20 @@ function isSacrifice(after, move) {
   return cheapest < movedVal && netLoss - cheapest >= 2;
 }
 
+/* A win was on the board and the move played does not keep it: either a forced
+   mate for the mover, or an evaluation far enough ahead that the game was won.
+   Reported as a Miss instead of a Mistake or a Blunder, because the useful
+   thing to say is that a win was there - not how many centipawns went with it.
+   The size of the drop still decides whether we get this far at all. */
+const WIN_CP = 300;   /* a clear piece up: the chance was real */
+const KEPT_CP = 150;  /* still comfortably better: the chance was not thrown */
+
+function missedChance(bestLine, cpBest, cpAfter) {
+  const hadMate = bestLine.mate !== null && bestLine.mate !== undefined && bestLine.mate > 0;
+  if (!hadMate && cpBest < WIN_CP) return false;
+  return cpAfter < KEPT_CP;
+}
+
 /**
  * @param before  analysis of the position before the move (UCI perspective = mover to move)
  * @param after   analysis of the position after the move (UCI perspective = opponent to move)
@@ -114,6 +129,7 @@ export function classify(before, after, fenBefore, san, ply) {
   } else if (loss < 2) cat = "excellent";
   else if (loss < 5) cat = "good";
   else if (loss < 10) cat = "inaccuracy";
+  else if (missedChance(bestLine, cpBest, cpAfter)) cat = "miss";
   else if (loss < 20) cat = "mistake";
   else cat = "blunder";
 

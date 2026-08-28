@@ -1,7 +1,7 @@
 import { Chess } from "../lib/chess.js";
 import { Engine } from "./engine.js";
 import { RemoteEngine } from "./remote-engine.js";
-import { classify, CATEGORIES, fmtEval, lineToCp, winPct } from "./classify.js";
+import { classify, CATEGORIES, fmtEval, lineToCp, winPct } from "./classify.js?v=2";
 
 const $ = (id) => document.getElementById(id);
 const els = {
