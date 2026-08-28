@@ -1,7 +1,7 @@
 /* The proof sheet.
  *
- * Ctrl+P on a black page with a moving ticker, a live map and a card game in
- * the corner is a waste of toner. The print stylesheet in style.css turns the
+ * Ctrl+P on a black page with a live map and a card game in the corner is a
+ * waste of toner. The print stylesheet in style.css turns the
  * page into a proof: white stock, black ink, the one red kept, every link
  * followed by its address, and the toys left out.
  *

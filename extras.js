@@ -84,25 +84,6 @@
     }
   });
 
-  /* ---------- the strip knows what time it is ---------- */
-
-  /* One ticker item becomes the visitor's own clock - a static site that
-     still manages to be right twice a day everywhere. */
-  (function () {
-    const items = document.querySelectorAll(".ticker-track > span");
-    if (!items.length) return;
-    const hh = new Date();
-    const stamp = "printed at " +
-      String(hh.getHours()).padStart(2, "0") + ":" +
-      String(hh.getMinutes()).padStart(2, "0") + " your time";
-    /* the strip is printed twice for the loop - restamp both copies */
-    items.forEach((it) => {
-      if (/no images on this site/i.test(it.textContent)) {
-        it.textContent = stamp;
-      }
-    });
-  })();
-
   /* ---------- the footer counts your visit in lost stars ---------- */
 
   (function () {

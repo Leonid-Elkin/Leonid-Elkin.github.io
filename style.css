@@ -210,44 +210,6 @@ iframe { max-width: 100%; }
   background: var(--red);
 }
 
-/* ---------- masthead strip ---------- */
-
-.ticker {
-  border-bottom: 1px solid var(--rule);
-  overflow: hidden;
-}
-
-.ticker-track {
-  display: flex;
-  gap: 0;
-  width: max-content;
-  animation: slide 40s linear infinite;
-}
-
-.ticker span {
-  font-family: var(--f-mono);
-  font-size: 0.7rem;
-  letter-spacing: 0.28em;
-  text-transform: uppercase;
-  color: var(--ink-3);
-  white-space: nowrap;
-  padding: 7px 0;
-}
-
-/* Only a top-level strip item gets a separator. `.ticker span` also matched
-   the nested count span, which printed "16 / entries in the index". */
-.ticker-track > span::after {
-  content: "\00a0\00a0/\00a0\00a0";
-  color: var(--red);
-}
-
-@keyframes slide {
-  from { transform: translateX(0); }
-  to   { transform: translateX(-50%); }
-}
-
-.ticker:hover .ticker-track { animation-play-state: paused; }
-
 /* ---------- hero ---------- */
 
 .hero { padding: clamp(36px, 5vw, 72px) 0 clamp(28px, 3.5vw, 52px); }
@@ -1572,14 +1534,12 @@ footer .col-label {
 
 .misprint .section-head::after { transform: translateX(6px); }
 .misprint .brand .mark { transform: translate(2px, -1px) rotate(12deg); }
-.misprint .ticker-track > span::after { color: var(--ink-3); }
 .misprint .eyebrow .red::after { content: " // REGISTRATION LOST"; }
 
 /* ---------- reduced motion ---------- */
 
 @media (prefers-reduced-motion: reduce) {
   html { scroll-behavior: auto; }
-  .ticker-track { animation: none; }
   *, *::before, *::after { transition-duration: 0.01ms !important; }
 }
 
@@ -1947,7 +1907,7 @@ dd.placeholder {
 
 /* ---------- the proof sheet (print) ----------
    White stock, black ink, the one red kept. The toys stay on screen: no
-   ticker, no map, no cards, no cluster, no range. Every outbound link is
+   map, no cards, no cluster, no range. Every outbound link is
    followed by its address, and the foot of the sheet says when it was
    pulled - proof.js stamps the date onto <body> on the way to the printer. */
 
@@ -1965,7 +1925,7 @@ dd.placeholder {
   @page { margin: 18mm; }
   html, body { background: #fff !important; color: #000; }
 
-  .ticker, .progress, .nav, .facet-band, canvas, iframe, .live-frame,
+  .progress, .nav, .facet-band, canvas, iframe, .live-frame,
   .egg, #egg, #durak-panel, .ramiel, .ramiel-beam, .ramiel-muzzle, .range-hud, .aim-target, .meteor, .debris, .dwell,
   [data-pad-edit], [data-pad-add], [data-pad-save], [data-pad-cancel],
   [data-pad-plate], [data-pad-status], .commit-fallback {
