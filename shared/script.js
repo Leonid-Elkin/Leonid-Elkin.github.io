@@ -431,11 +431,14 @@ function linkEl(link) {
 const STATUS_LABEL = { live: "live", wip: "in progress", old: "early", placeholder: "placeholder" };
 
 /* The running number in the left column - what stands where a thumbnail would
-   on a site that used images. This one does not. */
-function plate(n, p) {
+   on a site that used images. This one does not. The category sits under the
+   number on the index, where it is doing filing work; the home page drops it,
+   because a hand-picked shortlist is not a filing system. */
+function plate(n, p, showCat = true) {
   const box = el("div", "plate" + (p.placeholder ? " is-placeholder" : ""));
   box.setAttribute("aria-hidden", "true");
-  box.append(String(n).padStart(2, "0"), el("span", "plate-cat", p.cat || ""));
+  box.append(String(n).padStart(2, "0"));
+  if (showCat) box.append(el("span", "plate-cat", p.cat || ""));
   return box;
 }
 
@@ -475,12 +478,12 @@ function primaryLink(p) {
   return allLinks(p).find((l) => l.url && !l.pending) || null;
 }
 
-function projectCard(p, i) {
+function projectCard(p, i, opts = {}) {
   const card = el("article", "project-card");
   card.dataset.cat = p.cat;
   if (p.featured) card.classList.add("featured");
 
-  card.appendChild(plate(i + 1, p));
+  card.appendChild(plate(i + 1, p, !opts.plainPlate));
   card.appendChild(previewEl(p));
 
   const body = el("div", "project-body");
@@ -566,23 +569,34 @@ function initProjects() {
 }
 
 /* ---------- home: selected work ----------
-   The home page carries four entries, not the index. These four because each
-   one answers a different question: is it real (live and public), does anyone
-   use it (installed), did it survive contact with hardware (it flew), and was
-   it written up (a paper). Everything else is one click away on projects.html.
-   Titles, so the picks track the entries above rather than their positions. */
+   The home page carries five entries, not the index. These five because each
+   one answers a different question: is it real (live and public), was it
+   written up (a paper), does anyone use it (installed), does the physics hold
+   (an N-body simulation), and can it read the world on its own (the vision
+   bot). Everything else is one click away on the projects index. Titles, so
+   the picks track the entries above rather than their positions.
 
-const HOME_PICKS = ["Drone Strike Map", "MoveGrade", "CanSat 2025", "Neural scaling laws"];
+   They are numbered from one in the order listed here: a shortlist counts
+   itself, rather than quoting its members' places in the full index. */
+
+const HOME_PICKS = [
+  "Drone Strike Map",
+  "Neural scaling laws",
+  "MoveGrade",
+  "Globular clusters",
+  "Chess Vision Bot",
+];
 
 function initFeatured() {
   const grid = document.getElementById("featured-grid");
   if (!grid) return;
 
   const frag = document.createDocumentFragment();
+  let n = 0;
   HOME_PICKS.forEach((title) => {
-    const i = projects.findIndex((p) => p.title === title);
-    if (i < 0) return; /* a pick that no longer names an entry is simply dropped */
-    frag.appendChild(projectCard(projects[i], i));
+    const p = projects.find((q) => q.title === title);
+    if (!p) return; /* a pick that no longer names an entry is simply dropped */
+    frag.appendChild(projectCard(p, n++, { plainPlate: true }));
   });
   grid.appendChild(frag);
 }

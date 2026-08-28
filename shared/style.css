@@ -2472,7 +2472,7 @@ pre.code.out:empty::before { content: "…"; color: var(--ink-4); }
   .doors { grid-template-columns: repeat(3, 1fr); }
 }
 
-/* the "every project" button under the four picks */
+/* the "every project" button under the picks */
 .more-row { margin-top: clamp(22px, 3vw, 34px); margin-left: calc(var(--label-col) + clamp(14px, 3vw, 44px)); }
 
 /* the same breakpoint at which .setup and .edu-grid give up their label column */
