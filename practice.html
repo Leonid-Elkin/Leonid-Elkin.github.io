@@ -4,18 +4,18 @@
 <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <title>Projects &middot; Leonid Elkin</title>
+    <title>Practice &middot; Leonid Elkin</title>
     <meta name="description"
-        content="Every project by Leonid Elkin, filterable by software, hardware and research: what it is, what it is written in, and every door into it." />
+        content="Project Euler, LeetCode and Advent of Code: the solutions, run in the browser against the real inputs." />
     <meta name="theme-color" content="#0a0a0a" />
     <meta property="og:type" content="website" />
-    <meta property="og:title" content="Projects · Leonid Elkin" />
+    <meta property="og:title" content="Practice · Leonid Elkin" />
     <meta property="og:description"
-        content="Every project by Leonid Elkin, filterable by software, hardware and research." />
-    <meta property="og:url" content="https://leonid-elkin.github.io/projects.html" />
+        content="Project Euler, LeetCode and Advent of Code: solutions that run in the browser." />
+    <meta property="og:url" content="https://leonid-elkin.github.io/practice.html" />
     <meta property="og:image" content="https://leonid-elkin.github.io/previews/this-website.jpg" />
     <meta name="twitter:card" content="summary_large_image" />
-    <link rel="canonical" href="https://leonid-elkin.github.io/projects.html" />
+    <link rel="canonical" href="https://leonid-elkin.github.io/practice.html" />
     <link rel="icon"
         href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' fill='%230a0a0a'/%3E%3Crect x='7' y='7' width='18' height='18' fill='%23ff2d16'/%3E%3C/svg%3E" />
     <link rel="preconnect" href="https://fonts.googleapis.com" />
@@ -23,7 +23,6 @@
     <link rel="stylesheet"
         href="https://fonts.googleapis.com/css2?family=Archivo:wght@500;600;700;800&family=Inter+Tight:wght@400;500;600&family=JetBrains+Mono:wght@400;500&display=swap" />
     <link rel="stylesheet" href="style.css?v=7" />
-    <link rel="stylesheet" href="durak.css" />
 </head>
 
 <body>
@@ -33,9 +32,9 @@
             <a class="brand" href="index.html"><span class="mark" aria-hidden="true"></span>Leonid Elkin</a>
             <ul class="nav-links">
                 <li><a href="index.html">Home</a></li>
-                <li><a href="projects.html" aria-current="page">Projects</a></li>
+                <li><a href="projects.html">Projects</a></li>
                 <li><a href="research.html">Research</a></li>
-                <li><a href="practice.html">Practice</a></li>
+                <li><a href="practice.html" aria-current="page">Practice</a></li>
                 <li><a href="about.html">About</a></li>
                 <li><a href="live.html">Live</a></li>
                 <li><a href="#contact">Contact</a></li>
@@ -55,26 +54,47 @@
     </div>
 
     <main>
-        <section class="section" id="work">
+        <section class="section">
             <div class="wrap">
                 <div class="section-head">
-                    <span class="idx">Index &mdash;</span>
-                    <h1 class="display overprint" data-text="Projects">Projects</h1>
-                    <span class="aside mono" id="project-count"></span>
+                    <span class="idx">Practice &mdash;</span>
+                    <h1 class="display overprint" data-text="Practice">Practice</h1>
+                    <span class="aside mono">the reps, not the projects</span>
                 </div>
-                <p class="setup">Every project, in the order they show off best. Each entry carries what it is,
-                    what it is written in, and every door into it: the write-up, the source, the thing itself
-                    where it runs in a browser. Durak plays right here &mdash; <a href="#durak">deal a hand</a>.</p>
-                <div class="filter-row" role="group" aria-label="Filter projects">
-                    <button class="filter" data-filter="all" aria-pressed="true">All <span class="count"></span></button>
-                    <button class="filter" data-filter="software" aria-pressed="false">Software <span
-                            class="count"></span></button>
-                    <button class="filter" data-filter="hardware" aria-pressed="false">Hardware <span
-                            class="count"></span></button>
-                    <button class="filter" data-filter="research" aria-pressed="false">Research <span
-                            class="count"></span></button>
-                </div>
-                <div id="project-grid" class="project-grid dense"></div>
+                <p class="setup">The problem sets, each on its own page: the file as it was written rather than
+                    tidied for display, and every solution runnable in your browser against the real input.
+                    Project Euler answers are never printed &mdash; the site asks that they are not published, and
+                    a page that hands you the number is not one worth having.</p>
+
+                <ul class="doors">
+                    <li>
+                        <a href="euler.html">
+                            <span class="door-idx mono">01</span>
+                            <h3>Project Euler</h3>
+                            <p>Number theory, combinatorics and brute force that had to stop being brute force.
+                                Pick a problem number and the solution appears beside it, runnable through
+                                Pyodide.</p>
+                            <span class="door-go mono">open Euler &rarr;</span>
+                        </a>
+                    </li>
+                    <li>
+                        <a href="leetcode.html">
+                            <span class="door-idx mono">02</span>
+                            <h3>LeetCode</h3>
+                            <p>The interview set, with the complexity of each answer stated rather than implied,
+                                and the test cases run in the page.</p>
+                            <span class="door-go mono">open LeetCode &rarr;</span>
+                        </a>
+                    </li>
+                    <li>
+                        <a href="projects.html">
+                            <span class="door-idx mono">03</span>
+                            <h3>Advent of Code 2025</h3>
+                            <p>Twenty-five days of puzzles, listed in the project index alongside the source.</p>
+                            <span class="door-go mono">find it in the index &rarr;</span>
+                        </a>
+                    </li>
+                </ul>
             </div>
         </section>
     </main>
@@ -91,27 +111,6 @@
         </div>
     </footer>
 
-    <button class="egg" id="egg" type="button" aria-label="A stack of cards. Deal them.">
-        <span class="egg-hint" aria-hidden="true">deal?</span>
-        <span class="egg-stack" aria-hidden="true"></span>
-    </button>
-
-    <div class="durak-panel" id="durak-panel" role="dialog" aria-modal="true" aria-label="Durak" hidden>
-        <div class="panel-inner">
-            <div class="panel-head">
-                <h2>Durak</h2>
-                <a class="mono panel-link" href="durak-online.html">play a friend online &rarr;</a>
-                <button class="panel-close" type="button">Close &times;</button>
-            </div>
-            <div class="durak" id="durak" data-deferred></div>
-        </div>
-    </div>
-
-    <script src="previews.js"></script>
-    <script src="script.js?v=10"></script>
-    <script src="durak-sfx.js"></script>
-    <script src="durak.js"></script>
-    <script src="egg.js?v=2"></script>
     <script src="extras.js"></script>
     <script src="motion.js"></script>
 </body>

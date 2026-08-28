@@ -63,7 +63,7 @@
       const back = document.createElement("p");
       back.className = "mono";
       const a = document.createElement("a");
-      a.href = "index.html#work";
+      a.href = "projects.html";
       a.textContent = "back to the index →";
       back.appendChild(a);
       box.append(p, back);
