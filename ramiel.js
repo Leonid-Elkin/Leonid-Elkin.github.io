@@ -1,35 +1,17 @@
 /* The visitor.
  *
- * Idle, he is the octahedron, turning. Nothing more.
- *
- * CLICK him and the film's firing sequence runs, still and deliberate -
- * he does not shake:
- *
- *   1. The turn decays and he comes about to face LEFT.
- *   2. Only the front - the bit facing the firing line - extends.
- *   3. The body SPLITS into five prolonged octahedrons that PIVOT about
- *      a point near the tail, so the noses fan open toward the target
- *      while the back stays gathered and roughly octahedral, exposing
- *      the red core at the centre.
- *   4. The beam fires from the core, out across the country.
- *   5. The petals close, merge, and the octahedron resumes its turn.
- *
- * The trick that keeps the split honest: from the moment the stretch
- * begins, the body is ALREADY five coincident octahedrons. Coincident,
- * they render as one solid to the pixel; stretching is all five
- * elongating in place, and the split is only their centres parting. No
- * crossfade, no model swap, no seam.
+ * Idle, he is the octahedron, turning. Nothing more - he no longer answers
+ * a click.
  *
  * Flat faces carry no drawn lines: edges are detected per frame and drawn
  * only along silhouettes and true creases, in pale luminous blue. Faces
  * are stroked in their own fill to close antialiasing seams. All of it is
  * arithmetic in an SVG - no WebGL, no textures, no image files.
  *
- * Every phase is a pure function of absolute elapsed time, never of frame
- * deltas, so a throttled or coalesced frame schedule cannot stall the
- * sequence - the delta-integrated version demonstrably could.
+ * The turn is a pure function of absolute elapsed time, never of frame
+ * deltas, so a throttled or coalesced frame schedule cannot stall it.
  *
- * Under prefers-reduced-motion he holds one octahedral pose, unprovokable.
+ * Under prefers-reduced-motion he holds one octahedral pose.
  */
 
 (function () {
@@ -89,36 +71,7 @@
   const MAIN = subdivided(OCTA_V, OCTA_F, 2);
   MAIN.E = edgesOf(MAIN.F);
 
-  /* the petal scene: five octahedrons in one topology. Petal k owns
-     vertices [k*6, k*6+6); its parting direction around the beam axis is
-     fixed at build time. */
-  const PETALS = 5;
-  const PETAL_DIR = [];
-  const PSCENE = { V: [], F: [] };
-  for (let k = 0; k < PETALS; k++) {
-    const th = Math.PI / 2 + (k * 2 * Math.PI) / PETALS;
-    PETAL_DIR.push([0, Math.cos(th), Math.sin(th)]);
-    for (const v of OCTA_V) PSCENE.V.push(v.slice());
-    for (const f of OCTA_F) PSCENE.F.push([f[0] + k * 6, f[1] + k * 6, f[2] + k * 6]);
-  }
-  PSCENE.E = edgesOf(PSCENE.F);
-
-  /* ================= timing ================= */
-
   const SPIN = 1 / 4.2; /* idle angular velocity, rad/s */
-  const ALIGN = 1.7, STRETCH = 0.9, SPLIT = 1.0, FIRE = 1.05, CLOSE = 1.2;
-  const T1 = ALIGN, T2 = T1 + STRETCH, T3 = T2 + SPLIT, T4 = T3 + FIRE, T5 = T4 + CLOSE;
-
-  const smooth = (t) => t * t * (3 - 2 * t);
-
-  /* The prolonged petal. Only vertices AHEAD of centre stretch - the tail
-     keeps its octahedral extent - and the thinning tapers toward the nose,
-     so the rear half stays full-bodied. The split is a PIVOT: each petal
-     rotates about a point near the tail, fanning the noses apart. */
-  const STRETCH_X = 1.8;   /* how far the nose reaches */
-  const THIN_YZ = 0.5;     /* nose cross-section at full stretch */
-  const FAN = 0.4;         /* radians of pivot at full spread */
-  const PIVOT_X = 0.85;    /* the hinge, just short of the tail tip */
 
   /* ================= glass shading ================= */
 
@@ -147,7 +100,6 @@
   })();
 
   const TILT = -0.18;
-  const FIRE_TILT = -0.12;
   const SC = 27;
 
   /* ================= per-mount ================= */
@@ -161,8 +113,7 @@
     svg.setAttribute("shape-rendering", "geometricPrecision");
     svg.style.filter = "drop-shadow(0 0 16px rgba(100, 150, 255, 0.22))";
 
-    /* one polygon pool serves both scenes */
-    const POOL = Math.max(MAIN.F.length, PSCENE.F.length);
+    const POOL = MAIN.F.length;
     const polys = [];
     for (let i = 0; i < POOL; i++) {
       const p = document.createElementNS(NS, "polygon");
@@ -180,29 +131,7 @@
     edgePath.setAttribute("stroke-linecap", "round");
     svg.appendChild(edgePath);
 
-    /* the core: RED - the site's own red, with a hot centre */
-    const coreOuter = document.createElementNS(NS, "circle");
-    coreOuter.setAttribute("fill", "#ff2d16");
-    const coreInner = document.createElementNS(NS, "circle");
-    coreInner.setAttribute("fill", "#ffb3a0");
-    [coreOuter, coreInner].forEach((c) => {
-      c.setAttribute("cx", "50");
-      c.setAttribute("cy", "50");
-      c.setAttribute("r", "0");
-      svg.appendChild(c);
-    });
-
     mount.appendChild(svg);
-
-    const band = mount.closest(".facet-band");
-    let beam = null, muzzle = null;
-    if (band) {
-      beam = document.createElement("div");
-      beam.className = "ramiel-beam";
-      muzzle = document.createElement("div");
-      muzzle.className = "ramiel-muzzle";
-      band.append(beam, muzzle);
-    }
 
     const scratch = [];
     const normals = [];
@@ -255,8 +184,6 @@
         svg.appendChild(p);
       }
       for (let i = used; i < POOL; i++) polys[i].setAttribute("points", "");
-      svg.appendChild(coreOuter);
-      svg.appendChild(coreInner);
       svg.appendChild(edgePath);
 
       let d = "";
@@ -282,74 +209,6 @@
       renderScene(MAIN.V, MAIN.F, MAIN.E, yaw, tilt);
     }
 
-    /* the five petals: stretch 0..1 extends the noses in place; spread
-       0..1 pivots each petal about the tail hinge, fanning the front open
-       while the back stays gathered */
-    const petalModel = PSCENE.V.map(() => [0, 0, 0]);
-    function drawPetals(stretch, spread, tilt) {
-      const sx = 1 + (STRETCH_X - 1) * stretch;
-      const phi = FAN * spread;
-      const cph = Math.cos(phi), sph = Math.sin(phi);
-      for (let k = 0; k < PETALS; k++) {
-        const dy = PETAL_DIR[k][1], dz = PETAL_DIR[k][2];
-        for (let i = 0; i < 6; i++) {
-          const v = OCTA_V[i];
-          /* only the front extends; thinning tapers toward the nose */
-          const x = v[0] < 0 ? v[0] * sx : v[0];
-          const nose = Math.max(0, -v[0]);
-          const syz = 1 - (1 - THIN_YZ) * stretch * nose;
-          const y = v[1] * syz, z = v[2] * syz;
-          /* pivot in the (x, d) plane about the tail hinge: the nose
-             (ahead of the hinge) swings outward along +d */
-          const b = y * dy + z * dz;       /* component along the petal's d */
-          const c = -y * dz + z * dy;      /* component across it */
-          const u = x - PIVOT_X;
-          const u2 = u * cph + b * sph;
-          const b2 = -u * sph + b * cph;
-          const m = petalModel[k * 6 + i];
-          m[0] = u2 + PIVOT_X;
-          m[1] = b2 * dy - c * dz;
-          m[2] = b2 * dz + c * dy;
-        }
-      }
-      renderScene(petalModel, PSCENE.F, PSCENE.E, 0, tilt);
-    }
-
-    function setCore(k) {
-      coreOuter.setAttribute("r", (3.6 * k).toFixed(2));
-      coreInner.setAttribute("r", (1.5 * k).toFixed(2));
-    }
-
-    function setBeam(on, intensity) {
-      if (!beam) return;
-      if (!on) {
-        beam.style.opacity = "0";
-        muzzle.style.opacity = "0";
-        return;
-      }
-      const mr = mount.getBoundingClientRect();
-      const br = band.getBoundingClientRect();
-      const cx = mr.left - br.left + mr.width / 2;
-      const cyy = mr.top - br.top + mr.height / 2;
-      beam.style.width = Math.max(0, cx) + "px";
-      beam.style.top = cyy - 2 + "px";
-      beam.style.opacity = String(intensity);
-      /* the flash sits on the core - the beam is fired FROM it */
-      muzzle.style.left = cx + "px";
-      muzzle.style.top = cyy + "px";
-      muzzle.style.opacity = String(intensity);
-      muzzle.style.transform =
-        "translate(-50%, -50%) scale(" + (0.7 + 0.6 * intensity) + ")";
-    }
-
-    function setGlow(k) {
-      const blur = 16 + 26 * k;
-      const a = 0.22 + 0.45 * k;
-      svg.style.filter =
-        "drop-shadow(0 0 " + blur.toFixed(0) + "px rgba(" +
-        Math.round(100 + 120 * k) + ", " + Math.round(150 + 40 * k) + ", 255, " + a.toFixed(2) + "))";
-    }
-
     /* ---------- the clock ---------- */
 
     if (still) {
@@ -358,23 +217,13 @@
     }
 
     let running = false;
-    let firing = false;
     let idleStart = null;
     let yawBase = 0.66;
-    let fireStart = 0;
-    let yawAtAlign = 0;
 
     function idleYaw(now) {
       if (idleStart === null) idleStart = now;
       return yawBase + ((now - idleStart) / 1000) * SPIN;
     }
-
-    mount.addEventListener("click", () => {
-      if (firing || still) return;
-      firing = true;
-      fireStart = performance.now();
-      yawAtAlign = idleYaw(fireStart) % (Math.PI * 2);
-    });
 
     function frame() {
       if (!running) return;
@@ -384,66 +233,7 @@
       const vp = (rect.top + rect.height / 2 - innerHeight / 2) / innerHeight;
       const scrollTilt = Math.max(-0.4, Math.min(0.08, TILT - vp * 0.28));
 
-      if (!firing) {
-        mount.classList.remove("locked");
-        drawMain(idleYaw(now), scrollTilt);
-        setCore(0);
-        setBeam(false, 0);
-        setGlow(0);
-      } else {
-        mount.classList.add("locked");
-        const ft = (now - fireStart) / 1000;
-
-        if (ft < T1) {
-          /* the turn decays into the stop: a Hermite curve whose slope
-             starts at the live spin rate and ends at zero */
-          const k = ft / ALIGN;
-          const from = yawAtAlign % (Math.PI * 2);
-          const target = Math.PI * 2 * Math.ceil((from + 0.35) / (Math.PI * 2));
-          const h00 = 2 * k * k * k - 3 * k * k + 1;
-          const h10 = k * k * k - 2 * k * k + k;
-          const h01 = -2 * k * k * k + 3 * k * k;
-          const y = from * h00 + SPIN * ALIGN * h10 + target * h01;
-          const kk = smooth(k);
-          drawMain(y, scrollTilt * (1 - kk) + FIRE_TILT * kk);
-          setCore(0);
-          setGlow(0);
-        } else if (ft < T2) {
-          /* the front stretches toward the target */
-          const k = smooth((ft - T1) / STRETCH);
-          drawPetals(k, 0, FIRE_TILT);
-          setCore(0);
-          setGlow(k * 0.4);
-        } else if (ft < T3) {
-          /* the spindle splits into five; the red core is exposed */
-          const k = smooth((ft - T2) / SPLIT);
-          drawPetals(1, k, FIRE_TILT);
-          setCore(k);
-          setGlow(0.4 + 0.6 * k);
-        } else if (ft < T4) {
-          /* the beam, from the core. He holds perfectly still. */
-          const k = (ft - T3) / FIRE;
-          const flicker = 0.82 + 0.18 * Math.sin(now / 9);
-          drawPetals(1, 1, FIRE_TILT);
-          setCore(1);
-          setBeam(true, k < 0.08 ? k / 0.08 : flicker);
-          setGlow(1);
-        } else if (ft < T5) {
-          /* the petals close and merge */
-          const k = smooth((ft - T4) / CLOSE);
-          drawPetals(1 - k, 1 - k, FIRE_TILT * (1 - k) + scrollTilt * k);
-          setCore(1 - k);
-          setBeam(true, Math.max(0, 0.5 * (1 - k * 2.2)));
-          setGlow(1 - k);
-        } else {
-          firing = false;
-          yawBase = 0;
-          idleStart = now;
-          setBeam(false, 0);
-          setCore(0);
-          setGlow(0);
-        }
-      }
+      drawMain(idleYaw(now), scrollTilt);
       requestAnimationFrame(frame);
     }
 
@@ -454,12 +244,11 @@
       requestAnimationFrame(frame);
     }
     function stop() {
-      if (running && !firing) {
+      if (running) {
         yawBase = idleYaw(performance.now()) % (Math.PI * 2);
         idleStart = null;
       }
       running = false;
-      setBeam(false, 0);
     }
 
     drawMain(0.66, TILT);

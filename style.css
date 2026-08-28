@@ -1231,11 +1231,9 @@ footer .col-label {
   50%      { opacity: 0.95; }
 }
 
-/* The visitor: a mount ramiel.js fills with a turning octahedron.
-   Clickable on purpose - a click is what makes him fire. */
+/* The visitor: a mount ramiel.js fills with a turning octahedron. */
 .ramiel {
   display: block;
-  cursor: crosshair;
   animation: ramiel-bob 9s ease-in-out infinite;
 }
 
@@ -1274,38 +1272,6 @@ footer .col-label {
 @media (prefers-reduced-motion: reduce) {
   .ramiel { animation: none; }
 }
-
-/* the bob pauses while he is aligned and firing - the beam must stay level */
-.ramiel.locked { animation: none; }
-
-/* the particle beam: fired from the core, THROUGH the body, out to the left
-   edge of the country. Sits under the body (z) so the segment inside him is
-   occluded and the shot reads as coming from within. */
-.ramiel-beam {
-  position: absolute;
-  left: 0;
-  height: 4px;
-  background: #fff;
-  opacity: 0;
-  z-index: 1;
-  pointer-events: none;
-  box-shadow:
-    0 0 6px 1px #ffd7ef,
-    0 0 20px 5px rgba(255, 130, 200, 0.55),
-    0 0 48px 12px rgba(130, 150, 255, 0.35);
-}
-
-.ramiel-muzzle {
-  position: absolute;
-  width: 46px;
-  height: 46px;
-  border-radius: 50%;
-  background: radial-gradient(circle, #fff 0%, rgba(255, 180, 225, 0.85) 30%, rgba(140, 160, 255, 0.4) 60%, transparent 72%);
-  opacity: 0;
-  z-index: 3;
-  pointer-events: none;
-}
-
 
 /* ---------- the cluster band ---------- */
 
@@ -1952,7 +1918,7 @@ dd.placeholder {
   html, body { background: #fff !important; color: #000; }
 
   .progress, .nav, .facet-band, canvas, iframe, .live-frame,
-  .egg, #egg, #durak-panel, .ramiel, .ramiel-beam, .ramiel-muzzle, .range-hud, .aim-target, .meteor, .debris, .dwell,
+  .egg, #egg, #durak-panel, .ramiel, .range-hud, .aim-target, .meteor, .debris, .dwell,
   [data-pad-edit], [data-pad-add], [data-pad-save], [data-pad-cancel],
   [data-pad-plate], [data-pad-status], .commit-fallback {
     display: none !important;
