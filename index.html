@@ -35,11 +35,11 @@
             <ul class="nav-links">
                 <li><a href="index.html" aria-current="page">Home</a></li>
                 <li><a href="#experience">Research</a></li>
+                <li><a href="#skills">Skills</a></li>
                 <li><a href="#work">Projects</a></li>
+                <li><a href="#live">Live</a></li>
                 <li><a href="euler.html">Practice</a></li>
                 <li><a href="#durak">Durak</a></li>
-                <li><a href="#skills">Skills</a></li>
-                <li><a href="#live">Live</a></li>
                 <li><a href="#contact">Contact</a></li>
             </ul>
         </div>
@@ -229,14 +229,21 @@
                     <a class="mono" href="https://dronestrikemap.com/" target="_blank" rel="noopener">open in its
                         own tab</a>
                 </div>
-                <p class="setup">The Drone Strike Map, served from its own box. Every figure is a claim, and each
-                    one names the outlet that made it; the arrows walk the days. The site refuses to be framed
-                    &mdash; a deliberate header on the server &mdash; so this is a still of it: click through for
-                    the live one.</p>
-                <a class="live-still" href="https://dronestrikemap.com/" target="_blank" rel="noopener">
-                    <img src="previews/drone-strike-map.jpg" alt="The Drone Strike Map: a map of Ukraine with the day's reported strikes, and the sources behind them" loading="lazy" decoding="async" />
-                    <span class="mono">dronestrikemap.com &rarr;</span>
-                </a>
+                <p class="setup">The Drone Strike Map, served from its own box and running below &mdash; not a
+                    picture of it. Every figure is a claim, and each one names the outlet that made it; the arrows
+                    walk the days. Its server admits this page by name, so the map you are reading is the same one
+                    the world gets.</p>
+
+                <!-- The still is what stands here until the frame is mounted, and what
+                     stays for a visitor without scripting or from an origin the map's
+                     server does not admit. script.js swaps in the live map where it
+                     is allowed to load. -->
+                <div class="live-embed" data-live-src="https://dronestrikemap.com/">
+                    <a class="live-still" href="https://dronestrikemap.com/" target="_blank" rel="noopener">
+                        <img src="previews/drone-strike-map.jpg" alt="The Drone Strike Map: a map of Ukraine with the day's reported strikes, and the sources behind them" loading="lazy" decoding="async" />
+                        <span class="mono">dronestrikemap.com &rarr;</span>
+                    </a>
+                </div>
             </div>
         </section>
 

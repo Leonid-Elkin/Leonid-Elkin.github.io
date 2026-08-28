@@ -1,0 +1,84 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Document &middot; Leonid Elkin</title>
+    <meta name="description" content="A paper, poster or report from the index, read in place." />
+    <meta name="robots" content="noindex" />
+    <meta name="theme-color" content="#0a0a0a" />
+    <link rel="icon"
+        href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' fill='%230a0a0a'/%3E%3Crect x='7' y='7' width='18' height='18' fill='%23ff2d16'/%3E%3C/svg%3E" />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link rel="stylesheet"
+        href="https://fonts.googleapis.com/css2?family=Archivo:wght@500;600;700;800&family=Inter+Tight:wght@400;500;600&family=JetBrains+Mono:wght@400;500&display=swap" />
+    <link rel="stylesheet" href="style.css?v=5" />
+</head>
+
+<body>
+    <div class="progress" aria-hidden="true"></div>
+    <nav class="nav" aria-label="Main">
+        <div class="wrap">
+            <a class="brand" href="index.html"><span class="mark" aria-hidden="true"></span>Leonid Elkin</a>
+            <ul class="nav-links">
+                <li><a href="index.html">Home</a></li>
+                <li><a href="index.html#experience">Research</a></li>
+                <li><a href="index.html#skills">Skills</a></li>
+                <li><a href="index.html#work">Projects</a></li>
+                <li><a href="euler.html">Practice</a></li>
+                <li><a href="index.html#contact">Contact</a></li>
+            </ul>
+        </div>
+    </nav>
+
+    <main>
+        <section class="section doc-section">
+            <div class="wrap">
+                <div class="section-head">
+                    <span class="idx">&mdash;</span>
+                    <h1 class="display overprint" id="doc-title" data-text="Document">Document</h1>
+                    <a class="mono" id="doc-back" href="index.html#work">&larr; all projects</a>
+                </div>
+
+                <!-- Above the reader, not below it: the frame is as tall as the
+                     window allows, so anything under it starts off screen. -->
+                <p class="doc-actions mono">
+                    <a id="doc-open" href="" target="_blank" rel="noopener">open in its own tab &rarr;</a>
+                    <a id="doc-download" href="" download>download a copy &rarr;</a>
+                </p>
+
+                <!-- The reader itself. An <object> renders the PDF with the browser's
+                     own viewer, so there is no library to ship and no worker to load;
+                     the fallback inside it is what a phone or an old browser gets. -->
+                <div class="doc-frame">
+                    <object id="doc-object" type="application/pdf" data="" aria-label="PDF document">
+                        <div class="doc-fallback">
+                            <p>This browser will not display the PDF in the page.</p>
+                            <p class="mono"><a id="doc-open-fallback" href="" target="_blank" rel="noopener">open it in
+                                    a new tab &rarr;</a></p>
+                        </div>
+                    </object>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <footer id="contact">
+        <div class="wrap">
+            <p class="col-label">Contact</p>
+            <ul class="foot-links">
+                <li><a href="mailto:lnd.elkn@gmail.com">lnd.elkn@gmail.com</a></li>
+                <li><a href="https://github.com/Leonid-Elkin" target="_blank" rel="noopener">GitHub</a></li>
+                <li><a href="https://elkyy.itch.io/" target="_blank" rel="noopener">itch.io</a></li>
+            </ul>
+            <span class="colophon">Set in Archivo, Inter Tight and JetBrains Mono. Black stock, one red &mdash; and one visitor in blue. Static HTML, no build step.</span>
+        </div>
+    </footer>
+
+    <script src="doc.js"></script>
+    <script src="extras.js"></script>
+</body>
+
+</html>

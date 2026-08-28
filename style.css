@@ -71,7 +71,16 @@
 html {
   -webkit-text-size-adjust: 100%;
   scroll-behavior: smooth;
+  /* `clip` keeps the sideways bleed contained without turning the element
+     into a scroll container. `hidden` here (or on body) makes one, and a
+     scroll container swallows every in-page #anchor: the URL changes and
+     the page never moves. */
+  overflow-x: clip;
 }
+
+/* The nav is sticky and 59px tall, so an anchor landing at the exact top of
+   a section puts its heading underneath the bar. Hold the sections clear. */
+:where(section, footer)[id] { scroll-margin-top: 76px; }
 
 body {
   margin: 0;
@@ -81,7 +90,6 @@ body {
   font-size: 17px;
   line-height: 1.6;
   font-weight: 400;
-  overflow-x: hidden;
   -webkit-font-smoothing: antialiased;
   text-rendering: optimizeLegibility;
 }
@@ -2301,3 +2309,72 @@ pre.code.out:empty::before { content: "…"; color: var(--ink-4); }
    tab row still takes up space. */
 .filter[hidden],
 .euler-langs[hidden] { display: none; }
+
+
+
+/* ---------- doc.html: a PDF read in the page ---------- */
+
+/* Tall enough to read a page of A4 without the frame becoming its own little
+   scrolling well, but never taller than the window minus the masthead. */
+.doc-frame {
+  margin-top: 14px;
+  height: min(1100px, calc(100vh - 240px));
+  min-height: 420px;
+  border: 1px solid var(--rule);
+  background: var(--paper-2);
+}
+
+.doc-frame object,
+.doc-frame embed { display: block; width: 100%; height: 100%; border: 0; }
+
+/* What a browser that will not frame a PDF gets instead. */
+.doc-fallback {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  align-items: center;
+  justify-content: center;
+  height: 100%;
+  padding: 24px;
+  text-align: center;
+  color: var(--ink-2);
+}
+
+.doc-fallback a { color: var(--red); }
+
+.doc-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 20px 28px;
+  margin-top: clamp(18px, 2.4vw, 28px);
+  font-size: 0.82rem;
+}
+
+.doc-actions a { color: var(--ink-2); border-bottom: 1px solid var(--rule-hot); padding-bottom: 2px; }
+.doc-actions a:hover { color: var(--red); border-bottom-color: var(--red); }
+
+@media (max-width: 700px) {
+  /* A phone will not render the PDF inline, so the box is only ever holding
+     the fallback - no reason to reserve half a screen for it. */
+  .doc-frame { height: auto; min-height: 260px; }
+}
+
+
+/* ---------- the live map, framed rather than photographed ---------- */
+
+.live-embed { margin-top: 0; }
+
+/* Matches the footprint the still occupied, so swapping one for the other
+   does not move the page. */
+.live-embed.is-live {
+  border: 1px solid var(--rule);
+  background: var(--paper-2);
+  height: clamp(460px, 72vh, 860px);
+}
+
+.live-frame { display: block; width: 100%; height: 100%; border: 0; }
+
+@media (max-width: 700px) {
+  /* A map with its own panel and chart needs the height back on a phone. */
+  .live-embed.is-live { height: clamp(420px, 78vh, 620px); }
+}
