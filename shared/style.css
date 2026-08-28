@@ -225,12 +225,19 @@ iframe { max-width: 100%; }
   letter-spacing: 0.22em;
   text-transform: uppercase;
   color: var(--ink-3);
-  padding-bottom: 14px;
   margin-bottom: clamp(18px, 3vw, 40px);
-  border-bottom: 1px solid var(--rule);
 }
 
-.eyebrow .sep { flex: 1; }
+/* Items are set off by a small red lozenge rather than a rule, so the eyebrow
+   reads as one line of stamped type instead of a boxed caption. */
+.eyebrow .sep {
+  flex: 0 0 auto;
+  color: var(--red);
+  font-size: 0.5rem;
+  line-height: 1;
+  letter-spacing: 0;
+  transform: translateY(-0.05em);
+}
 .eyebrow .red { color: var(--red); }
 
 /* The headline is the page. It is set to run past the right edge on wide
@@ -331,8 +338,10 @@ iframe { max-width: 100%; }
   grid-template-columns: var(--label-col) minmax(0, 1fr);
   gap: clamp(16px, 3vw, 44px);
   padding-top: clamp(20px, 3vw, 34px);
-  border-top: 1px solid var(--rule);
 }
+
+/* no label column: the body runs the full measure */
+.hero-deck.bare { grid-template-columns: minmax(0, 1fr); }
 
 .hero-deck > .col-label {
   font-family: var(--f-mono);
