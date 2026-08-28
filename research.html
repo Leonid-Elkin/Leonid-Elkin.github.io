@@ -4,14 +4,18 @@
 <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <title>Project &middot; Leonid Elkin</title>
-    <meta name="description" content="A project by Leonid Elkin: what it is, how it was built, and where it lives." />
+    <title>Research &middot; Leonid Elkin</title>
+    <meta name="description"
+        content="Research, competitions and education: neural scaling laws, globular cluster evaporation, and a CanSat payload that flew." />
     <meta name="theme-color" content="#0a0a0a" />
     <meta property="og:type" content="website" />
-    <meta property="og:title" content="Project · Leonid Elkin" />
-    <meta property="og:description" content="A project by Leonid Elkin: what it is, how it was built, and where it lives." />
+    <meta property="og:title" content="Research · Leonid Elkin" />
+    <meta property="og:description"
+        content="Two papers, a satellite that flew, and the competitions behind them." />
+    <meta property="og:url" content="https://leonid-elkin.github.io/research.html" />
     <meta property="og:image" content="https://leonid-elkin.github.io/previews/this-website.jpg" />
     <meta name="twitter:card" content="summary_large_image" />
+    <link rel="canonical" href="https://leonid-elkin.github.io/research.html" />
     <link rel="icon"
         href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' fill='%230a0a0a'/%3E%3Crect x='7' y='7' width='18' height='18' fill='%23ff2d16'/%3E%3C/svg%3E" />
     <link rel="preconnect" href="https://fonts.googleapis.com" />
@@ -28,8 +32,8 @@
             <a class="brand" href="index.html"><span class="mark" aria-hidden="true"></span>Leonid Elkin</a>
             <ul class="nav-links">
                 <li><a href="index.html">Home</a></li>
-                <li><a href="projects.html" aria-current="page">Projects</a></li>
-                <li><a href="research.html">Research</a></li>
+                <li><a href="projects.html">Projects</a></li>
+                <li><a href="research.html" aria-current="page">Research</a></li>
                 <li><a href="practice.html">Practice</a></li>
                 <li><a href="about.html">About</a></li>
                 <li><a href="live.html">Live</a></li>
@@ -50,31 +54,35 @@
     </div>
 
     <main>
-        <section class="section">
+        <section class="section" id="experience">
             <div class="wrap">
                 <div class="section-head">
-                    <span class="idx" id="case-idx">&mdash;</span>
-                    <h1 class="display overprint" id="case-title" data-text="">&nbsp;</h1>
-                    <a class="mono" href="projects.html">&larr; all projects</a>
+                    <span class="idx">Research &mdash;</span>
+                    <h1 class="display overprint" data-text="Research">Research</h1>
+                    <span class="aside mono">what stands where a job history will</span>
                 </div>
+                <p class="setup">Two papers, a satellite that flew and the competitions that paid for them. The
+                    write-ups and the source for each sit in the <a href="projects.html#research">research
+                        filter</a> of the index.</p>
+                <div class="role-list" id="role-list"></div>
+            </div>
+        </section>
 
-                <p class="setup" id="case-setup"></p>
+        <!-- The paper's subject, demonstrating itself. cluster.js gives the
+             band its height; no script, no empty hole. -->
+        <div class="cluster-band" id="cluster" aria-hidden="true">
+            <canvas></canvas>
+            <p class="cluster-readout"><span>Globular cluster &middot; softened pairwise gravity &middot; click to perturb</span><b>N 140</b></p>
+        </div>
 
-                <figure class="case-hero" id="case-hero" hidden>
-                    <img id="case-img" alt="" decoding="async" hidden src="data:image/gif;base64,R0lGODlhAQABAAAAACH5BAEKAAEALAAAAAABAAEAAAICTAEAOw==" />
-                    <figcaption class="mono" id="case-cap"></figcaption>
-                </figure>
-
-                <div class="about-body">
-                    <p class="col-label">Write-up</p>
-                    <div class="about-copy" id="case-copy"></div>
-                    <dl class="fact-list" id="case-facts"></dl>
+        <section class="section" id="education">
+            <div class="wrap">
+                <div class="section-head">
+                    <span class="idx">Education &mdash;</span>
+                    <h2 class="display">Education</h2>
+                    <span class="aside mono">&nbsp;</span>
                 </div>
-
-                <nav class="case-nav" aria-label="Neighbouring projects">
-                    <a class="mono" id="case-prev" href="projects.html"></a>
-                    <a class="mono" id="case-next" href="projects.html"></a>
-                </nav>
+                <div class="edu-grid" id="edu-list"></div>
             </div>
         </section>
     </main>
@@ -87,17 +95,14 @@
                 <li><a href="https://github.com/Leonid-Elkin" target="_blank" rel="noopener">GitHub</a></li>
                 <li><a href="https://elkyy.itch.io/" target="_blank" rel="noopener">itch.io</a></li>
             </ul>
-            <span class="colophon">Set in Archivo, Inter Tight and JetBrains Mono. Black stock, one red &mdash; and one visitor in blue.
-                Static HTML, no build step.</span>
+            <span class="colophon">Set in Archivo, Inter Tight and JetBrains Mono. Black stock, one red &mdash; and one visitor in blue. Static HTML, no build step.</span>
         </div>
     </footer>
 
-    <script src="previews.js"></script>
     <script src="script.js?v=10"></script>
-    <script src="movegrade-demo.js?v=4"></script>
-    <script src="cases.js?v=8"></script>
     <script src="extras.js"></script>
     <script src="motion.js"></script>
+    <script src="cluster.js"></script>
 </body>
 
 </html>

@@ -562,7 +562,28 @@ function initProjects() {
   apply(grid.dataset.hash === "off" ? "all" : (location.hash || "").replace("#", ""), { push: false });
 }
 
-/* ---------- home: selected work ---------- */
+/* ---------- home: selected work ----------
+   The home page carries four entries, not the index. These four because each
+   one answers a different question: is it real (live and public), does anyone
+   use it (installed), did it survive contact with hardware (it flew), and was
+   it written up (a paper). Everything else is one click away on projects.html.
+   Titles, so the picks track the entries above rather than their positions. */
+
+const HOME_PICKS = ["Drone Strike Map", "MoveGrade", "CanSat 2025", "Neural scaling laws"];
+
+function initFeatured() {
+  const grid = document.getElementById("featured-grid");
+  if (!grid) return;
+
+  const frag = document.createDocumentFragment();
+  HOME_PICKS.forEach((title) => {
+    const i = projects.findIndex((p) => p.title === title);
+    if (i < 0) return; /* a pick that no longer names an entry is simply dropped */
+    frag.appendChild(projectCard(projects[i], i));
+  });
+  grid.appendChild(frag);
+}
+
 
 /* ---------- home: research & competitions ---------- */
 
@@ -668,6 +689,7 @@ function initCounts() {
 
 window.addEventListener("DOMContentLoaded", () => {
   initProjects();
+  initFeatured();
   initRoles();
   initEducation();
   initSkills();

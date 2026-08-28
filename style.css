@@ -2410,3 +2410,89 @@ pre.code.out:empty::before { content: "…"; color: var(--ink-4); }
   /* A map with its own panel and chart needs the height back on a phone. */
   .live-embed.is-live { height: clamp(420px, 78vh, 620px); }
 }
+
+
+/* ---------- the doors: the site's other pages, as a hairline grid ----------
+   One rule between cells, drawn the way .edu-grid draws it - the background
+   is the rule and each cell paints over it, so no cell owns a border and
+   nothing doubles up at the seams. */
+
+.doors {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 300px), 1fr));
+  gap: 1px;
+  background: var(--rule);
+  border: 1px solid var(--rule);
+  list-style: none;
+  margin-left: calc(var(--label-col) + clamp(14px, 3vw, 44px));
+}
+
+.doors > li { display: flex; }
+
+.doors a {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  flex: 1;
+  background: var(--paper);
+  padding: clamp(18px, 2.2vw, 26px) clamp(18px, 2vw, 24px);
+  color: inherit;
+  text-decoration: none;
+  transition: background 0.16s ease;
+}
+
+.doors a:hover,
+.doors a:focus-visible { background: var(--paper-2); }
+
+.door-idx {
+  font-size: 0.68rem;
+  letter-spacing: 0.14em;
+  color: var(--ink-4);
+}
+
+.doors h3 {
+  font-family: var(--f-display);
+  font-weight: 800;
+  font-size: clamp(1.15rem, 2vw, 1.5rem);
+  text-transform: uppercase;
+  letter-spacing: -0.03em;
+  line-height: 1.05;
+}
+
+.doors p {
+  color: var(--ink-2);
+  font-size: 0.92rem;
+  line-height: 1.5;
+  /* Pushes the go-line to the bottom so every cell's arrow lands on the same
+     baseline however long the paragraph runs. */
+  flex: 1;
+}
+
+.door-go {
+  font-size: 0.7rem;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--ink-3);
+}
+
+.doors a:hover .door-go,
+.doors a:focus-visible .door-go { color: var(--red); }
+
+.doors a:hover h3,
+.doors a:focus-visible h3 { color: var(--red); }
+
+/* Three to a row once there is room for it: the home page's six doors then
+   fill two rows exactly, and practice.html's three fill one. Left to auto-fit
+   the six break 4 + 2, which reads as a mistake rather than a grid. */
+@media (min-width: 1000px) {
+  .doors { grid-template-columns: repeat(3, 1fr); }
+}
+
+/* the "every project" button under the four picks */
+.more-row { margin-top: clamp(22px, 3vw, 34px); margin-left: calc(var(--label-col) + clamp(14px, 3vw, 44px)); }
+
+/* the same breakpoint at which .setup and .edu-grid give up their label column */
+@media (max-width: 720px) {
+  .doors,
+  .more-row { margin-left: 0; }
+}

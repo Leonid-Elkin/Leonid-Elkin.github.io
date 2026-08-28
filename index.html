@@ -23,7 +23,7 @@
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
     <link rel="stylesheet"
         href="https://fonts.googleapis.com/css2?family=Archivo:wght@500;600;700;800&family=Inter+Tight:wght@400;500;600&family=JetBrains+Mono:wght@400;500&display=swap" />
-    <link rel="stylesheet" href="style.css?v=6" />
+    <link rel="stylesheet" href="style.css?v=7" />
     <link rel="stylesheet" href="durak.css" />
 </head>
 
@@ -34,12 +34,11 @@
             <a class="brand" href="index.html"><span class="mark" aria-hidden="true"></span>Leonid Elkin</a>
             <ul class="nav-links">
                 <li><a href="index.html" aria-current="page">Home</a></li>
-                <li><a href="#experience">Research</a></li>
-                <li><a href="#skills">Skills</a></li>
-                <li><a href="#work">Projects</a></li>
-                <li><a href="#live">Live</a></li>
-                <li><a href="euler.html">Practice</a></li>
-                <li><a href="#durak">Durak</a></li>
+                <li><a href="projects.html">Projects</a></li>
+                <li><a href="research.html">Research</a></li>
+                <li><a href="practice.html">Practice</a></li>
+                <li><a href="about.html">About</a></li>
+                <li><a href="live.html">Live</a></li>
                 <li><a href="#contact">Contact</a></li>
             </ul>
         </div>
@@ -75,14 +74,13 @@
                         <p class="tagline">Software and hardware, mostly in Python, some in C++. Things that read the
                             <em>physical world</em> and answer it.</p>
                         <div>
-                            <!-- PLACEHOLDER: one paragraph in your own words. Delete the
-                                 `placeholder` class once it is written. -->
                             <p class="hero-note">No employment history yet, and this site does not pretend
                                 otherwise. What it has instead: a live public service with its own API, two
                                 research papers, a satellite that flew, and a dozen smaller things &mdash; each
                                 linked to its evidence.</p>
                             <div class="cta-row">
-                                <a class="btn primary" href="#work">See the projects</a>
+                                <a class="btn primary" href="projects.html">See all <span
+                                        data-project-count>14</span> projects</a>
                                 <a class="btn" href="#contact">Get in touch</a>
                             </div>
                         </div>
@@ -122,144 +120,87 @@
             <span class="ramiel" data-size="120" aria-hidden="true"></span>
         </div>
 
-        <section class="section about" id="about">
+        <!-- Four entries, not the whole index. The index lives on its own page
+             and this section's only job is to send you there. -->
+        <section class="section" id="selected">
             <div class="wrap">
                 <div class="section-head">
                     <span class="idx">01 &mdash;</span>
-                    <h2 class="display">About</h2>
-                    <span class="aside mono">&nbsp;</span>
+                    <h2 class="display">Selected work</h2>
+                    <a class="mono" href="projects.html">the whole index &rarr;</a>
                 </div>
-                <div class="about-body">
-                    <p class="col-label">Biography</p>
-                    <div class="about-copy">
-                        <!-- PLACEHOLDER: these two paragraphs are yours to write. Everything
-                             drafted here before was written for you, not by you, so they stay
-                             blank rather than shipped in someone else's voice. -->
-                        <p>I build things that have to meet the real world and be right about it: a public strike
-                            record that reads the news every morning and serves an API, a CanSat payload and radio
-                            that flew, a Yagi-Uda antenna that is slowly becoming a radar, a chess engine that
-                            watches games and says what it thinks of every move.</p>
-                        <p>Mostly Python, some C++ and C#, JavaScript when the thing has to live in a browser.
-                            Two research papers &mdash; one on neural scaling laws, one on globular cluster
-                            evaporation &mdash; and a habit of finishing the side projects: the games on this site
-                            play, the tools download, the extension grades.</p>
-                    </div>
-                    <dl class="fact-list">
-                        <div><dt class="k">Languages</dt><dd>Python &middot; C++ &middot; C# &middot; JavaScript</dd></div>
-                        <div><dt class="k">Research</dt><dd>neural scaling laws &middot; globular clusters</dd></div>
-                        <div><dt class="k">GitHub</dt><dd><a href="https://github.com/Leonid-Elkin" target="_blank"
-                                    rel="noopener">Leonid-Elkin</a></dd></div>
-                        <div><dt class="k">Email</dt><dd><a href="mailto:lnd.elkn@gmail.com">lnd.elkn@gmail.com</a>
-                            </dd></div>
-                        <!-- Everything on this line is evidenced by a project above it:
-                             chessbot, Sheet2Tab, the score visualiser, durak.js. -->
-                        <div><dt class="k">Off duty</dt><dd>chess &middot; classical guitar &middot; target
-                            shooting &middot; durak</dd></div>
-                    </dl>
-                </div>
+                <p class="setup">Four of them: the one that is live and public, the one people install, the one
+                    that flew, and the one that got written up. The rest &mdash; <span
+                        data-project-count>14</span> in all, software, hardware and research &mdash; are on the
+                    <a href="projects.html">projects page</a>.</p>
+                <div id="featured-grid" class="project-grid dense"></div>
+                <p class="more-row"><a class="btn primary" href="projects.html">Every project</a></p>
             </div>
         </section>
 
-        <section class="section" id="experience">
+        <!-- The rest of the site, as doors rather than as scroll. -->
+        <section class="section" id="elsewhere">
             <div class="wrap">
                 <div class="section-head">
                     <span class="idx">02 &mdash;</span>
-                    <h2 class="display">Research &amp; competitions</h2>
-                    <span class="aside mono">what stands where a job history will</span>
+                    <h2 class="display">The rest of it</h2>
+                    <span class="aside mono">five pages, no scrolling required</span>
                 </div>
-                <div class="role-list" id="role-list"></div>
-
-                <div class="section-head" style="margin-top: clamp(30px, 4vw, 52px);">
-                    <span class="idx">02.1 &mdash;</span>
-                    <h2 class="display">Education</h2>
-                    <span class="aside mono"></span>
-                </div>
-                <div class="edu-grid" id="edu-list"></div>
-            </div>
-        </section>
-
-        <!-- The paper's subject, demonstrating itself. cluster.js gives the
-             band its height; no script, no empty hole. -->
-        <div class="cluster-band" id="cluster" aria-hidden="true">
-            <canvas></canvas>
-            <p class="cluster-readout"><span>Globular cluster &middot; softened pairwise gravity &middot; click to perturb</span><b>N 140</b></p>
-        </div>
-
-        <section class="section" id="skills">
-            <div class="wrap">
-
-                <div class="section-head">
-                    <span class="idx">03 &mdash;</span>
-                    <h2 class="display">Skills</h2>
-                    <span class="aside mono">each one points at the work that shows it</span>
-                </div>
-                <div class="skill-cols" id="skill-cols"></div>
-            </div>
-        </section>
-
-        <section class="section" id="work">
-            <div class="wrap">
-
-                <div class="section-head">
-                    <span class="idx">04 &mdash;</span>
-                    <h2 class="display">Projects</h2>
-                    <span class="aside mono" id="project-count"></span>
-                </div>
-                <p class="setup">Every project, in the order they show off best. Each entry carries what it is,
-                    what it is written in, and every door into it: the write-up, the source, the thing itself
-                    where it runs in a browser. Durak plays right here &mdash; <a href="#durak">deal a hand</a>.</p>
-                <div class="filter-row" role="group" aria-label="Filter projects">
-                    <button class="filter" data-filter="all" aria-pressed="true">All <span class="count"></span></button>
-                    <button class="filter" data-filter="software" aria-pressed="false">Software <span
-                            class="count"></span></button>
-                    <button class="filter" data-filter="hardware" aria-pressed="false">Hardware <span
-                            class="count"></span></button>
-                    <button class="filter" data-filter="research" aria-pressed="false">Research <span
-                            class="count"></span></button>
-                </div>
-                <div id="project-grid" class="project-grid dense" data-hash="off"></div>
-            </div>
-        </section>
-
-        <section class="section" id="live">
-            <div class="wrap">
-                <div class="section-head">
-                    <span class="idx">05 &mdash;</span>
-                    <h2 class="display">Live fire</h2>
-                    <a class="mono" href="https://dronestrikemap.com/" target="_blank" rel="noopener">open in its
-                        own tab</a>
-                </div>
-                <p class="setup">The Drone Strike Map, served from its own box and running below &mdash; not a
-                    picture of it. Every figure is a claim, and each one names the outlet that made it; the arrows
-                    walk the days. Its server admits this page by name, so the map you are reading is the same one
-                    the world gets.</p>
-
-                <!-- The still is what stands here until the frame is mounted, and what
-                     stays for a visitor without scripting or from an origin the map's
-                     server does not admit. script.js swaps in the live map where it
-                     is allowed to load. -->
-                <div class="live-embed" data-live-src="https://dronestrikemap.com/">
-                    <a class="live-still" href="https://dronestrikemap.com/" target="_blank" rel="noopener">
-                        <img src="previews/drone-strike-map.jpg" alt="The Drone Strike Map: a map of Ukraine with the day's reported strikes, and the sources behind them" loading="lazy" decoding="async" />
-                        <span class="mono">dronestrikemap.com &rarr;</span>
-                    </a>
-                </div>
-            </div>
-        </section>
-
-
-        <section class="section" id="activity">
-            <div class="wrap">
-                <div class="section-head">
-                    <span class="idx">06 &mdash;</span>
-                    <h2 class="display">Recent commits</h2>
-                    <a class="mono" href="https://github.com/Leonid-Elkin?tab=repositories" target="_blank" rel="noopener">all repositories</a>
-                </div>
-                <p class="setup">A year of work, one square a day, then the newest of it in longhand &mdash; both
-                    pulled live from the GitHub API in your browser, across the ten repositories pushed to most
-                    recently. Each line is what was edited, and when.</p>
-                <div id="commit-graph" class="commit-graph"></div>
-                <div id="commit-feed"></div>
+                <ul class="doors">
+                    <li>
+                        <a href="projects.html">
+                            <span class="door-idx mono">01</span>
+                            <h3>Projects</h3>
+                            <p>The full index, filterable by software, hardware and research. Every entry names
+                                what it is, what it is written in, and every door into it.</p>
+                            <span class="door-go mono">open the index &rarr;</span>
+                        </a>
+                    </li>
+                    <li>
+                        <a href="research.html">
+                            <span class="door-idx mono">02</span>
+                            <h3>Research</h3>
+                            <p>Two papers, a satellite that flew, the competitions behind them &mdash; and the
+                                education that sits underneath. What stands where a job history will.</p>
+                            <span class="door-go mono">read it &rarr;</span>
+                        </a>
+                    </li>
+                    <li>
+                        <a href="practice.html">
+                            <span class="door-idx mono">03</span>
+                            <h3>Practice</h3>
+                            <p>Project Euler, LeetCode and Advent of Code: the solutions, run in the browser
+                                against the real inputs rather than merely listed.</p>
+                            <span class="door-go mono">solve one &rarr;</span>
+                        </a>
+                    </li>
+                    <li>
+                        <a href="about.html">
+                            <span class="door-idx mono">04</span>
+                            <h3>About &amp; skills</h3>
+                            <p>Who is writing this, in two paragraphs, plus every skill claimed pointed straight
+                                at the work that shows it.</p>
+                            <span class="door-go mono">who &rarr;</span>
+                        </a>
+                    </li>
+                    <li>
+                        <a href="live.html">
+                            <span class="door-idx mono">05</span>
+                            <h3>Live</h3>
+                            <p>The Drone Strike Map running on its own server, and a year of commits pulled from
+                                the GitHub API while you watch.</p>
+                            <span class="door-go mono">watch it &rarr;</span>
+                        </a>
+                    </li>
+                    <li>
+                        <a href="https://github.com/Leonid-Elkin" target="_blank" rel="noopener">
+                            <span class="door-idx mono">06</span>
+                            <h3>GitHub</h3>
+                            <p>Where the source that is not zipped up on this site actually lives.</p>
+                            <span class="door-go mono">Leonid-Elkin &rarr;</span>
+                        </a>
+                    </li>
+                </ul>
             </div>
         </section>
 
@@ -275,7 +216,6 @@
             </ul>
             <span class="colophon">Set in Archivo, Inter Tight and JetBrains Mono. Black stock, one red &mdash; and one visitor in blue. Static HTML, no build step.
                 <span class="dwell" id="dwell"></span></span>
-            <span class="colophon mono" id="last-change"></span>
         </div>
     </footer>
 
@@ -299,14 +239,12 @@
     </div>
 
     <script src="previews.js"></script>
-    <script src="script.js?v=9"></script>
-    <script src="commits.js?v=5"></script>
+    <script src="script.js?v=10"></script>
     <script src="durak-sfx.js"></script>
     <script src="durak.js"></script>
     <script src="egg.js?v=2"></script>
     <script src="extras.js"></script>
     <script src="motion.js"></script>
-    <script src="cluster.js"></script>
     <script src="ramiel.js"></script>
     <script src="terrain.js"></script>
     <script src="meteors.js"></script>
