@@ -38,6 +38,7 @@
     ".role",
     ".edu",
     ".skill-col",
+    ".hero-skills > div",
     ".select-row",
     ".project-card",
     ".setup",
