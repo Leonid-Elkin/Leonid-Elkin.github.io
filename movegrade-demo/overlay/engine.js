@@ -9,9 +9,9 @@
 // promise resolves with whatever partial result it had.
 //
 // Searches are bounded by time, not by depth: `go movetime`. A fixed depth
-// costs whatever the position happens to cost - depth 14 is instant in a
-// bare king-and-pawn ending and takes many seconds in a sharp middlegame with
-// six pieces hanging - so the badge arrived at wildly different times and the
+// costs whatever the position happens to cost - depth 14 is instant in a bare
+// king-and-pawn ending and takes many seconds in a sharp middlegame with six
+// pieces hanging - so the badge arrived at wildly different times and the
 // slider's number meant nothing a player could feel. A time budget is the
 // promise you can actually keep: every move gets the same wall clock, and the
 // engine spends it going as deep as that position allows.
