@@ -627,23 +627,61 @@ function initEducation() {
   });
 }
 
-/* ---------- home: skills ---------- */
+/* ---------- skills ---------- */
+
+/* One column, whatever the page wants in it - about.html asks for the whole
+   list, the home page asks for a shortlist. Both get the same markup, so the
+   two pages cannot drift apart in how a skill is drawn. */
+function skillColumn(head, items) {
+  const box = el("div", "skill-col");
+  box.appendChild(el("h3", null, head));
+  const ul = el("ul");
+  items.forEach((it) => {
+    const li = el("li");
+    li.appendChild(el("span", it.placeholder ? "placeholder" : null, it.name));
+    li.appendChild(el("span", "via" + (it.placeholder ? " placeholder" : ""), it.via));
+    ul.appendChild(li);
+  });
+  box.appendChild(ul);
+  return box;
+}
 
 function initSkills() {
   const root = document.getElementById("skill-cols");
   if (!root) return;
+  skills.forEach((col) => root.appendChild(skillColumn(col.head, col.items)));
+}
+
+/* The home page shows all four domains but not all twenty-three entries -
+   four apiece, the ones whose evidence is hardest to argue with. Named
+   rather than sliced, so the shortlist follows the entries above and not
+   their order, the same way HOME_PICKS does for projects. */
+const HOME_SKILLS = {
+  "Languages": ["Python", "C++", "C#", "JavaScript"],
+  "Frameworks & tools": [
+    "Unity 6",
+    "Chrome extensions (MV3), WebAssembly",
+    "SQLite + systemd",
+    "pygame",
+  ],
+  "Hardware & radio": ["Raspberry Pi", "RF transceivers", "Antenna construction", "Payload design"],
+  "Machine learning": [
+    "MLPs from scratch",
+    "Training and evaluation",
+    "Computer vision",
+    "Optical music recognition",
+  ],
+};
+
+function initHomeSkills() {
+  const root = document.getElementById("home-skills");
+  if (!root) return;
   skills.forEach((col) => {
-    const box = el("div", "skill-col");
-    box.appendChild(el("h3", null, col.head));
-    const ul = el("ul");
-    col.items.forEach((it) => {
-      const li = el("li");
-      li.appendChild(el("span", it.placeholder ? "placeholder" : null, it.name));
-      li.appendChild(el("span", "via" + (it.placeholder ? " placeholder" : ""), it.via));
-      ul.appendChild(li);
-    });
-    box.appendChild(ul);
-    root.appendChild(box);
+    const want = HOME_SKILLS[col.head];
+    if (!want) return;
+    /* a pick that no longer names an entry is dropped, not rendered blank */
+    const items = want.map((n) => col.items.find((it) => it.name === n)).filter(Boolean);
+    if (items.length) root.appendChild(skillColumn(col.head, items));
   });
 }
 
@@ -690,6 +728,7 @@ function initCounts() {
 window.addEventListener("DOMContentLoaded", () => {
   initProjects();
   initFeatured();
+  initHomeSkills();
   initRoles();
   initEducation();
   initSkills();
