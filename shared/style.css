@@ -288,6 +288,41 @@ iframe { max-width: 100%; }
   pointer-events: none;
 }
 
+/* Every skill under the name, in the label-and-value shape the rest of the
+   site uses for facts - but left-aligned and allowed to wrap, because these
+   values are long lists rather than the single values .fact-list carries. */
+.hero-skills {
+  border-top: 1px solid var(--rule);
+  margin-bottom: clamp(22px, 3.5vw, 40px);
+}
+
+.hero-skills > div {
+  display: grid;
+  grid-template-columns: var(--label-col) minmax(0, 1fr);
+  gap: clamp(12px, 3vw, 44px);
+  padding: 10px 0;
+  border-bottom: 1px solid var(--rule);
+}
+
+.hero-skills dt.k {
+  font-family: var(--f-mono);
+  font-size: 0.7rem;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  color: var(--ink-3);
+  padding-top: 3px;
+}
+
+.hero-skills dd {
+  font-size: 0.94rem;
+  line-height: 1.5;
+  color: var(--ink-2);
+}
+
+@media (max-width: 720px) {
+  .hero-skills > div { grid-template-columns: 1fr; gap: 4px; }
+}
+
 /* the two-column deck under the headline */
 .hero-deck {
   display: grid;

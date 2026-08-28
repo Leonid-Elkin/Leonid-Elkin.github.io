@@ -335,6 +335,9 @@ const skills = [
       { name: "C++", via: "chess engine port" },
       { name: "C", via: "a CMake game engine" },
       { name: "C#", via: "Unity" },
+      /* Nothing in the repo evidences this one yet - no .java anywhere - so it
+         is flagged rather than given a project it does not have. */
+      { name: "Java", via: "[ name what shows it ]", placeholder: true },
       { name: "JavaScript", via: "this site" },
       { name: "PowerShell", via: "YT Grab" },
     ],
@@ -652,36 +655,28 @@ function initSkills() {
   skills.forEach((col) => root.appendChild(skillColumn(col.head, col.items)));
 }
 
-/* The home page shows all four domains but not all twenty-three entries -
-   four apiece, the ones whose evidence is hardest to argue with. Named
-   rather than sliced, so the shortlist follows the entries above and not
-   their order, the same way HOME_PICKS does for projects. */
-const HOME_SKILLS = {
-  "Languages": ["Python", "C++", "C#", "JavaScript"],
-  "Frameworks & tools": [
-    "Unity 6",
-    "Chrome extensions (MV3), WebAssembly",
-    "SQLite + systemd",
-    "pygame",
-  ],
-  "Hardware & radio": ["Raspberry Pi", "RF transceivers", "Antenna construction", "Payload design"],
-  "Machine learning": [
-    "MLPs from scratch",
-    "Training and evaluation",
-    "Computer vision",
-    "Optical music recognition",
-  ],
-};
-
-function initHomeSkills() {
-  const root = document.getElementById("home-skills");
+/* Under the name on the home page: every skill, but only the names of them.
+   The evidence each one carries is the whole point of about.html's version
+   and the whole reason that one is long; here the job is to say the range in
+   a few lines and get out of the way. Same `skills` array either way, so the
+   two cannot list different things. */
+function initHeroSkills() {
+  const root = document.getElementById("hero-skills");
   if (!root) return;
   skills.forEach((col) => {
-    const want = HOME_SKILLS[col.head];
-    if (!want) return;
-    /* a pick that no longer names an entry is dropped, not rendered blank */
-    const items = want.map((n) => col.items.find((it) => it.name === n)).filter(Boolean);
-    if (items.length) root.appendChild(skillColumn(col.head, items));
+    const row = el("div");
+    row.appendChild(el("dt", "k", col.head));
+    const dd = el("dd");
+    /* No placeholder treatment here: it is the `via` that is unfilled on such
+       an entry, and this list does not show the via. Flagging the name itself
+       would light up a skill that is not in doubt - about.html still marks
+       the missing evidence, which is where the evidence is claimed. */
+    col.items.forEach((it, i) => {
+      if (i) dd.append(" · ");
+      dd.append(it.name);
+    });
+    row.appendChild(dd);
+    root.appendChild(row);
   });
 }
 
@@ -728,7 +723,7 @@ function initCounts() {
 window.addEventListener("DOMContentLoaded", () => {
   initProjects();
   initFeatured();
-  initHomeSkills();
+  initHeroSkills();
   initRoles();
   initEducation();
   initSkills();
