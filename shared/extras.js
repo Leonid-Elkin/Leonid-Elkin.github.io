@@ -84,32 +84,6 @@
     }
   });
 
-  /* ---------- the footer counts your visit in lost stars ---------- */
-
-  (function () {
-    /* by class, not by id: the home page shows the count in the masthead
-       strip as well as in the footer, and both tick off the same clock */
-    const nodes = document.querySelectorAll(".dwell");
-    if (!nodes.length) return;
-    const t0 = Date.now();
-
-    function tick() {
-      const s = Math.floor((Date.now() - t0) / 1000);
-      const mm = String(Math.floor(s / 60)).padStart(2, "0");
-      const ss = String(s % 60).padStart(2, "0");
-      let line = "You have been here " + mm + ":" + ss;
-      const cs = window.clusterStats;
-      if (cs && cs.escaped) line += " · the cluster has lost " + cs.escaped + " star" + (cs.escaped === 1 ? "" : "s") + " in that time";
-      if (cs && cs.intruders) line += " · " + cs.intruders + " of the intruders " + (cs.intruders === 1 ? "was" : "were") + " you";
-      nodes.forEach((n) => (n.textContent = line));
-    }
-
-    /* draw 00:00 at once - in the masthead an empty slot for the first
-       second reads as a hole, where in the footer nobody saw it */
-    tick();
-    setInterval(tick, 1000);
-  })();
-
   /* ---------- registration debris (the 404 only) ---------- */
 
   /* On the misprinted page, the cursor sheds little squares of loose ink. */
