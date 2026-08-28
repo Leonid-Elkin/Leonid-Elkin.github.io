@@ -4,13 +4,13 @@
 <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <title>Project Euler &middot; Leonid Elkin</title>
-    <meta name="description" content="Every Project Euler problem I have solved, with the solution as it was written. The Python runs in your browser." />
+    <title>LeetCode &middot; Leonid Elkin</title>
+    <meta name="description" content="The LeetCode problems I have solved, with the solution as it was written - in whichever language I wrote it in." />
     <meta name="theme-color" content="#0a0a0a" />
     <meta property="og:type" content="website" />
-    <meta property="og:title" content="Project Euler · Leonid Elkin" />
-    <meta property="og:description" content="Every Project Euler problem I have solved, with the solution as it was written." />
-    <meta property="og:image" content="https://leonid-elkin.github.io/previews/project-euler.jpg" />
+    <meta property="og:title" content="LeetCode · Leonid Elkin" />
+    <meta property="og:description" content="The LeetCode problems I have solved, in whichever language I wrote them in." />
+    <meta property="og:image" content="https://leonid-elkin.github.io/previews/leetcode.jpg" />
     <meta name="twitter:card" content="summary_large_image" />
     <link rel="icon"
         href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' fill='%230a0a0a'/%3E%3Crect x='7' y='7' width='18' height='18' fill='%23ff2d16'/%3E%3C/svg%3E" />
@@ -18,21 +18,21 @@
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
     <link rel="stylesheet"
         href="https://fonts.googleapis.com/css2?family=Archivo:wght@500;600;700;800&family=Inter+Tight:wght@400;500;600&family=JetBrains+Mono:wght@400;500&display=swap" />
-    <link rel="stylesheet" href="style.css?v=8" />
+    <link rel="stylesheet" href="/shared/style.css?v=8" />
 </head>
 
 <body>
     <div class="progress" aria-hidden="true"></div>
     <nav class="nav" aria-label="Main">
         <div class="wrap">
-            <a class="brand" href="index.html"><span class="mark" aria-hidden="true"></span>Leonid Elkin</a>
+            <a class="brand" href="/"><span class="mark" aria-hidden="true"></span>Leonid Elkin</a>
             <ul class="nav-links">
-                <li><a href="index.html">Home</a></li>
-                <li><a href="projects.html">Projects</a></li>
-                <li><a href="research.html">Research</a></li>
-                <li><a href="practice.html" aria-current="page">Practice</a></li>
-                <li><a href="about.html">About</a></li>
-                <li><a href="live.html">Live</a></li>
+                <li><a href="/">Home</a></li>
+                <li><a href="/projects/">Projects</a></li>
+                <li><a href="/research/">Research</a></li>
+                <li><a href="/practice/" aria-current="page">Practice</a></li>
+                <li><a href="/about/">About</a></li>
+                <li><a href="/live/">Live</a></li>
                 <li><a href="#contact">Contact</a></li>
             </ul>
         </div>
@@ -54,23 +54,23 @@
             <div class="wrap">
                 <div class="section-head">
                     <span class="idx">Practice &mdash;</span>
-                    <h1 class="display overprint" data-text="Project Euler">Project Euler</h1>
+                    <h1 class="display overprint" data-text="LeetCode">LeetCode</h1>
                     <div class="track-switch mono">
-                        <a href="leetcode.html">LeetCode</a>
-                        <a href="euler.html" aria-current="page">Project Euler</a>
+                        <a href="/practice/leetcode/" aria-current="page">LeetCode</a>
+                        <a href="/practice/euler/">Project Euler</a>
                     </div>
                 </div>
 
-                <!-- An index to Euler_source/, not an editor. The list and the code
-                     both come from data/euler-solutions.js, which a GitHub Action
-                     regenerates whenever the folder changes - so adding a file to
-                     the folder is the whole of "publishing" it. Answers are never
-                     printed: Project Euler asks that solutions are not published,
-                     and a page that hands you the number is not one worth having. -->
+                <!-- An index to LeetCode/, not an editor. Same page as euler.html,
+                     with one difference that matters: a problem can be solved more
+                     than once, so a solution with several files gets a tab per
+                     language. A GitHub Action regenerates the data whenever the
+                     folder changes, so dropping 1.cpp beside 1.py is the whole of
+                     publishing it. -->
                 <p class="setup">Pick a problem number and the solution appears beside it &mdash; the file as it was
                     written, not tidied for display. <span id="euler-count"></span> solved. The number links to the
-                    statement on projecteuler.net. Answers are not printed on the page, but every solution can be
-                    run in your browser (Python, through Pyodide) if you want to see one.</p>
+                    problem on leetcode.com. Where I have solved one more than once, each language gets a tab;
+                    Python and JavaScript can be run in your browser, the compiled languages are shown but not run.</p>
 
                 <div class="euler-layout">
                     <div class="euler-pick" id="euler-pick" role="listbox" aria-label="Problems"></div>
@@ -110,15 +110,15 @@
                 <li><a href="https://elkyy.itch.io/" target="_blank" rel="noopener">itch.io</a></li>
             </ul>
             <span class="colophon">Set in Archivo, Inter Tight and JetBrains Mono. Black stock, one red &mdash; and one
-                visitor in blue. Static HTML, no build step; the solutions are read straight out of the folder they
-                live in.</span>
+                visitor in blue. Static HTML, no build step; the solutions are read straight out of the folder
+                they live in.</span>
         </div>
     </footer>
 
-    <script src="data/euler-solutions.js"></script>
-    <script src="solutions.js"></script>
-    <script src="extras.js"></script>
-    <script src="motion.js"></script>
+    <script src="/data/leetcode-solutions.js"></script>
+    <script src="/shared/solutions.js"></script>
+    <script src="/shared/extras.js"></script>
+    <script src="/shared/motion.js"></script>
 </body>
 
 </html>

@@ -32,7 +32,7 @@
     return path;
   }
 
-  /* "Investigating_neural_scaling_laws (9).pdf" is a filename, not a title.
+  /* "/Investigating_neural_scaling_laws (9).pdf" is a filename, not a title.
      Strip the folder, the extension and the copy-number the download left
      behind, then let underscores read as spaces. */
   function titleFromPath(path) {
@@ -63,7 +63,7 @@
       const back = document.createElement("p");
       back.className = "mono";
       const a = document.createElement("a");
-      a.href = "projects.html";
+      a.href = "/projects/";
       a.textContent = "back to the index →";
       back.appendChild(a);
       box.append(p, back);
@@ -79,7 +79,7 @@
   titleEl.textContent = label;
   titleEl.setAttribute("data-text", label);
 
-  /* The filenames carry spaces and brackets - "Physics_investigation (2).pdf"
+  /* The filenames carry spaces and brackets - "/Physics_investigation (2).pdf"
      - so the path is encoded before it becomes a URL. */
   const href = encodeURI(path);
 

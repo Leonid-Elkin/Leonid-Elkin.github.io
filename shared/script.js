@@ -96,7 +96,7 @@ const projects = [
     tags: ["JavaScript", "WebRTC"],
     links: [
       { name: "play here", url: "#durak" },
-      { name: "play online", url: "durak-online.html" },
+      { name: "play online", url: "/durak-online/" },
       { name: "source", url: "https://github.com/Leonid-Elkin/Leonid-Elkin.github.io/blob/main/durak-online.js" },
     ],
   },
@@ -108,7 +108,7 @@ const projects = [
       "Give it a PDF of a score and it hands back classical-guitar tablature under the notation, with an editor for the bars it misreads. Also transcribes from a recording or a video of a page.",
     tags: ["Python", "PyMuPDF", "MusicXML"],
     links: [
-      { name: "example output", url: "Documentation/sheet2tab_example.pdf" },
+      { name: "example output", url: "/Documentation/sheet2tab_example.pdf" },
       { name: "the app", url: "", pending: true },
       { name: "source", url: "", pending: true, why: "repo private while it is unfinished" },
     ],
@@ -120,7 +120,7 @@ const projects = [
     caption:
       "A Windows app that downloads YouTube videos and playlists as mp3 or mp4, merges a playlist into one file, and can play the songs into a virtual microphone for a voice call. One PowerShell file and a WPF window - nothing to install beyond yt-dlp.",
     tags: ["PowerShell", "WPF", "yt-dlp", "NAudio"],
-    links: [{ name: "source", url: "YTGrab_source.zip" }],
+    links: [{ name: "source", url: "/YTGrab_source.zip" }],
   },
   {
     title: "Yavalath & Pentalath",
@@ -129,7 +129,7 @@ const projects = [
       "A-Level coursework: both hex board games in full, with sound and a computer opponent. Yavalath was itself designed by a program.",
     tags: ["Python"],
     links: [
-      { name: "documentation", url: "Documentation/Yavalath_NEA_documentation.pdf" },
+      { name: "documentation", url: "/Documentation/Yavalath_NEA_documentation.pdf" },
       { name: "source", url: "https://github.com/Leonid-Elkin/Computer-science-NEA-Yavalath-" },
       { name: "the rules", url: "https://boardgamegeek.com/boardgame/33767/yavalath" },
     ],
@@ -152,7 +152,7 @@ const projects = [
     tags: ["Python", "Pyodide"],
     links: [
       { name: "source", url: "https://github.com/Leonid-Elkin/Project-Euler" },
-      { name: "solutions (zip)", url: "Euler_source.zip" },
+      { name: "solutions (zip)", url: "/Euler_source.zip" },
       { name: "the archive", url: "https://projecteuler.net/archives" },
     ],
   },
@@ -182,7 +182,7 @@ const projects = [
     tags: ["Python"],
     links: [
       { name: "source", url: "https://github.com/Leonid-Elkin/Shooting-score-visualiser" },
-      { name: "zip", url: "Shooting score visualiser.zip" },
+      { name: "zip", url: "/Shooting score visualiser.zip" },
     ],
   },
   {
@@ -193,7 +193,7 @@ const projects = [
     tags: ["Python", "pygame"],
     links: [
       { name: "source", url: "https://github.com/Leonid-Elkin/AimTrainer" },
-      { name: "zip", url: "Aimtrainer_source/Aimtrainer.zip" },
+      { name: "zip", url: "/Aimtrainer_source/Aimtrainer.zip" },
     ],
   },
   /* ---------- hardware ---------- */
@@ -206,7 +206,7 @@ const projects = [
     links: [
       {
         name: "critical design report",
-        url: "Documentation/Tonbridge CanSat_ReLAACS_ 2024-25 CDR .pdf",
+        url: "/Documentation/Tonbridge CanSat_ReLAACS_ 2024-25 CDR .pdf",
       },
     ],
   },
@@ -230,10 +230,10 @@ const projects = [
       "Multilayer perceptrons written from scratch in NumPy, run at different sizes to see how loss falls with parameters. The library is on PyPI as elkwork; the paper is 56 pages.",
     tags: ["Python", "NumPy", "LaTeX"],
     links: [
-      { name: "the paper", url: "Documentation/Investigating_neural_scaling_laws (9).pdf" },
+      { name: "the paper", url: "/Documentation/Investigating_neural_scaling_laws (9).pdf" },
       { name: "elkwork on PyPI", url: "https://pypi.org/project/elkwork/" },
       { name: "source", url: "https://github.com/Leonid-Elkin/Scratch-MLP-implementation" },
-      { name: "code and models", url: "MLP all documents (2).zip" },
+      { name: "code and models", url: "/MLP all documents (2).zip" },
     ],
   },
   {
@@ -243,8 +243,8 @@ const projects = [
       "Does a population of primordial binaries change how fast a globular cluster evaporates? An N-body simulation, a paper and a poster.",
     tags: ["Python", "NumPy"],
     links: [
-      { name: "the paper", url: "Documentation/Physics_investigation (2).pdf" },
-      { name: "the poster", url: "Documentation/Physics_investigation_poster.pdf" },
+      { name: "the paper", url: "/Documentation/Physics_investigation (2).pdf" },
+      { name: "the poster", url: "/Documentation/Physics_investigation_poster.pdf" },
       { name: "source", url: "https://github.com/Leonid-Elkin/N-body-simulation" },
     ],
   },
@@ -257,7 +257,7 @@ const projects = [
     links: [
       { name: "source", url: "https://github.com/Leonid-Elkin/Elkwork-live-demo" },
       { name: "training example", url: "https://github.com/Leonid-Elkin/Elkwork-training-example" },
-      { name: "zip", url: "Drawer_source.zip" },
+      { name: "zip", url: "/Drawer_source.zip" },
     ],
   },
 ];
@@ -417,7 +417,7 @@ function linkEl(link) {
       /* A paper is meant to be read, so it opens in the site's own reader
          rather than landing in the downloads folder. Saving a copy is still
          one click away, on that page. */
-      a.href = "doc.html?f=" + encodeURIComponent(path);
+      a.href = "/doc/?f=" + encodeURIComponent(path);
     } else if (path && !/\.html?$/i.test(path)) {
       a.setAttribute("download", "");
     }
@@ -449,9 +449,9 @@ function previewEl(p) {
 /* Every project has a page. Most are case.html?p=<slug>; a few have a page
    of their own. The slug is the title, lower-cased, non-letters to hyphens. */
 const PAGE = {
-  "Drone Strike Map": "project.html",
-  "Project Euler": "euler.html",
-  "LeetCode": "leetcode.html",
+  "Drone Strike Map": "/project/",
+  "Project Euler": "/practice/euler/",
+  "LeetCode": "/practice/leetcode/",
 };
 
 function slugFor(p) {
@@ -459,7 +459,7 @@ function slugFor(p) {
 }
 
 function pageFor(p) {
-  return PAGE[p.title] || "case.html?p=" + slugFor(p);
+  return PAGE[p.title] || "/case/?p=" + slugFor(p);
 }
 
 /* the page first, then whatever the entry lists */

@@ -22,21 +22,21 @@
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
     <link rel="stylesheet"
         href="https://fonts.googleapis.com/css2?family=Archivo:wght@500;600;700;800&family=Inter+Tight:wght@400;500;600&family=JetBrains+Mono:wght@400;500&display=swap" />
-    <link rel="stylesheet" href="style.css?v=8" />
+    <link rel="stylesheet" href="/shared/style.css?v=8" />
 </head>
 
 <body>
     <div class="progress" aria-hidden="true"></div>
     <nav class="nav" aria-label="Main">
         <div class="wrap">
-            <a class="brand" href="index.html"><span class="mark" aria-hidden="true"></span>Leonid Elkin</a>
+            <a class="brand" href="/"><span class="mark" aria-hidden="true"></span>Leonid Elkin</a>
             <ul class="nav-links">
-                <li><a href="index.html">Home</a></li>
-                <li><a href="projects.html">Projects</a></li>
-                <li><a href="research.html">Research</a></li>
-                <li><a href="practice.html">Practice</a></li>
-                <li><a href="about.html">About</a></li>
-                <li><a href="live.html" aria-current="page">Live</a></li>
+                <li><a href="/">Home</a></li>
+                <li><a href="/projects/">Projects</a></li>
+                <li><a href="/research/">Research</a></li>
+                <li><a href="/practice/">Practice</a></li>
+                <li><a href="/about/">About</a></li>
+                <li><a href="/live/" aria-current="page">Live</a></li>
                 <li><a href="#contact">Contact</a></li>
             </ul>
         </div>
@@ -65,7 +65,7 @@
                 <p class="setup">The Drone Strike Map, served from its own box and running below &mdash; not a
                     picture of it. Every figure is a claim, and each one names the outlet that made it; the arrows
                     walk the days. Its server admits this page by name, so the map you are reading is the same one
-                    the world gets. The build is written up on <a href="project.html">its own page</a>.</p>
+                    the world gets. The build is written up on <a href="/project/">its own page</a>.</p>
 
                 <!-- The still is what stands here until the frame is mounted, and what
                      stays for a visitor without scripting or from an origin the map's
@@ -73,7 +73,7 @@
                      is allowed to load. -->
                 <div class="live-embed" data-live-src="https://dronestrikemap.com/">
                     <a class="live-still" href="https://dronestrikemap.com/" target="_blank" rel="noopener">
-                        <img src="previews/drone-strike-map.jpg" alt="The Drone Strike Map: a map of Ukraine with the day's reported strikes, and the sources behind them" loading="lazy" decoding="async" />
+                        <img src="/previews/drone-strike-map.jpg" alt="The Drone Strike Map: a map of Ukraine with the day's reported strikes, and the sources behind them" loading="lazy" decoding="async" />
                         <span class="mono">dronestrikemap.com &rarr;</span>
                     </a>
                 </div>
@@ -109,10 +109,10 @@
         </div>
     </footer>
 
-    <script src="script.js?v=11"></script>
-    <script src="commits.js?v=5"></script>
-    <script src="extras.js"></script>
-    <script src="motion.js"></script>
+    <script src="/shared/script.js?v=11"></script>
+    <script src="/live/commits.js?v=5"></script>
+    <script src="/shared/extras.js"></script>
+    <script src="/shared/motion.js"></script>
 </body>
 
 </html>

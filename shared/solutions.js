@@ -221,7 +221,7 @@
       } catch (err) { /* the run reports the missing file itself */ }
     }
 
-    worker = new Worker("run-worker.js");
+    worker = new Worker("/shared/run-worker.js");
     worker.onmessage = (event) => {
       const message = event.data;
       if (message.kind === "out") {
