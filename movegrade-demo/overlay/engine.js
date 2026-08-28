@@ -1,12 +1,20 @@
 // Thin UCI wrapper around the Stockfish WASM worker.
 //
 // One search at a time. analyse() returns a promise resolving to
-//   { bestMove, lines: [{ multipv, cp, mate, pv }], depth }
+//   { bestMove, lines: [{ multipv, cp, mate, pv }], depth, ms, elapsed }
 // with scores from the side-to-move's perspective (UCI convention).
 // onProgress(snapshot) fires after every completed depth with the same shape,
 // so callers can show provisional results while the search deepens.
 // Calling analyse() while a search runs stops the old one first; the old
 // promise resolves with whatever partial result it had.
+//
+// Searches are bounded by time, not by depth: `go movetime`. A fixed depth
+// costs whatever the position happens to cost - depth 14 is instant in a
+// bare king-and-pawn ending and takes many seconds in a sharp middlegame with
+// six pieces hanging - so the badge arrived at wildly different times and the
+// slider's number meant nothing a player could feel. A time budget is the
+// promise you can actually keep: every move gets the same wall clock, and the
+// engine spends it going as deep as that position allows.
 
 export class Engine {
   constructor(workerUrl, { onError, onLog, nnue = true } = {}) {
@@ -57,6 +65,8 @@ export class Engine {
       bestMove: lines[0] ? lines[0].pv[0] : null,
       lines,
       depth: cur.maxDepthSeen,
+      ms: cur.ms,
+      elapsed: Date.now() - cur.started,
     };
   }
 
@@ -111,13 +121,14 @@ export class Engine {
     }
   }
 
-  analyse(fen, depth, onProgress) {
+  /** Search `fen` for `ms` milliseconds. */
+  analyse(fen, ms, onProgress) {
     return new Promise((resolve) => {
       if (this.error) return resolve(null);
       const start = () => {
-        this.current = { resolve, lines: [], maxDepthSeen: 0, onProgress };
+        this.current = { resolve, lines: [], maxDepthSeen: 0, onProgress, ms, started: Date.now() };
         this.send(`position fen ${fen}`);
-        this.send(`go depth ${depth}`);
+        this.send(`go movetime ${Math.max(1, Math.round(ms))}`);
       };
       if (this.current) {
         // Preempt: whatever is queued behind the running search is stale.

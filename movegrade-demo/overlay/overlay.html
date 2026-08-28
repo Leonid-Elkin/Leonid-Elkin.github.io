@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8" />
   <title>MoveGrade</title>
-  <link rel="stylesheet" href="overlay.css?v=2" />
+  <link rel="stylesheet" href="overlay.css?v=3" />
 </head>
 <body>
   <div id="panel">
@@ -17,9 +17,9 @@
 
     <div id="settings" hidden>
       <div class="row">
-        <span>Depth</span>
-        <input id="depth" type="range" min="4" max="24" step="1" />
-        <span id="depthVal" class="val"></span>
+        <span>Think time</span>
+        <input id="think" type="range" min="200" max="5000" step="100" />
+        <span id="thinkVal" class="val"></span>
       </div>
       <div class="row">
         <span>Pieces</span>
@@ -60,6 +60,6 @@
 
     <div id="history"></div>
   </div>
-  <script type="module" src="overlay.js?v=2"></script>
+  <script type="module" src="overlay.js?v=3"></script>
 </body>
 </html>
