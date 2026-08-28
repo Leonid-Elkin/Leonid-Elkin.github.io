@@ -46,9 +46,12 @@ const projects = [
     cat: "software",
     status: "live",
     caption:
-      "A Chrome extension that grades every move of a chess game as it happens - Brilliant, Best, Miss, Blunder - on lichess and chess.com, on chess.com's own thresholds. Stockfish runs inside the extension and thinks for a fixed second per move rather than to a fixed depth; opening moves are named from a real book before the engine is asked at all. Watching, analysing and playing the computer only: it pauses in live games against people.",
+      "A Chrome extension that grades every move of a chess game as it happens - Brilliant, Best, Miss, Blunder - on lichess and chess.com, on chess.com's own thresholds. Stockfish runs inside the extension and thinks for a fixed second per move rather than to a fixed depth. Openings are judged against a book of 3,328 named lines rather than against the eval, so a gambit reads as theory and not as a mistake, and the badge is there before the engine is asked at all. Watching, analysing and playing the computer only: it pauses in live games against people.",
     tags: ["JavaScript", "Chrome extension", "Stockfish (WASM)", "chess.js"],
-    links: [{ name: "source", url: "MoveGrade_source.zip?v=3" }],
+    links: [
+      { name: "download", url: "https://github.com/Leonid-Elkin/MoveGrade/releases/latest/download/MoveGrade.zip" },
+      { name: "source", url: "https://github.com/Leonid-Elkin/MoveGrade" },
+    ],
   },
   {
     title: "SHELLFALL",

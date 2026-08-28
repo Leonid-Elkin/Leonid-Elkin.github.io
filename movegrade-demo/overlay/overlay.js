@@ -1,14 +1,15 @@
 import { Chess } from "../lib/chess.js";
 import { Engine } from "./engine.js";
 import { RemoteEngine } from "./remote-engine.js";
-import { classify, CATEGORIES, fmtEval, lineToCp, winPct } from "./classify.js?v=3";
-import { isBookPosition } from "./book.js";
+import { classify, CATEGORIES, fmtEval, lineToCp, winPct } from "./classify.js?v=4";
+import { lookupOpening } from "./book.js";
 
 const $ = (id) => document.getElementById(id);
 const els = {
   status: $("status"), badge: $("badge"), glyph: $("glyph"), label: $("label"),
   move: $("move"), evalBefore: $("evalBefore"), evalAfter: $("evalAfter"),
   detail: $("detail"), bestline: $("bestline"), history: $("history"),
+  opening: $("opening"),
   settings: $("settings"), think: $("think"), thinkVal: $("thinkVal"),
   backfill: $("backfill"), showBoard: $("showBoard"), pieceSet: $("pieceSet"),
   boardTheme: $("boardTheme"), board: $("board"), boardWrap: $("boardWrap"),
@@ -163,10 +164,9 @@ async function diagnoseEngine(msg) {
 }
 engine.readyPromise.then(() => setStatus("engine ready")).catch(() => {});
 
-// Both positions get this long first, so a grade is on screen almost at once;
-// the full budget then re-searches and sharpens it. Two quick searches cost
-// less than a third of a second, which is under the time it takes to look up
-// from the board.
+// The first grade is shown as soon as both positions have been searched to
+// this depth; every deeper iteration up to the user's selected depth then
+// re-grades and updates the badge. Nothing is searched beyond the selected depth.
 const QUICK_MS = 150;
 
 // ----------------------------------------------------------------- game state
@@ -200,9 +200,8 @@ function rebuild(newSans) {
 }
 
 /**
- * Search `fen` for `ms`. A cached result that was given at least as long is
- * reused; a shorter one is re-searched. `onPartial(snapshot)` fires after each
- * completed iteration, so the badge sharpens while the clock runs.
+ * Analyse `fen` to at least `depth`. Cached results shallower than `depth`
+ * are re-searched. `onPartial(snapshot)` fires after each completed depth.
  */
 async function analyseFen(fen, gen, ms, onPartial) {
   const cached = evalCache.get(fen);
@@ -219,8 +218,7 @@ async function analyseFen(fen, gen, ms, onPartial) {
     setStatus(`${fmtSecs(Math.min(snap.elapsed, ms))} / ${fmtSecs(ms)} · depth ${snap.depth}`);
     if (onPartial) onPartial(snap);
   });
-  // A longer think supersedes a shorter one; an interrupted search that got
-  // less time than the cached one does not.
+  // a longer think supersedes a shorter one; an interrupted search does not
   if (r && r.lines.length && (!cached || (r.ms || 0) >= (cached.ms || 0))) {
     evalCache.set(fen, r);
   }
@@ -228,13 +226,16 @@ async function analyseFen(fen, gen, ms, onPartial) {
 }
 
 /**
- * A move both of whose positions are named openings, before the engine has
- * said anything. Book is the one grade that needs no search: the whole point
- * is that 1.e4 should never flash "Inaccuracy" for the third of a second it
- * takes a shallow search to notice it is fine. The real classify() still runs
- * behind this and will overrule it if the move turns out to lose material -
- * the Bongcloud is in the database too.
+ * A move both of whose positions are named theory, before the engine has said
+ * anything. Book is the one grade that needs no search, and that is the point:
+ * 1.e4 should never spend a third of a second labelled an inaccuracy while a
+ * shallow search catches up.
  */
+function isBookMove(i) {
+  if (fens[i + 1] === undefined) return false;
+  return !!lookupOpening(fens[i + 1]) && (i === 0 || !!lookupOpening(fens[i]));
+}
+
 function bookGrade(i) {
   const chess = new Chess(fens[i]);
   let move = null;
@@ -244,12 +245,9 @@ function bookGrade(i) {
     cat: "book", loss: 0, move, san: sans[i], ply: i,
     before: empty, after: empty,
     cpBest: 0, cpAfter: 0, isEngineBest: false,
+    opening: lookupOpening(fens[i + 1]),
     depth: 0, provisional: true, fromBook: true,
   };
-}
-
-function isBookMove(i) {
-  return fens[i + 1] !== undefined && isBookPosition(fens[i]) && isBookPosition(fens[i + 1]);
 }
 
 function buildGrade(i, before, after, provisional) {
@@ -268,25 +266,26 @@ function isShown(i) {
 }
 
 /**
- * Grade ply i, giving each position `ms` of engine time. When `live` is set the
- * badge updates as the search deepens, so a provisional grade is on screen
- * long before the budget runs out.
+ * Grade ply i to `depth`. When `live` is set the badge updates after every
+ * completed depth so a provisional grade appears within a second or so.
  */
 async function gradePly(i, gen, ms, live) {
   const existing = grades[i];
   if (existing && !existing.provisional && (existing.ms || 0) >= ms) return existing;
 
-  // Theory first, and without waiting for the engine at all: a known opening
-  // move is named the moment it appears rather than after a shallow search has
-  // had a chance to call it an inaccuracy.
+  // Theory first, and without waiting for the engine at all: a move that
+  // reaches a named position is named straight away rather than after a
+  // shallow search has had a chance to call 1.e4 an inaccuracy. classify()
+  // still runs behind this and still has the last word - a named line that
+  // leaves the mover simply lost loses the badge on the next render.
   if (live && !existing && isBookMove(i)) {
     grades[i] = bookGrade(i);
     if (isShown(i)) renderCurrent();
     renderHistory();
   }
 
-  // Quick pass: give both positions a moment so a real grade shows almost at
-  // once, before the full budget is spent on each.
+  // Quick pass: get both positions to FIRST_GRADE_DEPTH so a grade shows
+  // right away, before the (much longer) full-depth search starts.
   if (live && ms > QUICK_MS && !(existing && (existing.ms || 0) >= QUICK_MS)) {
     const b0 = await analyseFen(fens[i], gen, QUICK_MS, null);
     if (!b0 || gen !== generation) return null;
@@ -430,6 +429,25 @@ function pvToSan(fen, pv, n = 5) {
   return out.join(" ");
 }
 
+/**
+ * Name the line under the badge. Once the game leaves theory the last name it
+ * had is kept, dimmed, so the panel still says which opening was played rather
+ * than going blank on the first new move.
+ */
+function renderOpening(g) {
+  let name = g.opening;
+  let stale = false;
+  for (let i = g.ply - 1; !name && i >= 0; i--) {
+    if (grades[i] && grades[i].opening) {
+      name = grades[i].opening;
+      stale = true;
+    }
+  }
+  els.opening.textContent = name || "";
+  els.opening.classList.toggle("stale", stale);
+  els.opening.title = name ? (stale ? name + " (out of book)" : name) : "";
+}
+
 function renderGrade(g) {
   setCat(g.cat);
   const white = g.ply % 2 === 0;
@@ -438,18 +456,16 @@ function renderGrade(g) {
   els.evalBefore.textContent = fmtEval(g.before.lines[0], white);
   els.evalAfter.textContent = g.after.terminal ? (g.cat === "mate" ? "#" : "½") : fmtEval(g.after.lines[0], !white);
 
+  renderOpening(g);
+
   const bits = [];
   if (g.loss > 0.05) bits.push(`−${g.loss.toFixed(1)}% win chance`);
   if (g.isEngineBest) bits.push("engine's top choice");
-  if (g.fromBook) {
-    // named before the engine was asked, so there is no depth to quote yet
-    bits.push("opening book…");
-  } else {
-    bits.push(`depth ${g.depth}${g.provisional ? "…" : ""}`);
-  }
+  if (g.fromBook) bits.push("opening book…");
+  else bits.push(`depth ${g.depth}${g.provisional ? "…" : ""}`);
   els.detail.textContent = bits.join(" · ");
 
-  if (!g.isEngineBest && g.before.lines[0] && !["mate", "book", "forced"].includes(g.cat)) {
+  if (!g.isEngineBest && g.before.lines[0] && g.cat !== "mate" && g.cat !== "book") {
     els.bestline.textContent = "Best was " + pvToSan(fens[g.ply], g.before.lines[0].pv, 4);
   } else {
     els.bestline.textContent = "";
