@@ -87,10 +87,13 @@
   /* ---------- the footer counts your visit in lost stars ---------- */
 
   (function () {
-    const el = document.getElementById("dwell");
-    if (!el) return;
+    /* by class, not by id: the home page shows the count in the masthead
+       strip as well as in the footer, and both tick off the same clock */
+    const nodes = document.querySelectorAll(".dwell");
+    if (!nodes.length) return;
     const t0 = Date.now();
-    setInterval(() => {
+
+    function tick() {
       const s = Math.floor((Date.now() - t0) / 1000);
       const mm = String(Math.floor(s / 60)).padStart(2, "0");
       const ss = String(s % 60).padStart(2, "0");
@@ -98,8 +101,13 @@
       const cs = window.clusterStats;
       if (cs && cs.escaped) line += " · the cluster has lost " + cs.escaped + " star" + (cs.escaped === 1 ? "" : "s") + " in that time";
       if (cs && cs.intruders) line += " · " + cs.intruders + " of the intruders " + (cs.intruders === 1 ? "was" : "were") + " you";
-      el.textContent = line;
-    }, 1000);
+      nodes.forEach((n) => (n.textContent = line));
+    }
+
+    /* draw 00:00 at once - in the masthead an empty slot for the first
+       second reads as a hole, where in the footer nobody saw it */
+    tick();
+    setInterval(tick, 1000);
   })();
 
   /* ---------- registration debris (the 404 only) ---------- */

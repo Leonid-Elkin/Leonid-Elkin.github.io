@@ -1469,6 +1469,24 @@ footer .col-label {
   margin-top: 10px;
 }
 
+/* and again in the masthead strip. No display here on purpose: the strip is a
+   flex row, which blockifies its items whatever they ask for - only the
+   footer's margin and tracking need undoing. */
+.eyebrow .dwell {
+  margin-top: 0;
+  letter-spacing: inherit;
+  color: var(--ink-4);
+  white-space: nowrap;
+}
+
+/* The strip already fills the width exactly on a phone, so the counter there
+   would push the page into a sideways scroll. It keeps ticking in the footer.
+   This has to sit after the rule above, not up in the other 720px block:
+   same specificity, so source order is what decides it. */
+@media (max-width: 720px) {
+  .eyebrow .dwell { display: none; }
+}
+
 /* ---------- reveals ---------- */
 
 .motion-ok .reveal {
