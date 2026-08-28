@@ -262,10 +262,11 @@ iframe { max-width: 100%; }
   margin-bottom: clamp(26px, 4vw, 52px);
 }
 
-/* The two facts that used to live only on the about page - pulled up here
+/* The one fact that used to live only on the about page - pulled up here
    so the room the headline gave up reads as content, not a gap. Capped in
-   width so a long skills list wraps under its label instead of stretching
-   the row back out to full bleed. */
+   width so a long value wraps under its label instead of stretching the row
+   back out to full bleed. Unruled: the about page keeps its ledger lines,
+   but up here a single row boxed by hairlines read as a stray fragment. */
 .hero-facts {
   flex: 0 1 auto;
   min-width: 220px;
@@ -273,7 +274,7 @@ iframe { max-width: 100%; }
   border-top: none;
 }
 
-.hero-facts > div { padding: 8px 0; }
+.hero-facts > div { padding: 8px 0; border-bottom: 0; }
 
 /* The overprint: the same word again in red, a hair out of register.
    `isolation` is load-bearing - it gives the element its own stacking context
