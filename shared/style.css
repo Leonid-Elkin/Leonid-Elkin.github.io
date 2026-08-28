@@ -266,15 +266,20 @@ iframe { max-width: 100%; }
    so the room the headline gave up reads as content, not a gap. Capped in
    width so a long value wraps under its label instead of stretching the row
    back out to full bleed. Unruled: the about page keeps its ledger lines,
-   but up here a single row boxed by hairlines read as a stray fragment. */
-.hero-facts {
+   but up here a single row boxed by hairlines read as a stray fragment.
+
+   Both selectors are doubled up with .fact-list deliberately. The .fact-list
+   rules that draw those hairlines are defined further down this file, so at
+   equal specificity they would win on source order alone - the plain
+   `.hero-facts { border-top: none }` this replaces never actually took. */
+.fact-list.hero-facts {
   flex: 0 1 auto;
   min-width: 220px;
   max-width: 320px;
-  border-top: none;
+  border-top: 0;
 }
 
-.hero-facts > div { padding: 8px 0; border-bottom: 0; }
+.fact-list.hero-facts > div { padding: 8px 0; border-bottom: 0; }
 
 /* The overprint: the same word again in red, a hair out of register.
    `isolation` is load-bearing - it gives the element its own stacking context
@@ -1204,7 +1209,8 @@ footer .col-label {
 
   .hero h1.display { white-space: normal; }
   .hero-head { flex-direction: column; align-items: flex-start; }
-  .hero-facts { max-width: none; width: 100%; }
+  /* doubled up to match the specificity of the .fact-list.hero-facts cap above */
+  .fact-list.hero-facts { max-width: none; width: 100%; }
 
   .section-head {
     grid-template-columns: 1fr;
