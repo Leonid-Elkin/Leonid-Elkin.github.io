@@ -53,6 +53,7 @@ TITLES = {
     "0550": "Prelude and Fugue in G major",
     "0551": "Prelude and Fugue in A minor",
     "0552": "Prelude and Fugue in E flat major",
+    "0582": "Passacaglia and Fugue in C minor",
 }
 
 
