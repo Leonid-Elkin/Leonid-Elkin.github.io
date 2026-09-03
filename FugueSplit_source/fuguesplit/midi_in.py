@@ -34,9 +34,14 @@ def read_midi(path: str, *, keep_drums: bool = False) -> Score:
             elif msg.type == "key_signature" and tick == 0:
                 score.key = _parse_key(msg.key)
             elif msg.type == "time_signature":
-                score.time_sigs.append(
-                    TimeSigEvent(tick, msg.numerator, msg.denominator)
-                )
+                # A 0/4 shows up in chorale settings to mark a free
+                # interlude that is not counted in bars. It is not a metre,
+                # and a bar of no length is one the writer can never fill,
+                # so let the previous signature stand.
+                if msg.numerator >= 1 and msg.denominator >= 1:
+                    score.time_sigs.append(
+                        TimeSigEvent(tick, msg.numerator, msg.denominator)
+                    )
             elif msg.type == "note_on" and msg.velocity > 0:
                 if msg.channel == DRUM_CHANNEL and not keep_drums:
                     continue
