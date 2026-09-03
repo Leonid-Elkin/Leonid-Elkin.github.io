@@ -29,8 +29,16 @@ def build_parser() -> argparse.ArgumentParser:
     p.add_argument("-o", "--out", help="output .gp5 (default: alongside input)")
     p.add_argument("-g", "--guitars", type=int, default=0,
                    help="guitar parts carrying the main voices. Default 0 "
-                        "means as many as the thickest chord needs, so no "
-                        "note is dropped; give a number to cap the ensemble")
+                        "works the number out from the texture and adds a "
+                        "player for as long as notes are still being "
+                        "crammed into a stave's second voice, so no note is "
+                        "dropped; give a number to fix the ensemble instead")
+    p.add_argument("--max-parts", type=int, default=7, metavar="N",
+                   help="ceiling on the ensemble when the part count is "
+                        "worked out for you: staves, bass included. A "
+                        "thicker moment than this can be covered is written "
+                        "as a double-stop or in a stave's second voice "
+                        "(default 7)")
     p.add_argument("--no-bass", action="store_true",
                    help="do not create a bass part")
     p.add_argument("--tuning", default="standard", choices=sorted(arrange.TUNINGS),
@@ -135,6 +143,7 @@ def main(argv: list[str] | None = None) -> int:
     out = args.out or os.path.splitext(args.midi)[0] + ".gp5"
     settings = Settings(
         guitars=args.guitars,
+        max_parts=args.max_parts,
         transpose=args.transpose + 12 * args.octave,
         bass_transpose=args.bass_transpose,
         bass_comfort_fret=args.bass_comfort_fret,
@@ -215,6 +224,11 @@ def _print_report(report: Report, out: str) -> None:
         print(f"  {part.name:<12} {part.notes:>6}  {span:>10}  {shift:>4}  "
               f"{part.max_fret:>7}  {part.open_strings:>5}  "
               f"{100 * part.sounding:>5.1f}%")
+    if report.added_voices:
+        players = len([p for p in report.parts if not p.name.startswith("Bass")])
+        print()
+        print(f"  grew to {players} guitars: any fewer left notes greyed "
+              f"into a stave's second voice")
     if report.chords or report.second_voice:
         print()
         if report.chords:

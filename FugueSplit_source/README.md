@@ -6,8 +6,10 @@ parts**, written out as a Guitar Pro tab.
 A fugue is already written as independent melodic lines, so it is the ideal
 input: instead of hacking chords apart, the program works out which line is
 which and hands each one to a different player. No chords are ever written —
-every part is strictly monophonic, the way a band with three guitarists and a
-bassist would actually cover the piece.
+every part is strictly monophonic, the way a band of guitarists and a bassist
+would actually cover the piece. The band is as big as the music needs: the
+count comes from the texture and grows while notes are still being crammed
+into a stave's second voice.
 
 Built and tested against Bach's Prelude and Fugue in B minor, BWV 544.
 
@@ -19,13 +21,17 @@ python -m fuguesplit BWV_0544.mid --from-bar 86 -o fugue.gp5
 "BWV_0544"  ->  fugue.gp5
   88 bars, 70 bpm, 2 sharps
   bass taken from source track(s): 8
-  4715 source notes -> 2390 written
+  4715 source notes -> 2393 written
 
-  part          notes       range   8ve  maxfret   open
-  Guitar I        672      C#3-C6     0       20     73
-  Guitar II       775       D3-B5     0       19     71
-  Guitar III      635      E2-F#5    -1       14    146
-  Bass            308       E2-C4     0       17      4
+  part          notes       range   8ve  maxfret   open  playing
+  Guitar I        518       D4-C6     0       20      8   77.6%
+  Guitar II       695      E3-F#5     0       14     82   86.4%
+  Guitar III      318     F#2-C#5     0        9     85   36.7%
+  Guitar IV       526       E2-A4     0        6    158   55.3%
+  Guitar V         28       F3-C5     0        8      9    4.5%
+  Bass            308       E1-C3    -1        5     71   48.4%
+
+  grew to 5 guitars: any fewer left notes greyed into a stave's second voice
 ```
 
 Open the `.gp5` in Guitar Pro (5 or later, including GP8).
@@ -69,6 +75,14 @@ tracks the top line and the bass — and longer notes beat passing ornament.
 The bass is handled separately: a track named `PEDAL`, `Bass` or `Continuo`
 (or, failing a name, one sitting more than a fifth below everything else) is
 routed straight to the bass part and takes no part in the assignment.
+
+**2a. As many players as it takes.** The part count is a guess, and a fugue
+does not hold still: BWV 582 opens in three voices and later stacks five over
+the pedal. A note that arrives when every player is busy is written as a
+double-stop or into the stave's second voice, greyed out behind the main one
+in Guitar Pro — so wherever that grey appears, a guitar is added and the piece
+is dealt out again, until nothing is left greyed or the ensemble reaches
+`--max-parts`. Asking for a size with `-g` turns this off.
 
 **Flow priority.** A fifth term ranks the guitars. Whenever a part would
 otherwise fall silent it gets a discount for picking a note up, largest for
@@ -121,7 +135,8 @@ python -m fuguesplit INPUT.mid [-o OUTPUT.gp5] [options]
 
 | option | meaning |
 |---|---|
-| `-g, --guitars N` | number of guitar parts (default 3) |
+| `-g, --guitars N` | fix the number of guitar parts; the default works it out from the texture and grows it while notes are still being crammed into a second voice |
+| `--max-parts N` | ceiling on that growth, staves including the bass (default 7) |
 | `--no-bass` | do not create a bass part |
 | `--tuning NAME` | `standard`, `drop-d`, `eb`, `d-standard` |
 | `--bass-tuning NAME` | `bass`, `bass5`, `bass-drop-d` |
@@ -166,12 +181,31 @@ report = convert("BWV_0544.mid", "fugue.gp5", Settings(guitars=3, from_bar=86))
 print(report.written_notes, "notes across", len(report.parts), "parts")
 ```
 
-## Choosing the number of parts
+## How many parts
 
-Count how many voices actually sound at once. In BWV 544 it is usually three
-or four, so three guitars plus bass loses almost nothing (4676 of 4715 notes
-survive). Ask for fewer parts and the arranger starts dropping inner voices —
-which is a legitimate arrangement choice, just a lossier one.
+Worked out from the piece, and then checked against the piece.
+
+The first guess counts how many voices are sounding for most of the playing
+time — three or four in BWV 544. That guess is regularly too low, because a
+fugue does not stay at its own voice count: the Passacaglia and Fugue in C
+minor, BWV 582, is written in three or four voices and then piles up to five
+over the pedal, and a note that arrives when every player is busy has nowhere
+to go. Such a note is not thrown away — it is written as a double-stop, or
+into the stave's **second voice**, which Guitar Pro draws greyed out behind
+the main one — but neither is a line anybody can read.
+
+So that grey is treated as the ensemble asking for another player. Each time
+it appears, a guitar is added and the whole piece is dealt out again, for as
+long as that keeps rescuing notes and up to `--max-parts` staves. On BWV 582
+that grows three guitars into six and takes the arrangement from 5165 to 5630
+of 5666 notes, with nothing left greyed at all; the 36 that remain are
+written-out trill notes shorter than the 32nd-note grid, and `--grid 64th`
+writes all 5666.
+
+Growth only happens when the count is left to the program. `-g N` fixes the
+ensemble at N guitars and keeps it there — a legitimate arrangement choice,
+just a lossier one, and the notes over that go back to the second voice
+rather than being dropped.
 
 ## Batch conversion
 
@@ -182,12 +216,17 @@ python convert_all.py [midi_dir] [out_dir]
 ```
 
 With no arguments it converts `midi/bach-preludes-and-fugues/` into `out/`.
-Run over all 30 of Bach's organ preludes and fugues (BWV 531-552, sourced
-from [Tobis Notenarchiv](https://tobis-notenarchiv.de/)), it keeps **97.9% of
-104,763 source notes**, with no failures. The lost 2% is where five or six
-voices sound at once and three guitars plus a bass simply run out of hands.
-Eight of the 30 needed a fourth guitar to take a handful of notes off the
-bass; the rest were solved by octave folding alone.
+Run over Bach's 30 organ preludes and fugues (BWV 531-552) and the
+Passacaglia (BWV 582), sourced from
+[Tobis Notenarchiv](https://tobis-notenarchiv.de/), it keeps **99.6% of
+110,429 source notes**, with no failures. Sixteen of the 31 keep every single
+note. Of the 446 notes still lost, 411 are ornament shorter than the
+quantisation grid; `--grid 64th` recovers most of those.
+
+The ensemble that takes is five or six guitars and a bass, against the three
+guitars that used to be the default — which is what the music is: an organist
+has two manuals and a pedal board, and Bach writes as many voices across them
+as ten fingers can hold.
 
 Every tab is credited to Leonid Elkin as arranger, with Bach as composer.
 
@@ -197,13 +236,15 @@ Every tab is credited to Leonid Elkin as arranger, with Bach as composer.
 python -m unittest discover -s tests -v
 ```
 
-49 tests. The assignment solver is checked against brute-force optimality; the
+93 tests. The assignment solver is checked against brute-force optimality; the
 notation layer is checked exhaustively (every offset and length on a 32nd grid
 in both simple and compound metre reconstructs to exactly the right number of
 ticks); and end-to-end tests parse the generated `.gp5` back and assert every
 bar is exactly filled, every beat holds at most one note, and every fret lies
-within the tuning, and that the bass never leaves the lower neck. The BWV 544
-tests are skipped if the file is not present.
+within the tuning, and that the bass never leaves the lower neck. A thick
+synthetic texture checks the ensemble grows until no note is left in a
+stave's second voice, and stops at `--max-parts`. The BWV 544 tests are
+skipped if the file is not present.
 
 ## Limitations
 

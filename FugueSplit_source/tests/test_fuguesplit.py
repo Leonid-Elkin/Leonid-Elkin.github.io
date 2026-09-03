@@ -679,6 +679,106 @@ class TestEndToEnd(unittest.TestCase):
                             self.assertTrue(1 <= note.string <= len(track.strings))
 
 
+def _make_thick_midi(path: str, lines: int = 4) -> None:
+    """A stack of staggered manual lines over a pedal, all on one track.
+
+    The Passacaglia's problem in miniature: several voices sounding at
+    once, entering off each other's beats, with nothing in the file to
+    say which note belongs to which line.
+    """
+    mid = mido.MidiFile(ticks_per_beat=480)
+    meta = mido.MidiTrack()
+    meta.append(mido.MetaMessage("set_tempo", tempo=mido.bpm2tempo(80), time=0))
+    meta.append(mido.MetaMessage("time_signature", numerator=4, denominator=4,
+                                 time=0))
+    mid.tracks.append(meta)
+
+    subject = [0, 2, 3, 5, 7, 5, 3, 2]
+    entries = [(79, 0), (74, 120), (69, 240), (64, 360), (60, 60)][:lines]
+
+    manual = mido.MidiTrack()
+    manual.append(mido.MetaMessage("track_name", name="MANUAL", time=0))
+    events = []
+    for base, delay in entries:
+        for rep in range(6):
+            for i, step in enumerate(subject):
+                on = delay + (rep * 8 + i) * 480
+                events.append((on, "note_on", base + step))
+                events.append((on + 460, "note_off", base + step))
+    events.sort()
+    prev = 0
+    for tick, kind, pitch in events:
+        manual.append(mido.Message(kind, note=pitch, velocity=90,
+                                   time=tick - prev))
+        prev = tick
+    mid.tracks.append(manual)
+
+    pedal = mido.MidiTrack()
+    pedal.append(mido.MetaMessage("track_name", name="PEDAL", time=0))
+    prev = 0
+    for rep in range(6):
+        for i, step in enumerate(subject):
+            on = (rep * 8 + i) * 480
+            pedal.append(mido.Message("note_on", note=40 + step, velocity=90,
+                                      time=on - prev))
+            pedal.append(mido.Message("note_off", note=40 + step, time=440))
+            prev = on + 440
+    mid.tracks.append(pedal)
+    mid.save(path)
+
+
+class TestThickTexture(unittest.TestCase):
+    """A note with no line to sit in gets a player, not a grey second voice."""
+
+    def _convert(self, settings, lines=4):
+        with tempfile.TemporaryDirectory() as d:
+            src = os.path.join(d, "thick.mid")
+            dst = os.path.join(d, "thick.gp5")
+            _make_thick_midi(src, lines)
+            return convert(src, dst, settings)
+
+    def _guitars(self, report):
+        return len([p for p in report.parts if p.name.startswith("Guitar")])
+
+    def test_a_thick_texture_is_written_as_lines(self):
+        report = self._convert(Settings())
+        self.assertGreaterEqual(self._guitars(report), 4,
+                                "one guitar per voice")
+        self.assertEqual(report.second_voice, 0,
+                         "nothing should be left greyed into a second voice")
+        self.assertEqual(report.written_notes, report.source_notes,
+                         "no note should be thrown away")
+
+    def test_a_fixed_ensemble_greys_what_it_cannot_place(self):
+        """Ask for two guitars and the notes over that are still kept --
+        as a second voice, which is exactly what growing avoids."""
+        report = self._convert(Settings(guitars=2))
+        self.assertEqual(self._guitars(report), 2,
+                         "an explicit ensemble size is never grown")
+        self.assertGreater(report.second_voice, 0)
+
+    def test_the_ensemble_grows_past_the_estimate(self):
+        thin = self._convert(Settings(max_parts=3), lines=5)
+        grown = self._convert(Settings(), lines=5)
+        self.assertGreater(self._guitars(grown), self._guitars(thin))
+        self.assertGreater(grown.added_voices, 0)
+        self.assertLess(grown.second_voice, thin.second_voice)
+
+    def test_growth_stops_at_max_parts(self):
+        report = self._convert(Settings(max_parts=3), lines=5)
+        self.assertLessEqual(len(report.parts), 3)
+
+    def test_a_thin_texture_is_not_grown(self):
+        """Two voices need two players, however high the ceiling is."""
+        with tempfile.TemporaryDirectory() as d:
+            src = os.path.join(d, "canon.mid")
+            dst = os.path.join(d, "canon.gp5")
+            _make_test_midi(src)
+            report = convert(src, dst, Settings(max_parts=7))
+            self.assertLessEqual(len(report.parts), 4)
+            self.assertEqual(report.added_voices, 0)
+
+
 @unittest.skipUnless(os.path.exists(BWV544), "BWV 544 test file not present")
 class TestBWV544(unittest.TestCase):
     """The real thing: Bach's Prelude and Fugue in B minor."""

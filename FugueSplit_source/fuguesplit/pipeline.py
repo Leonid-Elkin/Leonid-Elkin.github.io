@@ -13,7 +13,8 @@ from .score import Note, Part, Score
 @dataclass
 class Settings:
     guitars: int = 0              # 0 = as many as the music needs
-    max_parts: int = 7            # ceiling on that; the rest become chord tones
+    max_parts: int = 7            # ceiling on that; past it a note goes
+                                  # into the stave's second voice instead
     bass: bool = True
     guitar_tuning: str = "standard"
     bass_tuning: str = "bass"
@@ -68,6 +69,7 @@ class Report:
     handed_off: int = 0          # notes lifted off the bass onto a guitar
     pulled_back: int = 0         # notes a transposition pushed off the neck
     added_guitar: bool = False
+    added_voices: int = 0        # players added because the texture thickened
     parts: list[PartReport] = field(default_factory=list)
     # The finished parts and the score they came from, for `check` to
     # audit. Held in memory only; nothing is written out from these.
@@ -100,55 +102,11 @@ def convert(midi_path: str, out_path: str, settings: Settings) -> Report:
     if not settings.bass:
         bass_tracks = set()
 
-    guitars = settings.guitars
-    if guitars <= 0:
-        # One instrument per voice. Where the file already separates the
-        # voices, trust its own count; otherwise infer it from how many
-        # notes sound for most of the piece.
-        if voices.is_per_voice(score, bass_tracks):
-            needed = voices.track_voice_count(score)
-        else:
-            needed = voices.voice_count(score)
-        needed = min(needed, max(2, settings.max_parts))
-        guitars = max(1, needed - (1 if settings.bass else 0))
-
-    n_parts = guitars + (1 if settings.bass else 0)
-    if n_parts < 1:
-        raise ValueError("need at least one part")
-
-    streams = voices.separate(score, _voice_config(settings, n_parts), bass_tracks)
-
-    parts = _make_parts(settings, n_parts, guitars)
+    plan = _plan_parts(score, settings, bass_tracks)
+    parts, streams = plan.parts, plan.streams
+    prefolded = plan.prefolded
+    handed_off, added_guitar = plan.handed_off, plan.added_guitar
     fold_cfg = arrange.FoldConfig(fret_count=settings.fret_count)
-
-    # Which source notes the separation could not place. Worked out here,
-    # before the bass stage folds its line to a new octave: folding builds
-    # fresh notes, so afterwards every pedal note looks unplaced and would
-    # be written a second time as a double-stop on top of itself.
-    placed = {id(n) for stream in streams for n in stream}
-    leftovers = [n for n in score.notes if id(n) not in placed]
-
-    prefolded: set[int] = set()
-    handed_off = 0
-    added_guitar = False
-    # Not conditional on a detected pedal track: some files put the whole
-    # texture on one MIDI track, and their bass part still belongs on a
-    # guitar.
-    if settings.bass and settings.bass_on_guitar and len(parts) > 1:
-        parts, streams, prefolded, handed_off, added_guitar = _bass_onto_guitar(
-            parts, streams, settings
-        )
-    elif settings.bass and settings.relieve_bass and len(parts) > 1:
-        parts, streams, prefolded, handed_off, added_guitar = _relieve_bass(
-            parts, streams, settings, score.ppq
-        )
-    # An orphaned run of notes goes to one guitar that is free for all of
-    # it, so a line parked in a spare track stays in one pair of hands.
-    leftovers = _place_orphan_lines(parts, streams, leftovers, score.ppq)
-    # Whatever is left could not be taken monophonically at all; it is kept
-    # as a second note on whichever part is already playing at that instant.
-    _assign_extras(parts, streams, leftovers, score.ppq,
-                   min(arrange.TUNINGS[settings.guitar_tuning]))
 
     relief_counts = [0] * len(parts)
     if handed_off:
@@ -288,6 +246,7 @@ def convert(midi_path: str, out_path: str, settings: Settings) -> Report:
         bass_tracks=bass_tracks,
         handed_off=handed_off,
         added_guitar=added_guitar,
+        added_voices=plan.added_voices,
         pulled_back=pulled_back,
         parts=[
             PartReport(
@@ -310,6 +269,144 @@ def convert(midi_path: str, out_path: str, settings: Settings) -> Report:
             for part, pos, relief in zip(parts, positions, relief_counts)
         ],
     )
+
+
+@dataclass
+class _Plan:
+    """One deal of the piece's notes among a given number of players."""
+
+    guitars: int
+    parts: list
+    streams: list
+    prefolded: set[int]
+    handed_off: int
+    added_guitar: bool
+    crowded: int             # notes with no line of their own to sit in
+    added_voices: int = 0    # players added on top of the first estimate
+
+
+def _plan_parts(score: Score, settings: Settings, bass_tracks: set[int]) -> _Plan:
+    """Decide how many players the piece needs, and deal the notes out.
+
+    A note no part can pick up as part of its line is not thrown away: it
+    is written as a double-stop, or into the stave's second voice, where
+    Guitar Pro draws it greyed out behind the main voice. That grey is the
+    ensemble telling us it has run out of hands, and in the Passacaglia,
+    BWV 582, it is everywhere -- the manuals pile up to five voices over
+    the pedal, and three guitars and a bass lost 500 notes to it.
+
+    So when the part count is ours to choose, the estimate is only a
+    starting point: add a player, deal again, and keep the new arrangement
+    as long as it rescues notes from the grey. Growth stops at
+    `max_parts`, or as soon as another player stops rescuing anything.
+
+    A double-stop the arrangement means to keep -- a third ringing under a
+    cadence -- is not a note in trouble and does not ask for a player.
+    """
+    if settings.guitars > 0:
+        return _assign_parts(score, settings, bass_tracks, settings.guitars)
+
+    # One instrument per voice. Where the file already separates the
+    # voices, trust its own count; otherwise infer it from how many notes
+    # sound for most of the piece.
+    if voices.is_per_voice(score, bass_tracks):
+        needed = voices.track_voice_count(score)
+    else:
+        needed = voices.voice_count(score)
+    cap = max(1, settings.max_parts - (1 if settings.bass else 0))
+    guitars = max(1, min(needed - (1 if settings.bass else 0), cap))
+
+    plan = _assign_parts(score, settings, bass_tracks, guitars)
+    while plan.crowded and plan.guitars < cap:
+        trial = _assign_parts(score, settings, bass_tracks, plan.guitars + 1)
+        if trial.crowded >= plan.crowded:
+            break
+        trial.added_voices = trial.guitars - guitars
+        plan = trial
+    return plan
+
+
+def _assign_parts(
+    score: Score,
+    settings: Settings,
+    bass_tracks: set[int],
+    guitars: int,
+) -> _Plan:
+    """Hand every source note to one of `guitars` guitars (plus the bass)."""
+    n_parts = guitars + (1 if settings.bass else 0)
+    if n_parts < 1:
+        raise ValueError("need at least one part")
+
+    streams = voices.separate(score, _voice_config(settings, n_parts), bass_tracks)
+    parts = _make_parts(settings, n_parts, guitars)
+
+    # Which source notes the separation could not place. Worked out here,
+    # before the bass stage folds its line to a new octave: folding builds
+    # fresh notes, so afterwards every pedal note looks unplaced and would
+    # be written a second time as a double-stop on top of itself.
+    placed = {id(n) for stream in streams for n in stream}
+    leftovers = [n for n in score.notes if id(n) not in placed]
+
+    prefolded: set[int] = set()
+    handed_off = 0
+    added_guitar = False
+    # Not conditional on a detected pedal track: some files put the whole
+    # texture on one MIDI track, and their bass part still belongs on a
+    # guitar.
+    if settings.bass and settings.bass_on_guitar and len(parts) > 1:
+        parts, streams, prefolded, handed_off, added_guitar = _bass_onto_guitar(
+            parts, streams, settings
+        )
+    elif settings.bass and settings.relieve_bass and len(parts) > 1:
+        parts, streams, prefolded, handed_off, added_guitar = _relieve_bass(
+            parts, streams, settings, score.ppq
+        )
+    # An orphaned run of notes goes to one guitar that is free for all of
+    # it, so a line parked in a spare track stays in one pair of hands.
+    leftovers = _place_orphan_lines(parts, streams, leftovers, score.ppq)
+    # Whatever is left could not be taken monophonically at all; it is kept
+    # as a second note on whichever part is already playing at that instant.
+    lost = _assign_extras(parts, streams, leftovers, score.ppq,
+                          min(arrange.TUNINGS[settings.guitar_tuning]))
+
+    return _Plan(
+        guitars=guitars,
+        parts=parts,
+        streams=streams,
+        prefolded=prefolded,
+        handed_off=handed_off,
+        added_guitar=added_guitar,
+        crowded=lost + _crowded(parts, streams, settings, score.ppq),
+    )
+
+
+def _crowded(parts: list[Part], streams: list, settings: Settings,
+             ppq: int) -> int:
+    """Notes this deal cannot write as part of anybody's line.
+
+    Two ways that happens, and both are worth another player: a note
+    lands in a stave's second voice, which Guitar Pro greys out behind
+    the main one, or it lands on a beat as a double-stop that the chord
+    filter is about to discard. A double-stop the filter would keep is a
+    chord the arrangement means to write, so it does not count.
+    """
+    count = sum(len(part.second) for part in parts)
+    if settings.chords == "all":
+        return count
+    for part, stream in zip(parts, streams):
+        if not part.extras:
+            continue
+        if settings.chords == "none":
+            count += len(part.extras)
+            continue
+        # The part's line is still in its stream at this stage; the notes
+        # are only moved onto the part once the octaves are settled.
+        kept = arrange.thin_chords(
+            part.extras, stream, ppq,
+            min_quarters=settings.chord_min_quarters,
+        )
+        count += len(part.extras) - len(kept)
+    return count
 
 
 def _bass_onto_guitar(parts, streams, settings):
@@ -494,16 +591,19 @@ def _place_orphan_lines(parts, streams, leftovers, ppq):
     return rest
 
 
-def _assign_extras(parts, streams, leftovers, ppq, guitar_low) -> None:
+def _assign_extras(parts, streams, leftovers, ppq, guitar_low) -> int:
     """Give each unplaceable note to a part that is already sounding.
 
     It becomes a second note on that part's beat -- the rare double-stop
     the arrangement allows -- rather than being thrown away. Onsets only
     have to agree to within a grid step, since both are about to be
     quantised onto the same one anyway.
+
+    Returns how many notes even that could not save, which is the count
+    the planner grows the ensemble against.
     """
     if not leftovers:
-        return
+        return 0
     tolerance = max(1, ppq // 8)
     # Which part carries most of each source voice, so a displaced note
     # goes back to its own line rather than a stranger's.
@@ -522,6 +622,7 @@ def _assign_extras(parts, streams, leftovers, ppq, guitar_low) -> None:
         ordered = sorted(stream, key=lambda n: n.start)
         tables.append(([n.start for n in ordered], ordered))
 
+    lost = 0
     for note in leftovers:
         best = best_key = None
         for index, (starts, ordered) in enumerate(tables):
@@ -546,11 +647,11 @@ def _assign_extras(parts, streams, leftovers, ppq, guitar_low) -> None:
         # chord at all -- it belongs in the stave's second voice, on the
         # part that owns this line.
         index = owner.get(note.src_track)
-        if index is None:
-            continue
-        if parts[index].is_bass and note.pitch >= guitar_low:
+        if index is None or (parts[index].is_bass and note.pitch >= guitar_low):
+            lost += 1
             continue
         parts[index].second.append(note)
+    return lost
 
 
 def _relief_counts(parts, streams, settings):
