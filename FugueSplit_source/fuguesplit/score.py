@@ -54,6 +54,9 @@ class Score:
     title: str = ""
     track_names: dict[int, str] = field(default_factory=dict)
     key: tuple[int, int] = (0, 0)   # (sharps: -7..7, is_minor: 0/1)
+    engraved: bool = False          # tracks are the engraving's own voices,
+                                    # and src_channel the staff group they
+                                    # belong to -- not guessed from the notes
 
     @property
     def end_tick(self) -> int:

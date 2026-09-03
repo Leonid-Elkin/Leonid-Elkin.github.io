@@ -264,6 +264,13 @@ Eight notes do change hands, all of them where a voice is playing a
 double-stop against itself — one player cannot hold two notes of one line —
 and six of those are a single run, handed over whole.
 
+Across all 31 pieces the same swap takes broken runs from **4152 to 963**, and
+of the 194 notes still played by a part other than their voice's own, exactly
+one falls inside a run of that voice. Where a piece is engraved in more voices
+than there are staves for — `--max-parts` is 7 — the extra voices are handed
+to whichever guitar is free for the whole run rather than split across
+several.
+
 Engravings for the Bach organ works, matching the MIDI files this repository
 already uses, are at [Tobis Notenarchiv](https://tobis-notenarchiv.de/):
 each piece offers MusicXML beside its MIDI. Drop the `.xml` next to the `.mid`
@@ -288,10 +295,14 @@ to the source note it came from:
 - **missing** — a note the arrangement meant to write that the file has not
   got, and source notes that reached the file as nothing at all
 
-Across the 31 organ pieces that is **109,892 written notes, every one of them
+Across the 31 organ pieces that is **108,940 written notes, every one of them
 traced back to its source note, and no problems of any kind** — and the count
-in the file matches the count in the report, piece by piece. Of the 416 notes
-not written, 375 are ornament shorter than the quantisation grid.
+in the file matches the count in the report, piece by piece.
+
+It has already earned its keep. It caught a unison double-stop that the
+notation writer discarded while the report still counted it, and a chord tone
+dragged onto a neighbouring beat far enough to be quantised to the wrong
+32nd.
 
 ## Batch conversion
 
@@ -305,10 +316,10 @@ With no arguments it converts `midi/bach-preludes-and-fugues/` into `out/`,
 taking the engraving of a piece where one is sitting beside its MIDI. Run over
 Bach's 30 organ preludes and fugues (BWV 531-552) and the Passacaglia
 (BWV 582), sourced from
-[Tobis Notenarchiv](https://tobis-notenarchiv.de/), it keeps **99.6% of
-110,308 source notes**, with no failures. Twelve of the 31 keep every single
-note. Of the 416 notes still lost, 375 are ornament shorter than the
-quantisation grid; `--grid 64th` recovers most of those.
+[Tobis Notenarchiv](https://tobis-notenarchiv.de/), it keeps **99.7% of the
+109,280 notes in those engravings**, with no failures, and breaks a run with a
+handover **0.88 times per 100 notes** — read from the MIDI files of the same
+pieces that figure is 3.76.
 
 The ensemble that takes is five or six guitars and a bass, against the three
 guitars that used to be the default — which is what the music is: an organist
@@ -323,7 +334,7 @@ Every tab is credited to Leonid Elkin as arranger, with Bach as composer.
 python -m unittest discover -s tests -v
 ```
 
-109 tests. The assignment solver is checked against brute-force optimality; the
+111 tests. The assignment solver is checked against brute-force optimality; the
 notation layer is checked exhaustively (every offset and length on a 32nd grid
 in both simple and compound metre reconstructs to exactly the right number of
 ticks); and end-to-end tests parse the generated `.gp5` back and assert every

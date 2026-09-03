@@ -388,7 +388,8 @@ def _assign_parts(
     # Whatever is left could not be taken monophonically at all; it is kept
     # as a second note on whichever part is already playing at that instant.
     lost = _assign_extras(parts, streams, leftovers, score.ppq,
-                          min(arrange.TUNINGS[settings.guitar_tuning]))
+                          min(arrange.TUNINGS[settings.guitar_tuning]),
+                          _grid_ticks_in_source(settings, score.ppq))
 
     return _Plan(
         guitars=guitars,
@@ -619,20 +620,23 @@ def _place_orphan_lines(parts, streams, leftovers, ppq):
     return rest
 
 
-def _assign_extras(parts, streams, leftovers, ppq, guitar_low) -> int:
+def _assign_extras(parts, streams, leftovers, ppq, guitar_low,
+                   grid: int = 0) -> int:
     """Give each unplaceable note to a part that is already sounding.
 
     It becomes a second note on that part's beat -- the rare double-stop
-    the arrangement allows -- rather than being thrown away. Onsets only
-    have to agree to within a grid step, since both are about to be
-    quantised onto the same one anyway.
+    the arrangement allows -- rather than being thrown away. The two
+    onsets need not be identical, since both are about to be quantised,
+    but they must be close enough to land on the *same* grid step: a note
+    dragged onto a beat it does not share is a note written at the wrong
+    time, which is worse than one written as a chord tone somewhere else.
 
     Returns how many notes even that could not save, which is the count
     the planner grows the ensemble against.
     """
     if not leftovers:
         return 0
-    tolerance = max(1, ppq // 8)
+    tolerance = max(1, (grid or ppq // 4) // 2)
     # Which part carries most of each source voice, so a displaced note
     # goes back to its own line rather than a stranger's.
     holding: dict[int, tuple[int, int]] = {}
@@ -681,6 +685,11 @@ def _assign_extras(parts, streams, leftovers, ppq, guitar_low) -> int:
         parts[index].second.append(note)
     return lost
 
+
+def _grid_ticks_in_source(settings: Settings, ppq: int) -> int:
+    """One quantisation step, measured in the source's own ticks."""
+    return max(1, round(rhythm.grid_ticks(settings.grid) * ppq
+                        / rhythm.GP_QUARTER))
 
 def _relief_counts(parts, streams, settings):
     """How many notes each part is covering on the bass's behalf."""

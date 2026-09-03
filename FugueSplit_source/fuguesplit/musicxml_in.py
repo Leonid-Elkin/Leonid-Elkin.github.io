@@ -40,7 +40,7 @@ def read_musicxml(path: str) -> Score:
                          "score-partwise first")
 
     ppq = _first_divisions(root)
-    score = Score(ppq=ppq, title=_title(root, path))
+    score = Score(ppq=ppq, title=_title(root, path), engraved=True)
     names = _part_names(root)
 
     parts = root.findall("part")

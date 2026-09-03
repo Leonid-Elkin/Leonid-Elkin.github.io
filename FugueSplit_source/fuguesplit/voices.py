@@ -72,6 +72,15 @@ def detect_bass_tracks(score: Score) -> set[int]:
     if named:
         return named
 
+    if score.engraved:
+        # An engraving is grouped into parts, and an organ's bottom part is
+        # its pedal board. Compare parts rather than voices: a manual voice
+        # dipping under the pedal for a bar is common, and it used to sink
+        # the test and leave the whole pedal line on the guitars.
+        parted = _lowest_part(score)
+        if parted:
+            return parted
+
     by_track = score.notes_by_track()
     if len(by_track) < 2:
         return set()
@@ -87,6 +96,23 @@ def detect_bass_tracks(score: Score) -> set[int]:
     if means[lowest] <= min(others) - 7:
         return {lowest}
     return set()
+
+
+
+def _lowest_part(score: Score, margin: int = 7) -> set[int]:
+    """Tracks of the one part sitting a fifth below every other part."""
+    by_part: dict[int, list[Note]] = {}
+    for note in score.notes:
+        by_part.setdefault(note.src_channel, []).append(note)
+    real = {p: ns for p, ns in by_part.items() if len(ns) >= 8}
+    if len(real) < 2:
+        return set()
+    means = {p: sum(n.pitch for n in ns) / len(ns) for p, ns in real.items()}
+    lowest = min(means, key=means.get)
+    others = [m for p, m in means.items() if p != lowest]
+    if means[lowest] > min(others) - margin:
+        return set()
+    return {n.src_track for n in real[lowest]}
 
 
 def separate(
@@ -202,7 +228,14 @@ def is_per_voice(score: Score, bass_tracks: set[int], tolerance: float = 0.05) -
     Engravings exported from notation software usually do. A few stray
     overlaps are tolerated -- they are typically note-length artefacts, not
     a second voice sharing the staff.
+
+    A score read from MusicXML says so outright, and is believed: its
+    tracks *are* the engraved voices, overlaps and all. A voice with a
+    double-stop in it is still one voice, and inferring lines afresh from
+    a file that already names them only loses information.
     """
+    if score.engraved:
+        return True
     by_track = score.notes_by_track()
     real = {ti: ns for ti, ns in by_track.items() if len(ns) >= 8}
     if len(real) < 2:

@@ -907,6 +907,38 @@ class TestMusicXML(unittest.TestCase):
         self.assertEqual(len(musicxml_in.read_musicxml(zipped).notes),
                          len(score.notes))
 
+    def test_an_engraving_is_believed_even_where_voices_overlap(self):
+        """A voice with a double-stop in it is still one voice."""
+        notes = [Note(60, 0, 960, 90, src_track=0),
+                 Note(64, 480, 1440, 90, src_track=0),
+                 Note(48, 0, 960, 90, src_track=1)]
+        notes += [Note(62, t, t + 480, 90, src_track=0)
+                  for t in range(1920, 1920 + 480 * 8, 480)]
+        notes += [Note(50, t, t + 480, 90, src_track=1)
+                  for t in range(1920, 1920 + 480 * 8, 480)]
+        guessed = Score(ppq=480, notes=notes)
+        self.assertFalse(voices.is_per_voice(guessed, set()),
+                         "inferred from the notes, the overlaps look like "
+                         "two voices sharing a track")
+        engraved = Score(ppq=480, notes=notes, engraved=True)
+        self.assertTrue(voices.is_per_voice(engraved, set()))
+
+    def test_the_bottom_part_is_taken_for_the_pedal(self):
+        """Voices are compared part by part, not one at a time.
+
+        A manual voice dipping below the pedal for a bar used to sink the
+        register test and leave the whole pedal line on the guitars.
+        """
+        notes = []
+        for track, channel, base_pitch in ((0, 0, 72), (1, 0, 60), (2, 1, 43)):
+            notes += [Note(base_pitch + (i % 5), i * 480, i * 480 + 480, 90,
+                           src_track=track, src_channel=channel)
+                      for i in range(20)]
+        # One manual note far below the pedal, as a voice crossing gives.
+        notes.append(Note(38, 0, 480, 90, src_track=1, src_channel=0))
+        score = Score(ppq=480, notes=notes, engraved=True)
+        self.assertEqual(voices.detect_bass_tracks(score), {2})
+
     def test_one_voice_one_guitar_all_the_way_through(self):
         """The point of reading an engraving: no part changes voice."""
         _score, path = self._score()

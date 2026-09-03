@@ -129,6 +129,7 @@ def clip_to_ticks(score: Score, start: int, end: int | None) -> Score:
         title=score.title,
         track_names=dict(score.track_names),
         key=score.key,
+        engraved=score.engraved,
     )
     if not out.tempos:
         out.tempos.append(TempoEvent(0, score.tempo_at(start)))
