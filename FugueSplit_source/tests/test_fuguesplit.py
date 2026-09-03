@@ -11,6 +11,7 @@ import random
 import sys
 import tempfile
 import unittest
+import zipfile
 
 sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
@@ -19,9 +20,11 @@ import mido
 from guitarpro import models as M
 
 from fuguesplit import (arrange, check, compare, fretting, hungarian,
-                        midi_in, rhythm, voices)
-from fuguesplit.pipeline import Settings, convert
-from fuguesplit.score import Note, Score, TempoEvent, TimeSigEvent
+                        midi_in, musicxml_in, rhythm, verify, voices)
+from fuguesplit.pipeline import (Settings, convert, read_source,
+                                 _drop_unplayable_chords)
+from fuguesplit.score import (Note, Part, Score, TempoEvent,
+                              TimeSigEvent)
 
 BWV544 = r"C:\Users\walru\Downloads\BWV_0544.mid"
 
@@ -779,6 +782,221 @@ class TestThickTexture(unittest.TestCase):
             self.assertEqual(report.added_voices, 0)
 
 
+# A two-bar scrap of engraving: a pickup bar, two voices on one staff and
+# a third on another, a tie across the bar line and a chord.
+MUSICXML = """<?xml version="1.0" encoding="UTF-8"?>
+<score-partwise version="3.1">
+  <part-list>
+    <score-part id="P1"><part-name>Manual</part-name></score-part>
+    <score-part id="P2"><part-name>Pedal</part-name></score-part>
+  </part-list>
+  <part id="P1">
+    <measure number="0">
+      <attributes>
+        <divisions>480</divisions>
+        <key><fifths>-3</fifths><mode>minor</mode></key>
+        <time><beats>3</beats><beat-type>4</beat-type></time>
+        <staves>2</staves>
+      </attributes>
+      <note><pitch><step>C</step><octave>5</octave></pitch>
+        <duration>480</duration><voice>1</voice><staff>1</staff></note>
+    </measure>
+    <measure number="1">
+      <note><pitch><step>E</step><alter>-1</alter><octave>5</octave></pitch>
+        <duration>960</duration><voice>1</voice><staff>1</staff>
+        <tie type="start"/></note>
+      <note><pitch><step>G</step><octave>4</octave></pitch>
+        <duration>480</duration><voice>1</voice><staff>1</staff></note>
+      <backup><duration>1440</duration></backup>
+      <note><pitch><step>G</step><octave>3</octave></pitch>
+        <duration>1440</duration><voice>2</voice><staff>1</staff></note>
+      <backup><duration>1440</duration></backup>
+      <note><pitch><step>C</step><octave>3</octave></pitch>
+        <duration>1440</duration><voice>5</voice><staff>2</staff></note>
+      <note><chord/><pitch><step>E</step><alter>-1</alter><octave>3</octave></pitch>
+        <duration>1440</duration><voice>5</voice><staff>2</staff></note>
+    </measure>
+    <measure number="2">
+      <note><pitch><step>E</step><alter>-1</alter><octave>5</octave></pitch>
+        <duration>480</duration><voice>1</voice><staff>1</staff>
+        <tie type="stop"/></note>
+      <note><rest/><duration>960</duration><voice>1</voice><staff>1</staff></note>
+      <backup><duration>1440</duration></backup>
+      <note><rest/><duration>1440</duration><voice>2</voice><staff>1</staff></note>
+      <backup><duration>1440</duration></backup>
+      <note><rest/><duration>1440</duration><voice>5</voice><staff>2</staff></note>
+    </measure>
+  </part>
+  <part id="P2">
+    <measure number="0">
+      <attributes><divisions>480</divisions>
+        <time><beats>3</beats><beat-type>4</beat-type></time></attributes>
+      <note><rest/><duration>480</duration><voice>1</voice></note>
+    </measure>
+    <measure number="1">
+      <note><pitch><step>C</step><octave>2</octave></pitch>
+        <duration>1440</duration><voice>1</voice></note>
+    </measure>
+    <measure number="2">
+      <note><pitch><step>G</step><octave>1</octave></pitch>
+        <duration>1440</duration><voice>1</voice></note>
+    </measure>
+  </part>
+</score-partwise>
+"""
+
+
+def _write_musicxml(path: str) -> None:
+    with open(path, "w", encoding="utf-8") as handle:
+        handle.write(MUSICXML)
+
+
+class TestMusicXML(unittest.TestCase):
+    """An engraving already knows what the separator would have to guess."""
+
+    def _score(self, name="score.xml"):
+        directory = tempfile.mkdtemp()
+        path = os.path.join(directory, name)
+        _write_musicxml(path)
+        return musicxml_in.read_musicxml(path), path
+
+    def test_every_voice_becomes_its_own_track(self):
+        score, _path = self._score()
+        self.assertEqual(len(score.notes_by_track()), 4,
+                         "two voices on the top staff, one below, one pedal")
+        self.assertEqual(sorted(score.track_names.values()),
+                         ["Manual s1 v1", "Manual s1 v2", "Manual s2 v5",
+                          "Pedal s1 v1"])
+
+    def test_a_tie_is_one_note(self):
+        score, _path = self._score()
+        held = [n for n in score.notes if n.pitch == 75]
+        self.assertEqual(len(held), 1, "the tied Eb is a single note")
+        self.assertEqual(held[0].duration, 960 + 480)
+
+    def test_a_chord_keeps_its_onset(self):
+        score, _path = self._score()
+        starts = {n.start for n in score.notes if n.pitch in (48, 51)}
+        self.assertEqual(len(starts), 1, "both chord tones start together")
+
+    def test_the_pickup_bar_keeps_its_own_length(self):
+        score, _path = self._score()
+        signatures = [(e.tick, e.numerator, e.denominator)
+                      for e in score.time_sigs]
+        self.assertEqual(signatures[0], (0, 1, 4), "a one-beat pickup bar")
+        self.assertEqual(signatures[1], (480, 3, 4))
+        bars = rhythm.build_bars(score, score.end_tick)
+        self.assertEqual(bars[0].length, rhythm.GP_QUARTER)
+        # So the first full bar starts where the engraving puts it, rather
+        # than a whole bar of the new metre later.
+        self.assertEqual(bars[1].start, rhythm.GP_QUARTER)
+
+    def test_the_key_comes_from_the_engraving(self):
+        score, _path = self._score()
+        self.assertEqual(score.key, (-3, 1))
+
+    def test_the_reader_is_chosen_by_suffix(self):
+        score, path = self._score()
+        self.assertEqual(len(read_source(path).notes), len(score.notes))
+
+    def test_a_zipped_engraving_reads_the_same(self):
+        score, path = self._score()
+        zipped = os.path.join(os.path.dirname(path), "score.mxl")
+        with zipfile.ZipFile(zipped, "w") as archive:
+            archive.write(path, "score.xml")
+        self.assertEqual(len(musicxml_in.read_musicxml(zipped).notes),
+                         len(score.notes))
+
+    def test_one_voice_one_guitar_all_the_way_through(self):
+        """The point of reading an engraving: no part changes voice."""
+        _score, path = self._score()
+        with tempfile.TemporaryDirectory() as d:
+            report = convert(path, os.path.join(d, "out.gp5"), Settings())
+            self.assertEqual(check.tally(check.audit(report))[0], 0,
+                             "no note should be played by another voice's part")
+            source = {n.uid: n for n in report.source.notes}
+            for part in report.arranged:
+                tracks = {source[n.uid].src_track for n in part.notes
+                          if n.uid in source}
+                self.assertLessEqual(len(tracks), 1,
+                                     f"{part.name} plays more than one voice")
+
+
+class TestChordTones(unittest.TestCase):
+    """A double-stop is only kept if a hand could hold it and an ear hear it."""
+
+    def _part(self, extras):
+        part = Part(name="Guitar I", tuning=list(arrange.TUNINGS["standard"]))
+        part.notes = [Note(50, 0, 960, 90)]      # open D, third string
+        part.extras = extras
+        part.max_fret = 22
+        return part
+
+    def test_a_unison_is_dropped_rather_than_doubled(self):
+        """Two voices on the same note is a doubling, not a chord."""
+        part = self._part([Note(50, 0, 960, 90)])
+        self.assertEqual(_drop_unplayable_chords(part, [(2, 0)], 4), [])
+
+    def test_a_reachable_second_note_is_kept(self):
+        part = self._part([Note(57, 0, 960, 90)])
+        kept = _drop_unplayable_chords(part, [(2, 0)], 4)
+        self.assertEqual([n.pitch for n in kept], [57])
+
+    def test_a_note_the_hand_cannot_reach_is_dropped(self):
+        """With the hand up at the 10th fret, a low F needs the other end."""
+        part = self._part([Note(41, 0, 960, 90)])
+        part.notes = [Note(60, 0, 960, 90)]
+        self.assertEqual(_drop_unplayable_chords(part, [(2, 10)], 4), [])
+
+
+class TestVerify(unittest.TestCase):
+    """Every written note has to trace back to the note it came from."""
+
+    def test_a_finished_tab_matches_its_source(self):
+        with tempfile.TemporaryDirectory() as d:
+            src = os.path.join(d, "canon.mid")
+            tab = os.path.join(d, "canon.gp5")
+            _make_test_midi(src)
+            report = convert(src, tab, Settings())
+            audit = verify.verify(report, tab)
+            self.assertTrue(audit.ok, "; ".join(str(p) for p in audit.problems))
+            self.assertEqual(audit.traced, audit.written_notes)
+            self.assertEqual(audit.missing, [])
+
+    def test_an_engraved_source_is_written_whole(self):
+        directory = tempfile.mkdtemp()
+        path = os.path.join(directory, "score.xml")
+        _write_musicxml(path)
+        tab = os.path.join(directory, "score.gp5")
+        report = convert(path, tab, Settings())
+        audit = verify.verify(report, tab)
+        self.assertTrue(audit.ok, "; ".join(str(p) for p in audit.problems))
+        self.assertEqual(audit.missing, [])
+
+    def test_a_doctored_tab_is_caught(self):
+        """The audit reads the file, so a wrong note in it must show up."""
+        with tempfile.TemporaryDirectory() as d:
+            src = os.path.join(d, "canon.mid")
+            tab = os.path.join(d, "canon.gp5")
+            _make_test_midi(src)
+            report = convert(src, tab, Settings())
+            song = gp.parse(tab)
+            for track in song.tracks:
+                for measure in track.measures:
+                    hit = next((b for b in measure.voices[0].beats if b.notes),
+                               None)
+                    if hit is not None:
+                        hit.notes[0].value += 1      # a semitone out
+                        break
+                else:
+                    continue
+                break
+            gp.write(song, tab, version=(5, 1, 0))
+            audit = verify.verify(report, tab)
+            self.assertFalse(audit.ok)
+            self.assertTrue(any(p.kind == "pitch" for p in audit.problems))
+
+
 @unittest.skipUnless(os.path.exists(BWV544), "BWV 544 test file not present")
 class TestBWV544(unittest.TestCase):
     """The real thing: Bach's Prelude and Fugue in B minor."""
@@ -1096,6 +1314,38 @@ class TestBWV544(unittest.TestCase):
             result = compare.compare(report)
             self.assertEqual(result.lost_too_low, 0)
             self.assertEqual(result.lost_too_high, 0)
+
+    def test_a_bar_of_no_length_cannot_hang_the_writer(self):
+        """A 0/4 marks a free interlude, not a metre.
+
+        Chorale settings use it for a passage that is not counted in bars.
+        Taken literally it makes a bar of no length, and the loop that
+        extends the last bar to cover the final note then never finishes.
+        """
+        score = Score(ppq=480, notes=[Note(60, 0, 480, 90)])
+        score.time_sigs = [TimeSigEvent(0, 4, 4), TimeSigEvent(480, 0, 4)]
+        bars = rhythm.build_bars(score, score.end_tick)
+        self.assertTrue(bars)
+        self.assertTrue(all(b.length > 0 for b in bars),
+                        "no bar may have zero length")
+
+    def test_a_non_metre_time_signature_is_ignored_on_read(self):
+        with tempfile.TemporaryDirectory() as d:
+            path = os.path.join(d, "free.mid")
+            mid = mido.MidiFile(ticks_per_beat=480)
+            track = mido.MidiTrack()
+            mid.tracks.append(track)
+            track.append(mido.MetaMessage("time_signature", numerator=4,
+                                          denominator=4, time=0))
+            track.append(mido.MetaMessage("time_signature", numerator=0,
+                                          denominator=4, time=480))
+            track.append(mido.Message("note_on", note=60, velocity=90, time=0))
+            track.append(mido.Message("note_off", note=60, velocity=0, time=480))
+            mid.save(path)
+            score = midi_in.read_midi(path)
+            self.assertTrue(all(e.numerator >= 1 and e.denominator >= 1
+                                for e in score.time_sigs),
+                            "a 0/4 should never reach the score")
 
     def test_the_pedal_line_is_never_fragmented_across_guitars(self):
         """A pedal phrase that sits too high drops an octave on the bass.

@@ -67,6 +67,51 @@ def title_for(stem: str) -> str | None:
     return f"BWV {number.lstrip('0')} - {name}"
 
 
+
+MIDI = (".mid", ".midi")
+ENGRAVED = (".xml", ".musicxml", ".mxl")
+
+
+def pick_sources(folder: str) -> list[str]:
+    """One file per piece, taking the engraving where there is one.
+
+    A MusicXML edition carries the voices, the bar lines and the key that
+    a MIDI of the same piece only implies, so where both are sitting in
+    the folder the engraving wins and the MIDI is left alone.
+    """
+    best: dict[str, str] = {}
+    for name in sorted(os.listdir(folder)):
+        stem, ext = os.path.splitext(name)
+        ext = ext.lower()
+        if ext not in MIDI + ENGRAVED:
+            continue
+        if stem not in best or ext in ENGRAVED:
+            best[stem] = name
+    return [best[stem] for stem in sorted(best)]
+
+
+def tempo_beside(folder: str, name: str) -> int:
+    """An engraving rarely marks a tempo; its MIDI twin always has one.
+
+    Editions are typeset without a metronome mark -- Bach wrote none --
+    while the sequenced version of the same piece carries whatever tempo
+    the sequencer chose. Where both are in the folder, take it.
+    """
+    stem, ext = os.path.splitext(name)
+    if ext.lower() not in ENGRAVED:
+        return 0
+    for suffix in MIDI:
+        beside = os.path.join(folder, stem + suffix)
+        if os.path.exists(beside):
+            from fuguesplit.midi_in import read_midi
+
+            try:
+                return round(read_midi(beside).tempo_at(0))
+            except Exception:                          # noqa: BLE001
+                return 0
+    return 0
+
+
 def main(argv: list[str]) -> int:
     # Paths here can contain characters the console codepage cannot encode.
     for stream in (sys.stdout, sys.stderr):
@@ -88,6 +133,9 @@ def main(argv: list[str]) -> int:
     ap.add_argument("-g", "--guitars", type=int, default=0)
     ap.add_argument("--legato", type=float, default=1.0,
                     help="ring across rests shorter than this many quarters")
+    ap.add_argument("--tempo", type=int, default=0, metavar="BPM",
+                    help="tempo to write into every tab (default: whatever "
+                         "each source says)")
     args = ap.parse_args(argv)
 
     here = os.path.dirname(os.path.abspath(__file__))
@@ -97,11 +145,9 @@ def main(argv: list[str]) -> int:
     out_dir = args.out_dir or os.path.join(here, "out")
     os.makedirs(out_dir, exist_ok=True)
 
-    files = sorted(
-        f for f in os.listdir(midi_dir) if f.lower().endswith((".mid", ".midi"))
-    )
+    files = pick_sources(midi_dir)
     if not files:
-        print(f"no MIDI files in {midi_dir}", file=sys.stderr)
+        print(f"no scores in {midi_dir}", file=sys.stderr)
         return 1
 
     print(f"{len(files)} files: {midi_dir} -> {out_dir}\n")
@@ -123,6 +169,7 @@ def main(argv: list[str]) -> int:
             artist=COMPOSER,
             transpose=args.transpose + 12 * args.octave,
             legato_quarters=args.legato,
+            tempo=args.tempo or tempo_beside(midi_dir, name),
             voice_config=VoiceConfig(mode=args.assign,
                                      voice_gap_quarters=args.voice_gap),
         )

@@ -6,7 +6,7 @@ import bisect
 import os
 from dataclasses import dataclass, field, replace
 
-from . import arrange, fretting, gpout, midi_in, rhythm, voices
+from . import arrange, fretting, gpout, midi_in, musicxml_in, rhythm, voices
 from .score import Note, Part, Score
 
 
@@ -20,6 +20,7 @@ class Settings:
     bass_tuning: str = "bass"
     fret_count: int = 22
     grid: str = "32nd"
+    tempo: int = 0                # 0 = whatever the source says
     guitar_program: str = "clean"
     bass_program: str = "bass-finger"
     bass_on_guitar: bool = False  # keep the pedal line on the bass
@@ -89,8 +90,23 @@ class Report:
         return sum(p.second_notes for p in self.parts)
 
 
+ENGRAVED = (".xml", ".musicxml", ".mxl", ".zip")
+
+
+def read_source(path: str) -> Score:
+    """Read a score from whichever kind of file this is.
+
+    An engraving is preferred wherever one exists -- it knows the voices,
+    the bar lines and the key, all of which a MIDI file only implies --
+    so both are accepted and the suffix decides.
+    """
+    if path.lower().endswith(ENGRAVED):
+        return musicxml_in.read_musicxml(path)
+    return midi_in.read_midi(path)
+
+
 def convert(midi_path: str, out_path: str, settings: Settings) -> Report:
-    score = midi_in.read_midi(midi_path)
+    score = read_source(midi_path)
     source_total = len(score.notes)
     score = _clip_bars(score, settings)
 
@@ -198,6 +214,8 @@ def convert(midi_path: str, out_path: str, settings: Settings) -> Report:
     # Make sure the last sounding note has a bar to live in.
     while bars and bars[-1].end < end_gp:
         last = bars[-1]
+        if last.length <= 0:
+            break               # a bar of no length would never reach the end
         bars.append(rhythm.Bar(last.index + 1, last.end, last.numerator,
                                last.denominator))
 
@@ -218,7 +236,10 @@ def convert(midi_path: str, out_path: str, settings: Settings) -> Report:
                            settings.ties == "few") if part.second else None
         )
 
-    tempo_changes = _tempo_changes(score, bars)
+    tempo = settings.tempo or round(score.tempo_at(0))
+    # An engraving often carries no tempo at all, so an explicit one
+    # replaces the default rather than being written alongside it.
+    tempo_changes = [] if settings.tempo else _tempo_changes(score, bars)
     song = gpout.build_song(
         parts,
         laid_out,
@@ -226,7 +247,7 @@ def convert(midi_path: str, out_path: str, settings: Settings) -> Report:
         positions,
         bars,
         title=settings.title or score.title,
-        tempo=round(score.tempo_at(0)),
+        tempo=tempo,
         key=score.key,
         tempo_changes=tempo_changes,
         artist=settings.artist,
@@ -241,7 +262,7 @@ def convert(midi_path: str, out_path: str, settings: Settings) -> Report:
         title=settings.title or score.title,
         source_notes=source_total,
         bars=len(bars),
-        tempo=round(score.tempo_at(0)),
+        tempo=tempo,
         key=score.key,
         bass_tracks=bass_tracks,
         handed_off=handed_off,
@@ -487,7 +508,7 @@ def _relieve_bass(parts, streams, settings, ppq):
 
 
 def _drop_unplayable_chords(part, positions, hand_span) -> list:
-    """Keep only the double-stops a hand could actually hold.
+    """Keep only the double-stops a hand could actually hold, and hear.
 
     Two notes on one beat have to be stopped at the same instant. The
     second one needs its own string, and it has to sit close enough to the
@@ -495,16 +516,23 @@ def _drop_unplayable_chords(part, positions, hand_span) -> list:
     costs no finger. A chord tone with nowhere to go was silently skipped
     when the file was written, which quietly overstated how much of the
     music had survived; now it is dropped here, where it is counted.
+
+    A unison goes the same way. Two voices landing on the same pitch at
+    the same instant is a doubling, not a chord: one guitar cannot sound
+    it twice, and writing it as two notes on two strings would be a lie
+    about what is heard.
     """
     if not part.extras or not part.notes:
         return []
     where: dict[int, tuple] = {}
+    sounding: dict[int, int] = {}
     for note, spot in zip(sorted(part.notes, key=lambda n: n.start), positions):
         where.setdefault(note.start, spot)
+        sounding.setdefault(note.start, note.pitch)
     kept = []
     for extra in part.extras:
         spot = where.get(extra.start)
-        if spot is None:
+        if spot is None or extra.pitch == sounding.get(extra.start):
             continue
         if fretting.position_beside(extra.pitch, part.tuning, part.max_fret,
                                     spot[0], spot[1], hand_span) is not None:

@@ -1,7 +1,8 @@
 # FugueSplit
 
-Turns a polyphonic MIDI file into **one-note-at-a-time electric guitar and bass
-parts**, written out as a Guitar Pro tab.
+Turns a polyphonic score — a MIDI file, or better a MusicXML engraving —
+into **one-note-at-a-time electric guitar and bass parts**, written out as a
+Guitar Pro tab.
 
 A fugue is already written as independent melodic lines, so it is the ideal
 input: instead of hacking chords apart, the program works out which line is
@@ -50,9 +51,11 @@ Needs Python 3.10+, [mido](https://mido.readthedocs.io) for MIDI and
 The interesting problem is not the file format, it is deciding *who plays
 what*. Six stages:
 
-**1. Read.** The MIDI is flattened onto one absolute-tick timeline, keeping
+**1. Read.** The score is flattened onto one absolute-tick timeline, keeping
 each note's source track — a strong hint, because organ and choral
-transcriptions are usually engraved voice by voice.
+transcriptions are usually engraved voice by voice. A MusicXML engraving is
+read the same way but arrives already separated: see [Reading an
+engraving](#reading-an-engraving).
 
 **2. Separate voices.** The piece is walked in time order, and at every onset
 a minimum-cost assignment decides which part takes which note. The cost of
@@ -142,6 +145,7 @@ python -m fuguesplit INPUT.mid [-o OUTPUT.gp5] [options]
 | `--bass-tuning NAME` | `bass`, `bass5`, `bass-drop-d` |
 | `--frets N` | highest usable fret (default 22) |
 | `--grid NAME` | quantisation: `quarter`…`64th` (default `32nd`) |
+| `--tempo BPM` | tempo written into the tab (default: whatever the source says) |
 | `--tone NAME` | guitar voice: `clean`, `jazz`, `overdrive`, `distortion` |
 | `--bass-tone NAME` | `bass-finger`, `bass-pick` |
 | `--flow-priority top\|bottom` | which guitar gets the unbroken line (default `top` = Guitar I) |
@@ -197,15 +201,97 @@ the main one — but neither is a line anybody can read.
 So that grey is treated as the ensemble asking for another player. Each time
 it appears, a guitar is added and the whole piece is dealt out again, for as
 long as that keeps rescuing notes and up to `--max-parts` staves. On BWV 582
-that grows three guitars into six and takes the arrangement from 5165 to 5630
-of 5666 notes, with nothing left greyed at all; the 36 that remain are
-written-out trill notes shorter than the 32nd-note grid, and `--grid 64th`
-writes all 5666.
+that grows three guitars into six: from the MIDI it takes the arrangement from
+5165 to 5630 of 5666 notes, and from the engraving it writes 5540 of 5545 —
+in both cases with nothing left greyed at all.
 
 Growth only happens when the count is left to the program. `-g N` fixes the
 ensemble at N guitars and keeps it there — a legitimate arrangement choice,
 just a lossier one, and the notes over that go back to the second voice
 rather than being dropped.
+
+## Reading an engraving
+
+Give it a `.xml`, `.musicxml` or `.mxl` and it reads that instead. Worth
+doing wherever an edition exists, because a MIDI file is a performance and an
+engraving is the piece:
+
+| | MIDI | MusicXML |
+|---|---|---|
+| voices | inferred from pitch and timing | **written down**, one track per staff-and-voice |
+| bar lines | counted forward from a metre map | **the engraving's own**, pickup bars included |
+| key | often absent | in the file |
+| note lengths | as played, gaps and all | as written |
+| ornaments | played out as real notes | left as symbols, so not sounded |
+
+That last row is the one thing the MIDI does better, and it is why both are
+kept.
+
+The difference is not cosmetic. Bach's Passacaglia in C minor, BWV 582, is
+the case that made this worth writing.
+
+- Its MIDI puts all five manual voices on **one track**, so every voice has to
+  be inferred, and the separator hands lines between guitars wherever two of
+  them cross.
+- Its MIDI also carries a time signature of 4/4 changing to 3/4 two beats in,
+  which is not a metre any bar can hold. Read literally it puts **every bar
+  line in the piece a beat late**. The engraving has a one-beat pickup bar and
+  3/4 after it, which is what Bach wrote.
+- The MIDI has no key signature at all; the engraving has three flats.
+
+Read from the engraving, each guitar picks up one voice and keeps it for the
+whole piece:
+
+```
+guitar      engraved voice    notes  of    playing
+Guitar I    staff 1 voice 1    1553  1562    82.6%
+Guitar II   staff 1 voice 2    1480  1481    84.9%
+Guitar III  staff 2 voice 5    1262  1265    68.6%
+Guitar IV   staff 2 voice 6     341   341    22.9%
+Guitar V    staff 1 voice 3      23    24     3.4%
+Guitar VI   staff 1 voice 4      17    17     1.8%
+Bass        pedal               854   854    73.7%
+```
+
+Guitars V and VI look like padding and are not: they are the two voices the
+engraving adds where the texture thickens to six parts, and giving them their
+own staves is what stops them elbowing another voice off its guitar mid-phrase.
+`python -m fuguesplit.check` reports **no misplaced notes** and the count of
+runs broken by a handover drops from 285 to 78 against the same piece read
+from MIDI.
+
+Eight notes do change hands, all of them where a voice is playing a
+double-stop against itself — one player cannot hold two notes of one line —
+and six of those are a single run, handed over whole.
+
+Engravings for the Bach organ works, matching the MIDI files this repository
+already uses, are at [Tobis Notenarchiv](https://tobis-notenarchiv.de/):
+each piece offers MusicXML beside its MIDI. Drop the `.xml` next to the `.mid`
+and `convert_all.py` prefers it automatically, taking the tempo from the MIDI
+since editions carry none.
+
+## Is it the right piece? (`fuguesplit.verify`)
+
+```
+python -m fuguesplit.verify BWV_0582.xml out/BWV_0582.gp5
+```
+
+`check.py` asks whether the arrangement is musically sensible.
+`verify.py` asks the blunter question — is what came out the piece that went
+in? It parses the written `.gp5` back off disk, works out what each fret on
+each string actually sounds, folds ties back together, and follows every note
+to the source note it came from:
+
+- **pitch** — the written note must be the source note, in some octave
+- **timing** — its onset must be where the source puts it on the grid
+- **bar** — every bar must hold exactly its own length, in every voice
+- **missing** — a note the arrangement meant to write that the file has not
+  got, and source notes that reached the file as nothing at all
+
+Across the 31 organ pieces that is **109,892 written notes, every one of them
+traced back to its source note, and no problems of any kind** — and the count
+in the file matches the count in the report, piece by piece. Of the 416 notes
+not written, 375 are ornament shorter than the quantisation grid.
 
 ## Batch conversion
 
@@ -215,12 +301,13 @@ rather than being dropped.
 python convert_all.py [midi_dir] [out_dir]
 ```
 
-With no arguments it converts `midi/bach-preludes-and-fugues/` into `out/`.
-Run over Bach's 30 organ preludes and fugues (BWV 531-552) and the
-Passacaglia (BWV 582), sourced from
+With no arguments it converts `midi/bach-preludes-and-fugues/` into `out/`,
+taking the engraving of a piece where one is sitting beside its MIDI. Run over
+Bach's 30 organ preludes and fugues (BWV 531-552) and the Passacaglia
+(BWV 582), sourced from
 [Tobis Notenarchiv](https://tobis-notenarchiv.de/), it keeps **99.6% of
-110,429 source notes**, with no failures. Sixteen of the 31 keep every single
-note. Of the 446 notes still lost, 411 are ornament shorter than the
+110,308 source notes**, with no failures. Twelve of the 31 keep every single
+note. Of the 416 notes still lost, 375 are ornament shorter than the
 quantisation grid; `--grid 64th` recovers most of those.
 
 The ensemble that takes is five or six guitars and a bass, against the three
@@ -236,14 +323,18 @@ Every tab is credited to Leonid Elkin as arranger, with Bach as composer.
 python -m unittest discover -s tests -v
 ```
 
-93 tests. The assignment solver is checked against brute-force optimality; the
+109 tests. The assignment solver is checked against brute-force optimality; the
 notation layer is checked exhaustively (every offset and length on a 32nd grid
 in both simple and compound metre reconstructs to exactly the right number of
 ticks); and end-to-end tests parse the generated `.gp5` back and assert every
 bar is exactly filled, every beat holds at most one note, and every fret lies
 within the tuning, and that the bass never leaves the lower neck. A thick
 synthetic texture checks the ensemble grows until no note is left in a
-stave's second voice, and stops at `--max-parts`. The BWV 544 tests are
+stave's second voice, and stops at `--max-parts`. A scrap of MusicXML checks
+that voices, ties, chords, a pickup bar and the key survive the read, and that
+each voice keeps one guitar for the whole piece; the verifier is checked both
+against a clean tab and against one with a note deliberately altered in the
+written file. The BWV 544 tests are
 skipped if the file is not present.
 
 ## Limitations
@@ -255,6 +346,9 @@ skipped if the file is not present.
   hand movement but does not model finger stretch, so a dense passage can still
   ask for an awkward shape.
 - **Repeats are written out**, not folded into repeat barlines.
+- **Ornaments in an engraving stay symbols.** A MIDI file of the same piece
+  plays trills and mordents out as real notes; MusicXML marks them, and those
+  marks are not realised, so they are not in the tab.
 - Output is `.gp5`, which Guitar Pro 8 opens and can re-save as `.gp`.
 
 `midi/` and `out/` are git-ignored: the source MIDI sequences are other

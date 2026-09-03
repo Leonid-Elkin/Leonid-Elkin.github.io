@@ -25,7 +25,7 @@ def build_parser() -> argparse.ArgumentParser:
             "and write them as a Guitar Pro tab."
         ),
     )
-    p.add_argument("midi", help="input .mid/.midi file")
+    p.add_argument("midi", help="input score: .mid/.midi, or a MusicXML .xml/.musicxml/.mxl engraving, which knows its own voices and bar lines")
     p.add_argument("-o", "--out", help="output .gp5 (default: alongside input)")
     p.add_argument("-g", "--guitars", type=int, default=0,
                    help="guitar parts carrying the main voices. Default 0 "
@@ -47,6 +47,10 @@ def build_parser() -> argparse.ArgumentParser:
                    help="bass tuning (default: bass)")
     p.add_argument("--frets", type=int, default=22,
                    help="highest usable fret (default: 22)")
+    p.add_argument("--tempo", type=int, default=0, metavar="BPM",
+                   help="tempo written into the tab; by default whatever "
+                        "the source says, which for an engraving with no "
+                        "tempo mark at all is 120")
     p.add_argument("--grid", default="32nd",
                    choices=["quarter", "8th", "16th", "32nd", "64th"],
                    help="rhythmic quantisation grid (default: 32nd)")
@@ -167,6 +171,7 @@ def main(argv: list[str] | None = None) -> int:
         bass_tuning=args.bass_tuning,
         fret_count=args.frets,
         grid=args.grid,
+        tempo=args.tempo,
         guitar_program=args.tone,
         bass_program=args.bass_tone,
         from_bar=args.from_bar,
@@ -188,9 +193,9 @@ def main(argv: list[str] | None = None) -> int:
 
 
 def _list_tracks(path: str) -> int:
-    from .midi_in import read_midi
+    from .pipeline import read_source
 
-    score = read_midi(path)
+    score = read_source(path)
     detected = voices.detect_bass_tracks(score)
     print(f"{path}: {len(score.notes)} notes, {score.ppq} ticks/beat")
     print(f"{'trk':>4}  {'notes':>6}  {'range':>9}  name")
