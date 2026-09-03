@@ -1,0 +1,1097 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Fugue &middot; Leonid Elkin</title>
+    <meta name="description"
+        content="FugueSplit turns organ fugues into one-note-at-a-time guitar and bass parts. 70 of Bach's fugues arranged for a band, as Guitar Pro files and printable tablature." />
+    <meta name="theme-color" content="#0a0a0a" />
+    <meta property="og:type" content="website" />
+    <meta property="og:title" content="Fugue &middot; Leonid Elkin" />
+    <meta property="og:description"
+        content="70 of Bach's fugues arranged for three guitars and a bass, one voice per instrument." />
+    <meta property="og:url" content="https://leonid-elkin.github.io/fugue/" />
+    <meta name="twitter:card" content="summary_large_image" />
+    <link rel="canonical" href="https://leonid-elkin.github.io/fugue/" />
+    <link rel="icon"
+        href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' fill='%230a0a0a'/%3E%3Crect x='7' y='7' width='18' height='18' fill='%23ff2d16'/%3E%3C/svg%3E" />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link rel="stylesheet"
+        href="https://fonts.googleapis.com/css2?family=Archivo:wght@500;600;700;800&family=Inter+Tight:wght@400;500;600&family=JetBrains+Mono:wght@400;500&display=swap" />
+    <link rel="stylesheet" href="/shared/style.css?v=18" />
+    <style>
+        /* The piece list: one row per tab, two doors out of each. */
+        .pieces {
+            list-style: none;
+            border-top: 1px solid var(--rule);
+            margin: 0 0 clamp(30px, 4vw, 52px);
+            padding: 0;
+        }
+
+        .pieces li {
+            display: grid;
+            grid-template-columns: 5.2rem minmax(0, 1fr) auto auto;
+            align-items: baseline;
+            gap: clamp(8px, 1.4vw, 20px);
+            padding: 11px 2px;
+            border-bottom: 1px solid var(--rule);
+        }
+
+        .pieces li:hover { background: var(--paper-2); }
+
+        .piece-idx {
+            font-size: 0.68rem;
+            letter-spacing: 0.12em;
+            color: var(--ink-4);
+        }
+
+        .piece-name {
+            font-family: var(--f-body);
+            font-size: 0.94rem;
+            color: var(--ink);
+        }
+
+        .piece-meta {
+            font-size: 0.66rem;
+            letter-spacing: 0.06em;
+            color: var(--ink-3);
+            white-space: nowrap;
+        }
+
+        .piece-get { display: flex; gap: 5px; flex-wrap: wrap; justify-content: flex-end; }
+
+        .piece-get a {
+            font-family: var(--f-mono);
+            font-size: 0.62rem;
+            letter-spacing: 0.08em;
+            text-transform: uppercase;
+            color: var(--ink-3);
+            border: 1px solid var(--rule);
+            padding: 4px 7px;
+            min-width: 2.1rem;
+            text-align: center;
+            text-decoration: none;
+            transition: color 0.15s ease, border-color 0.15s ease;
+        }
+
+        /* One button per player, then the whole score, then the editable file. */
+        .piece-get .get-score { color: var(--ink-2); border-color: var(--rule-hot); }
+        .piece-get .get-gp { color: var(--ink-2); border-color: var(--rule-hot); }
+
+        .piece-get a:hover,
+        .piece-get a:focus-visible { color: var(--ink); border-color: var(--red); }
+
+        .set-head {
+            display: flex;
+            align-items: baseline;
+            justify-content: space-between;
+            gap: 16px;
+            margin: clamp(26px, 3.4vw, 44px) 0 12px;
+        }
+
+        .set-head h2 {
+            font-family: var(--f-display);
+            font-weight: 800;
+            font-size: clamp(1.05rem, 2vw, 1.35rem);
+            text-transform: uppercase;
+            letter-spacing: -0.02em;
+            margin: 0;
+        }
+
+        .set-head span { font-size: 0.68rem; letter-spacing: 0.1em; color: var(--ink-3); }
+
+        .numbers {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(min(100%, 168px), 1fr));
+            border-top: 1px solid var(--rule);
+            border-left: 1px solid var(--rule);
+            margin: 0 0 clamp(26px, 3.4vw, 44px);
+            padding: 0;
+            list-style: none;
+        }
+
+        .numbers li {
+            border-right: 1px solid var(--rule);
+            border-bottom: 1px solid var(--rule);
+            padding: 16px 18px;
+        }
+
+        .numbers b {
+            display: block;
+            font-family: var(--f-display);
+            font-weight: 800;
+            font-size: clamp(1.4rem, 3vw, 2rem);
+            letter-spacing: -0.03em;
+            color: var(--ink);
+        }
+
+        .numbers span { font-size: 0.66rem; letter-spacing: 0.1em; color: var(--ink-3); }
+
+        @media (max-width: 720px) {
+            .pieces li { grid-template-columns: 2.4rem minmax(0, 1fr); }
+            .piece-meta { grid-column: 2; }
+            .piece-get { grid-column: 2; padding-top: 4px; }
+        }
+    </style>
+</head>
+
+<body>
+    <div class="progress" aria-hidden="true"></div>
+    <nav class="nav" aria-label="Main">
+        <div class="wrap">
+            <a class="brand" href="/"><span class="mark" aria-hidden="true"></span>Leonid Elkin</a>
+            <ul class="nav-links">
+                <li><a href="/">Home</a></li>
+                <li><a href="/projects/">Projects</a></li>
+                <li><a href="/research/">Research</a></li>
+                <li><a href="/practice/">Practice</a></li>
+                <li><a href="/fugue/" aria-current="page">Fugue</a></li>
+                <li><a href="/about/">About</a></li>
+                <li><a href="/live/">Live</a></li>
+                <li><a href="#contact">Contact</a></li>
+            </ul>
+        </div>
+    </nav>
+
+    <div class="facet-band slim" aria-hidden="true">
+        <svg viewBox="0 0 1440 100" preserveAspectRatio="none" shape-rendering="crispEdges">
+            <rect width="1440" height="100" fill="#0a0a0a" />
+            <polygon points="0,100 0,62 240,30 480,66 700,40 940,74 1180,44 1440,70 1440,100" fill="#131313" />
+            <polygon points="240,30 480,66 380,100 120,100" fill="#0f0f0f" />
+            <polygon points="700,40 940,74 830,100 560,100" fill="#171717" />
+            <polygon class="facet-hot" points="940,74 1180,44 1240,100 1040,100" fill="#ff2d16" />
+            <polygon points="1180,44 1440,70 1440,100 1240,100" fill="#101010" />
+        </svg>
+    </div>
+
+    <main>
+        <section class="section" id="fugue">
+            <div class="wrap">
+                <div class="section-head">
+                    <span class="idx">Tablature &mdash;</span>
+                    <h1 class="display overprint" data-text="Fugue">Fugue</h1>
+                    <span class="aside mono">70 movements</span>
+                </div>
+                <p class="setup">A fugue is already written as independent melodic lines, so it is the ideal
+                    thing to hand to a band: instead of hacking chords apart, work out which line is which and
+                    give each one to a different player. <b>FugueSplit</b> reads an organ fugue and writes out
+                    one-note-at-a-time electric guitar and bass parts &mdash; one instrument per voice, the pedal
+                    line on the bass, and no chords anywhere. Every tab below is generated by it, not edited by
+                    hand.</p>
+                <ul class="numbers">
+                    <li><b>70</b><span>movements arranged</span></li>
+                    <li><b>295</b><span>parts engraved</span></li>
+                    <li><b>7,589</b><span>bars written</span></li>
+                    <li><b>1</b><span>voice per instrument</span></li>
+                </ul>
+                <p class="setup">Every part is engraved on its own: the buttons are one PDF per player &mdash;
+                    <b>I</b> is Guitar I, <b>BASS</b> is the bass &mdash; so nobody reads round four staves to
+                    find their line. <b>GP5</b> holds every part together and opens in Guitar Pro 5 or later,
+                    where you can hear it, slow it down and edit it. Each PDF carries standard notation over
+                    tablature, engraved by <a href="https://musescore.org/" rel="noopener">MuseScore</a>.</p>
+                <p class="setup">Prelude and fugue are listed and downloaded separately, because they are two
+                    pieces and you rarely want both at once. The boundary is found from the score itself: Bach
+                    almost always changes metre between the movements, and where he does not, the fugue gives
+                    itself away by entering on the manuals with the pedal silent. Four works where neither sign
+                    is clear are left whole and say so.</p>
+                <p class="setup">The arranger keeps every voice on one instrument for the whole piece, folds a
+                    line by whole octaves where a guitar cannot reach it &mdash; never by anything else &mdash;
+                    and refuses to write a double-stop no hand could hold.</p>
+
+                <div class="set-head">
+                    <h2>Organ preludes and fugues</h2>
+                    <span class="mono">BWV 531&ndash;552 &middot; 54 movements</span>
+                </div>
+                <ul class="pieces">
+                        <li>
+                            <span class="piece-idx mono">BWV 531</span>
+                            <span class="piece-name">Prelude and Fugue in C major</span>
+                            <span class="piece-meta mono">3 guitars + bass &middot; 114 bars &middot; 69 bpm</span>
+                            <span class="piece-get">
+                                <a class="get-part" href="/fugue/pdf/BWV_0531-guitar-i.pdf" title="Guitar I &mdash; PDF">I</a>
+                                <a class="get-part" href="/fugue/pdf/BWV_0531-guitar-ii.pdf" title="Guitar II &mdash; PDF">II</a>
+                                <a class="get-part" href="/fugue/pdf/BWV_0531-guitar-iii.pdf" title="Guitar III &mdash; PDF">III</a>
+                                <a class="get-part" href="/fugue/pdf/BWV_0531-bass.pdf" title="Bass &mdash; PDF">BASS</a>
+                                <a class="get-gp" href="/fugue/gp/BWV_0531.gp5" title="Guitar Pro file, every part together">GP5</a>
+                            </span>
+                        </li>
+                        <li>
+                            <span class="piece-idx mono">BWV 532</span>
+                            <span class="piece-name">Prelude in D major</span>
+                            <span class="piece-meta mono">3 guitars + bass &middot; 31 bars &middot; 80 bpm</span>
+                            <span class="piece-get">
+                                <a class="get-part" href="/fugue/pdf/BWV_0532-1-guitar-i.pdf" title="Guitar I &mdash; PDF">I</a>
+                                <a class="get-part" href="/fugue/pdf/BWV_0532-1-guitar-ii.pdf" title="Guitar II &mdash; PDF">II</a>
+                                <a class="get-part" href="/fugue/pdf/BWV_0532-1-guitar-iii.pdf" title="Guitar III &mdash; PDF">III</a>
+                                <a class="get-part" href="/fugue/pdf/BWV_0532-1-bass.pdf" title="Bass &mdash; PDF">BASS</a>
+                                <a class="get-gp" href="/fugue/gp/BWV_0532-1.gp5" title="Guitar Pro file, every part together">GP5</a>
+                            </span>
+                        </li>
+                        <li>
+                            <span class="piece-idx mono">BWV 532</span>
+                            <span class="piece-name">Fugue in D major</span>
+                            <span class="piece-meta mono">3 guitars + bass &middot; 213 bars &middot; 80 bpm</span>
+                            <span class="piece-get">
+                                <a class="get-part" href="/fugue/pdf/BWV_0532-2-guitar-i.pdf" title="Guitar I &mdash; PDF">I</a>
+                                <a class="get-part" href="/fugue/pdf/BWV_0532-2-guitar-ii.pdf" title="Guitar II &mdash; PDF">II</a>
+                                <a class="get-part" href="/fugue/pdf/BWV_0532-2-guitar-iii.pdf" title="Guitar III &mdash; PDF">III</a>
+                                <a class="get-part" href="/fugue/pdf/BWV_0532-2-bass.pdf" title="Bass &mdash; PDF">BASS</a>
+                                <a class="get-gp" href="/fugue/gp/BWV_0532-2.gp5" title="Guitar Pro file, every part together">GP5</a>
+                            </span>
+                        </li>
+                        <li>
+                            <span class="piece-idx mono">BWV 532a</span>
+                            <span class="piece-name">Fugue in D major (early version)</span>
+                            <span class="piece-meta mono">3 guitars + bass &middot; 98 bars &middot; 80 bpm</span>
+                            <span class="piece-get">
+                                <a class="get-part" href="/fugue/pdf/BWV_0532a-guitar-i.pdf" title="Guitar I &mdash; PDF">I</a>
+                                <a class="get-part" href="/fugue/pdf/BWV_0532a-guitar-ii.pdf" title="Guitar II &mdash; PDF">II</a>
+                                <a class="get-part" href="/fugue/pdf/BWV_0532a-guitar-iii.pdf" title="Guitar III &mdash; PDF">III</a>
+                                <a class="get-part" href="/fugue/pdf/BWV_0532a-bass.pdf" title="Bass &mdash; PDF">BASS</a>
+                                <a class="get-gp" href="/fugue/gp/BWV_0532a.gp5" title="Guitar Pro file, every part together">GP5</a>
+                            </span>
+                        </li>
+                        <li>
+                            <span class="piece-idx mono">BWV 533</span>
+                            <span class="piece-name">Prelude in E minor</span>
+                            <span class="piece-meta mono">4 guitars + bass &middot; 31 bars &middot; 69 bpm</span>
+                            <span class="piece-get">
+                                <a class="get-part" href="/fugue/pdf/BWV_0533-1-guitar-i.pdf" title="Guitar I &mdash; PDF">I</a>
+                                <a class="get-part" href="/fugue/pdf/BWV_0533-1-guitar-ii.pdf" title="Guitar II &mdash; PDF">II</a>
+                                <a class="get-part" href="/fugue/pdf/BWV_0533-1-guitar-iii.pdf" title="Guitar III &mdash; PDF">III</a>
+                                <a class="get-part" href="/fugue/pdf/BWV_0533-1-guitar-iv.pdf" title="Guitar IV &mdash; PDF">IV</a>
+                                <a class="get-part" href="/fugue/pdf/BWV_0533-1-bass.pdf" title="Bass &mdash; PDF">BASS</a>
+                                <a class="get-gp" href="/fugue/gp/BWV_0533-1.gp5" title="Guitar Pro file, every part together">GP5</a>
+                            </span>
+                        </li>
+                        <li>
+                            <span class="piece-idx mono">BWV 533</span>
+                            <span class="piece-name">Fugue in E minor</span>
+                            <span class="piece-meta mono">3 guitars + bass &middot; 36 bars &middot; 79 bpm</span>
+                            <span class="piece-get">
+                                <a class="get-part" href="/fugue/pdf/BWV_0533-2-guitar-i.pdf" title="Guitar I &mdash; PDF">I</a>
+                                <a class="get-part" href="/fugue/pdf/BWV_0533-2-guitar-ii.pdf" title="Guitar II &mdash; PDF">II</a>
+                                <a class="get-part" href="/fugue/pdf/BWV_0533-2-guitar-iii.pdf" title="Guitar III &mdash; PDF">III</a>
+                                <a class="get-part" href="/fugue/pdf/BWV_0533-2-bass.pdf" title="Bass &mdash; PDF">BASS</a>
+                                <a class="get-gp" href="/fugue/gp/BWV_0533-2.gp5" title="Guitar Pro file, every part together">GP5</a>
+                            </span>
+                        </li>
+                        <li>
+                            <span class="piece-idx mono">BWV 533a</span>
+                            <span class="piece-name">Prelude and Fugue in E minor (early version)</span>
+                            <span class="piece-meta mono">4 guitars + bass &middot; 70 bars &middot; 69 bpm</span>
+                            <span class="piece-get">
+                                <a class="get-part" href="/fugue/pdf/BWV_0533a-guitar-i.pdf" title="Guitar I &mdash; PDF">I</a>
+                                <a class="get-part" href="/fugue/pdf/BWV_0533a-guitar-ii.pdf" title="Guitar II &mdash; PDF">II</a>
+                                <a class="get-part" href="/fugue/pdf/BWV_0533a-guitar-iii.pdf" title="Guitar III &mdash; PDF">III</a>
+                                <a class="get-part" href="/fugue/pdf/BWV_0533a-guitar-iv.pdf" title="Guitar IV &mdash; PDF">IV</a>
+                                <a class="get-part" href="/fugue/pdf/BWV_0533a-bass.pdf" title="Bass &mdash; PDF">BASS</a>
+                                <a class="get-gp" href="/fugue/gp/BWV_0533a.gp5" title="Guitar Pro file, every part together">GP5</a>
+                            </span>
+                        </li>
+                        <li>
+                            <span class="piece-idx mono">BWV 534</span>
+                            <span class="piece-name">Prelude in F minor</span>
+                            <span class="piece-meta mono">4 guitars + bass &middot; 76 bars &middot; 60 bpm</span>
+                            <span class="piece-get">
+                                <a class="get-part" href="/fugue/pdf/BWV_0534-1-guitar-i.pdf" title="Guitar I &mdash; PDF">I</a>
+                                <a class="get-part" href="/fugue/pdf/BWV_0534-1-guitar-ii.pdf" title="Guitar II &mdash; PDF">II</a>
+                                <a class="get-part" href="/fugue/pdf/BWV_0534-1-guitar-iii.pdf" title="Guitar III &mdash; PDF">III</a>
+                                <a class="get-part" href="/fugue/pdf/BWV_0534-1-guitar-iv.pdf" title="Guitar IV &mdash; PDF">IV</a>
+                                <a class="get-part" href="/fugue/pdf/BWV_0534-1-bass.pdf" title="Bass &mdash; PDF">BASS</a>
+                                <a class="get-gp" href="/fugue/gp/BWV_0534-1.gp5" title="Guitar Pro file, every part together">GP5</a>
+                            </span>
+                        </li>
+                        <li>
+                            <span class="piece-idx mono">BWV 534</span>
+                            <span class="piece-name">Fugue in F minor</span>
+                            <span class="piece-meta mono">5 guitars + bass &middot; 138 bars &middot; 120 bpm</span>
+                            <span class="piece-get">
+                                <a class="get-part" href="/fugue/pdf/BWV_0534-2-guitar-i.pdf" title="Guitar I &mdash; PDF">I</a>
+                                <a class="get-part" href="/fugue/pdf/BWV_0534-2-guitar-ii.pdf" title="Guitar II &mdash; PDF">II</a>
+                                <a class="get-part" href="/fugue/pdf/BWV_0534-2-guitar-iii.pdf" title="Guitar III &mdash; PDF">III</a>
+                                <a class="get-part" href="/fugue/pdf/BWV_0534-2-guitar-iv.pdf" title="Guitar IV &mdash; PDF">IV</a>
+                                <a class="get-part" href="/fugue/pdf/BWV_0534-2-guitar-v.pdf" title="Guitar V &mdash; PDF">V</a>
+                                <a class="get-part" href="/fugue/pdf/BWV_0534-2-bass.pdf" title="Bass &mdash; PDF">BASS</a>
+                                <a class="get-gp" href="/fugue/gp/BWV_0534-2.gp5" title="Guitar Pro file, every part together">GP5</a>
+                            </span>
+                        </li>
+                        <li>
+                            <span class="piece-idx mono">BWV 535</span>
+                            <span class="piece-name">Prelude in G minor</span>
+                            <span class="piece-meta mono">4 guitars + bass &middot; 42 bars &middot; 70 bpm</span>
+                            <span class="piece-get">
+                                <a class="get-part" href="/fugue/pdf/BWV_0535-1-guitar-i.pdf" title="Guitar I &mdash; PDF">I</a>
+                                <a class="get-part" href="/fugue/pdf/BWV_0535-1-guitar-ii.pdf" title="Guitar II &mdash; PDF">II</a>
+                                <a class="get-part" href="/fugue/pdf/BWV_0535-1-guitar-iii.pdf" title="Guitar III &mdash; PDF">III</a>
+                                <a class="get-part" href="/fugue/pdf/BWV_0535-1-guitar-iv.pdf" title="Guitar IV &mdash; PDF">IV</a>
+                                <a class="get-part" href="/fugue/pdf/BWV_0535-1-bass.pdf" title="Bass &mdash; PDF">BASS</a>
+                                <a class="get-gp" href="/fugue/gp/BWV_0535-1.gp5" title="Guitar Pro file, every part together">GP5</a>
+                            </span>
+                        </li>
+                        <li>
+                            <span class="piece-idx mono">BWV 535</span>
+                            <span class="piece-name">Fugue in G minor</span>
+                            <span class="piece-meta mono">3 guitars + bass &middot; 77 bars &middot; 96 bpm</span>
+                            <span class="piece-get">
+                                <a class="get-part" href="/fugue/pdf/BWV_0535-2-guitar-i.pdf" title="Guitar I &mdash; PDF">I</a>
+                                <a class="get-part" href="/fugue/pdf/BWV_0535-2-guitar-ii.pdf" title="Guitar II &mdash; PDF">II</a>
+                                <a class="get-part" href="/fugue/pdf/BWV_0535-2-guitar-iii.pdf" title="Guitar III &mdash; PDF">III</a>
+                                <a class="get-part" href="/fugue/pdf/BWV_0535-2-bass.pdf" title="Bass &mdash; PDF">BASS</a>
+                                <a class="get-gp" href="/fugue/gp/BWV_0535-2.gp5" title="Guitar Pro file, every part together">GP5</a>
+                            </span>
+                        </li>
+                        <li>
+                            <span class="piece-idx mono">BWV 535a</span>
+                            <span class="piece-name">Prelude in G minor (early version)</span>
+                            <span class="piece-meta mono">4 guitars + bass &middot; 21 bars &middot; 70 bpm</span>
+                            <span class="piece-get">
+                                <a class="get-part" href="/fugue/pdf/BWV_0535a-1-guitar-i.pdf" title="Guitar I &mdash; PDF">I</a>
+                                <a class="get-part" href="/fugue/pdf/BWV_0535a-1-guitar-ii.pdf" title="Guitar II &mdash; PDF">II</a>
+                                <a class="get-part" href="/fugue/pdf/BWV_0535a-1-guitar-iii.pdf" title="Guitar III &mdash; PDF">III</a>
+                                <a class="get-part" href="/fugue/pdf/BWV_0535a-1-guitar-iv.pdf" title="Guitar IV &mdash; PDF">IV</a>
+                                <a class="get-part" href="/fugue/pdf/BWV_0535a-1-bass.pdf" title="Bass &mdash; PDF">BASS</a>
+                                <a class="get-gp" href="/fugue/gp/BWV_0535a-1.gp5" title="Guitar Pro file, every part together">GP5</a>
+                            </span>
+                        </li>
+                        <li>
+                            <span class="piece-idx mono">BWV 535a</span>
+                            <span class="piece-name">Fugue in G minor (early version)</span>
+                            <span class="piece-meta mono">2 guitars + bass &middot; 65 bars &middot; 70 bpm</span>
+                            <span class="piece-get">
+                                <a class="get-part" href="/fugue/pdf/BWV_0535a-2-guitar-i.pdf" title="Guitar I &mdash; PDF">I</a>
+                                <a class="get-part" href="/fugue/pdf/BWV_0535a-2-guitar-ii.pdf" title="Guitar II &mdash; PDF">II</a>
+                                <a class="get-part" href="/fugue/pdf/BWV_0535a-2-bass.pdf" title="Bass &mdash; PDF">BASS</a>
+                                <a class="get-gp" href="/fugue/gp/BWV_0535a-2.gp5" title="Guitar Pro file, every part together">GP5</a>
+                            </span>
+                        </li>
+                        <li>
+                            <span class="piece-idx mono">BWV 536</span>
+                            <span class="piece-name">Prelude in A major</span>
+                            <span class="piece-meta mono">3 guitars + bass &middot; 32 bars &middot; 95 bpm</span>
+                            <span class="piece-get">
+                                <a class="get-part" href="/fugue/pdf/BWV_0536-1-guitar-i.pdf" title="Guitar I &mdash; PDF">I</a>
+                                <a class="get-part" href="/fugue/pdf/BWV_0536-1-guitar-ii.pdf" title="Guitar II &mdash; PDF">II</a>
+                                <a class="get-part" href="/fugue/pdf/BWV_0536-1-guitar-iii.pdf" title="Guitar III &mdash; PDF">III</a>
+                                <a class="get-part" href="/fugue/pdf/BWV_0536-1-bass.pdf" title="Bass &mdash; PDF">BASS</a>
+                                <a class="get-gp" href="/fugue/gp/BWV_0536-1.gp5" title="Guitar Pro file, every part together">GP5</a>
+                            </span>
+                        </li>
+                        <li>
+                            <span class="piece-idx mono">BWV 536</span>
+                            <span class="piece-name">Fugue in A major</span>
+                            <span class="piece-meta mono">3 guitars + bass &middot; 182 bars &middot; 120 bpm</span>
+                            <span class="piece-get">
+                                <a class="get-part" href="/fugue/pdf/BWV_0536-2-guitar-i.pdf" title="Guitar I &mdash; PDF">I</a>
+                                <a class="get-part" href="/fugue/pdf/BWV_0536-2-guitar-ii.pdf" title="Guitar II &mdash; PDF">II</a>
+                                <a class="get-part" href="/fugue/pdf/BWV_0536-2-guitar-iii.pdf" title="Guitar III &mdash; PDF">III</a>
+                                <a class="get-part" href="/fugue/pdf/BWV_0536-2-bass.pdf" title="Bass &mdash; PDF">BASS</a>
+                                <a class="get-gp" href="/fugue/gp/BWV_0536-2.gp5" title="Guitar Pro file, every part together">GP5</a>
+                            </span>
+                        </li>
+                        <li>
+                            <span class="piece-idx mono">BWV 536a</span>
+                            <span class="piece-name">Prelude in A major (early version)</span>
+                            <span class="piece-meta mono">3 guitars + bass &middot; 32 bars &middot; 95 bpm</span>
+                            <span class="piece-get">
+                                <a class="get-part" href="/fugue/pdf/BWV_0536a-1-guitar-i.pdf" title="Guitar I &mdash; PDF">I</a>
+                                <a class="get-part" href="/fugue/pdf/BWV_0536a-1-guitar-ii.pdf" title="Guitar II &mdash; PDF">II</a>
+                                <a class="get-part" href="/fugue/pdf/BWV_0536a-1-guitar-iii.pdf" title="Guitar III &mdash; PDF">III</a>
+                                <a class="get-part" href="/fugue/pdf/BWV_0536a-1-bass.pdf" title="Bass &mdash; PDF">BASS</a>
+                                <a class="get-gp" href="/fugue/gp/BWV_0536a-1.gp5" title="Guitar Pro file, every part together">GP5</a>
+                            </span>
+                        </li>
+                        <li>
+                            <span class="piece-idx mono">BWV 536a</span>
+                            <span class="piece-name">Fugue in A major (early version)</span>
+                            <span class="piece-meta mono">3 guitars + bass &middot; 184 bars &middot; 95 bpm</span>
+                            <span class="piece-get">
+                                <a class="get-part" href="/fugue/pdf/BWV_0536a-2-guitar-i.pdf" title="Guitar I &mdash; PDF">I</a>
+                                <a class="get-part" href="/fugue/pdf/BWV_0536a-2-guitar-ii.pdf" title="Guitar II &mdash; PDF">II</a>
+                                <a class="get-part" href="/fugue/pdf/BWV_0536a-2-guitar-iii.pdf" title="Guitar III &mdash; PDF">III</a>
+                                <a class="get-part" href="/fugue/pdf/BWV_0536a-2-bass.pdf" title="Bass &mdash; PDF">BASS</a>
+                                <a class="get-gp" href="/fugue/gp/BWV_0536a-2.gp5" title="Guitar Pro file, every part together">GP5</a>
+                            </span>
+                        </li>
+                        <li>
+                            <span class="piece-idx mono">BWV 537</span>
+                            <span class="piece-name">Fantasia in C minor</span>
+                            <span class="piece-meta mono">3 guitars + bass &middot; 48 bars &middot; 70 bpm</span>
+                            <span class="piece-get">
+                                <a class="get-part" href="/fugue/pdf/BWV_0537-1-guitar-i.pdf" title="Guitar I &mdash; PDF">I</a>
+                                <a class="get-part" href="/fugue/pdf/BWV_0537-1-guitar-ii.pdf" title="Guitar II &mdash; PDF">II</a>
+                                <a class="get-part" href="/fugue/pdf/BWV_0537-1-guitar-iii.pdf" title="Guitar III &mdash; PDF">III</a>
+                                <a class="get-part" href="/fugue/pdf/BWV_0537-1-bass.pdf" title="Bass &mdash; PDF">BASS</a>
+                                <a class="get-gp" href="/fugue/gp/BWV_0537-1.gp5" title="Guitar Pro file, every part together">GP5</a>
+                            </span>
+                        </li>
+                        <li>
+                            <span class="piece-idx mono">BWV 537</span>
+                            <span class="piece-name">Fugue in C minor</span>
+                            <span class="piece-meta mono">3 guitars + bass &middot; 130 bars &middot; 140 bpm</span>
+                            <span class="piece-get">
+                                <a class="get-part" href="/fugue/pdf/BWV_0537-2-guitar-i.pdf" title="Guitar I &mdash; PDF">I</a>
+                                <a class="get-part" href="/fugue/pdf/BWV_0537-2-guitar-ii.pdf" title="Guitar II &mdash; PDF">II</a>
+                                <a class="get-part" href="/fugue/pdf/BWV_0537-2-guitar-iii.pdf" title="Guitar III &mdash; PDF">III</a>
+                                <a class="get-part" href="/fugue/pdf/BWV_0537-2-bass.pdf" title="Bass &mdash; PDF">BASS</a>
+                                <a class="get-gp" href="/fugue/gp/BWV_0537-2.gp5" title="Guitar Pro file, every part together">GP5</a>
+                            </span>
+                        </li>
+                        <li>
+                            <span class="piece-idx mono">BWV 538</span>
+                            <span class="piece-name">Toccata in D minor (Dorian)</span>
+                            <span class="piece-meta mono">4 guitars + bass &middot; 99 bars &middot; 70 bpm</span>
+                            <span class="piece-get">
+                                <a class="get-part" href="/fugue/pdf/BWV_0538-1-guitar-i.pdf" title="Guitar I &mdash; PDF">I</a>
+                                <a class="get-part" href="/fugue/pdf/BWV_0538-1-guitar-ii.pdf" title="Guitar II &mdash; PDF">II</a>
+                                <a class="get-part" href="/fugue/pdf/BWV_0538-1-guitar-iii.pdf" title="Guitar III &mdash; PDF">III</a>
+                                <a class="get-part" href="/fugue/pdf/BWV_0538-1-guitar-iv.pdf" title="Guitar IV &mdash; PDF">IV</a>
+                                <a class="get-part" href="/fugue/pdf/BWV_0538-1-bass.pdf" title="Bass &mdash; PDF">BASS</a>
+                                <a class="get-gp" href="/fugue/gp/BWV_0538-1.gp5" title="Guitar Pro file, every part together">GP5</a>
+                            </span>
+                        </li>
+                        <li>
+                            <span class="piece-idx mono">BWV 538</span>
+                            <span class="piece-name">Fugue in D minor (Dorian)</span>
+                            <span class="piece-meta mono">4 guitars + bass &middot; 222 bars &middot; 110 bpm</span>
+                            <span class="piece-get">
+                                <a class="get-part" href="/fugue/pdf/BWV_0538-2-guitar-i.pdf" title="Guitar I &mdash; PDF">I</a>
+                                <a class="get-part" href="/fugue/pdf/BWV_0538-2-guitar-ii.pdf" title="Guitar II &mdash; PDF">II</a>
+                                <a class="get-part" href="/fugue/pdf/BWV_0538-2-guitar-iii.pdf" title="Guitar III &mdash; PDF">III</a>
+                                <a class="get-part" href="/fugue/pdf/BWV_0538-2-guitar-iv.pdf" title="Guitar IV &mdash; PDF">IV</a>
+                                <a class="get-part" href="/fugue/pdf/BWV_0538-2-bass.pdf" title="Bass &mdash; PDF">BASS</a>
+                                <a class="get-gp" href="/fugue/gp/BWV_0538-2.gp5" title="Guitar Pro file, every part together">GP5</a>
+                            </span>
+                        </li>
+                        <li>
+                            <span class="piece-idx mono">BWV 539</span>
+                            <span class="piece-name">Prelude and Fugue in D minor</span>
+                            <span class="piece-meta mono">4 guitars + bass &middot; 139 bars &middot; 90 bpm</span>
+                            <span class="piece-get">
+                                <a class="get-part" href="/fugue/pdf/BWV_0539-guitar-i.pdf" title="Guitar I &mdash; PDF">I</a>
+                                <a class="get-part" href="/fugue/pdf/BWV_0539-guitar-ii.pdf" title="Guitar II &mdash; PDF">II</a>
+                                <a class="get-part" href="/fugue/pdf/BWV_0539-guitar-iii.pdf" title="Guitar III &mdash; PDF">III</a>
+                                <a class="get-part" href="/fugue/pdf/BWV_0539-guitar-iv.pdf" title="Guitar IV &mdash; PDF">IV</a>
+                                <a class="get-part" href="/fugue/pdf/BWV_0539-bass.pdf" title="Bass &mdash; PDF">BASS</a>
+                                <a class="get-gp" href="/fugue/gp/BWV_0539.gp5" title="Guitar Pro file, every part together">GP5</a>
+                            </span>
+                        </li>
+                        <li>
+                            <span class="piece-idx mono">BWV 540</span>
+                            <span class="piece-name">Toccata in F major</span>
+                            <span class="piece-meta mono">4 guitars + bass &middot; 438 bars &middot; 70 bpm</span>
+                            <span class="piece-get">
+                                <a class="get-part" href="/fugue/pdf/BWV_0540-1-guitar-i.pdf" title="Guitar I &mdash; PDF">I</a>
+                                <a class="get-part" href="/fugue/pdf/BWV_0540-1-guitar-ii.pdf" title="Guitar II &mdash; PDF">II</a>
+                                <a class="get-part" href="/fugue/pdf/BWV_0540-1-guitar-iii.pdf" title="Guitar III &mdash; PDF">III</a>
+                                <a class="get-part" href="/fugue/pdf/BWV_0540-1-guitar-iv.pdf" title="Guitar IV &mdash; PDF">IV</a>
+                                <a class="get-part" href="/fugue/pdf/BWV_0540-1-bass.pdf" title="Bass &mdash; PDF">BASS</a>
+                                <a class="get-gp" href="/fugue/gp/BWV_0540-1.gp5" title="Guitar Pro file, every part together">GP5</a>
+                            </span>
+                        </li>
+                        <li>
+                            <span class="piece-idx mono">BWV 540</span>
+                            <span class="piece-name">Fugue in F major</span>
+                            <span class="piece-meta mono">3 guitars + bass &middot; 170 bars &middot; 180 bpm</span>
+                            <span class="piece-get">
+                                <a class="get-part" href="/fugue/pdf/BWV_0540-2-guitar-i.pdf" title="Guitar I &mdash; PDF">I</a>
+                                <a class="get-part" href="/fugue/pdf/BWV_0540-2-guitar-ii.pdf" title="Guitar II &mdash; PDF">II</a>
+                                <a class="get-part" href="/fugue/pdf/BWV_0540-2-guitar-iii.pdf" title="Guitar III &mdash; PDF">III</a>
+                                <a class="get-part" href="/fugue/pdf/BWV_0540-2-bass.pdf" title="Bass &mdash; PDF">BASS</a>
+                                <a class="get-gp" href="/fugue/gp/BWV_0540-2.gp5" title="Guitar Pro file, every part together">GP5</a>
+                            </span>
+                        </li>
+                        <li>
+                            <span class="piece-idx mono">BWV 541</span>
+                            <span class="piece-name">Prelude in G major</span>
+                            <span class="piece-meta mono">4 guitars + bass &middot; 82 bars &middot; 80 bpm</span>
+                            <span class="piece-get">
+                                <a class="get-part" href="/fugue/pdf/BWV_0541-1-guitar-i.pdf" title="Guitar I &mdash; PDF">I</a>
+                                <a class="get-part" href="/fugue/pdf/BWV_0541-1-guitar-ii.pdf" title="Guitar II &mdash; PDF">II</a>
+                                <a class="get-part" href="/fugue/pdf/BWV_0541-1-guitar-iii.pdf" title="Guitar III &mdash; PDF">III</a>
+                                <a class="get-part" href="/fugue/pdf/BWV_0541-1-guitar-iv.pdf" title="Guitar IV &mdash; PDF">IV</a>
+                                <a class="get-part" href="/fugue/pdf/BWV_0541-1-bass.pdf" title="Bass &mdash; PDF">BASS</a>
+                                <a class="get-gp" href="/fugue/gp/BWV_0541-1.gp5" title="Guitar Pro file, every part together">GP5</a>
+                            </span>
+                        </li>
+                        <li>
+                            <span class="piece-idx mono">BWV 541</span>
+                            <span class="piece-name">Fugue in G major</span>
+                            <span class="piece-meta mono">3 guitars + bass &middot; 83 bars &middot; 100 bpm</span>
+                            <span class="piece-get">
+                                <a class="get-part" href="/fugue/pdf/BWV_0541-2-guitar-i.pdf" title="Guitar I &mdash; PDF">I</a>
+                                <a class="get-part" href="/fugue/pdf/BWV_0541-2-guitar-ii.pdf" title="Guitar II &mdash; PDF">II</a>
+                                <a class="get-part" href="/fugue/pdf/BWV_0541-2-guitar-iii.pdf" title="Guitar III &mdash; PDF">III</a>
+                                <a class="get-part" href="/fugue/pdf/BWV_0541-2-bass.pdf" title="Bass &mdash; PDF">BASS</a>
+                                <a class="get-gp" href="/fugue/gp/BWV_0541-2.gp5" title="Guitar Pro file, every part together">GP5</a>
+                            </span>
+                        </li>
+                        <li>
+                            <span class="piece-idx mono">BWV 542</span>
+                            <span class="piece-name">Fantasia in G minor</span>
+                            <span class="piece-meta mono">5 guitars + bass &middot; 49 bars &middot; 70 bpm</span>
+                            <span class="piece-get">
+                                <a class="get-part" href="/fugue/pdf/BWV_0542-1-guitar-i.pdf" title="Guitar I &mdash; PDF">I</a>
+                                <a class="get-part" href="/fugue/pdf/BWV_0542-1-guitar-ii.pdf" title="Guitar II &mdash; PDF">II</a>
+                                <a class="get-part" href="/fugue/pdf/BWV_0542-1-guitar-iii.pdf" title="Guitar III &mdash; PDF">III</a>
+                                <a class="get-part" href="/fugue/pdf/BWV_0542-1-guitar-iv.pdf" title="Guitar IV &mdash; PDF">IV</a>
+                                <a class="get-part" href="/fugue/pdf/BWV_0542-1-guitar-v.pdf" title="Guitar V &mdash; PDF">V</a>
+                                <a class="get-part" href="/fugue/pdf/BWV_0542-1-bass.pdf" title="Bass &mdash; PDF">BASS</a>
+                                <a class="get-gp" href="/fugue/gp/BWV_0542-1.gp5" title="Guitar Pro file, every part together">GP5</a>
+                            </span>
+                        </li>
+                        <li>
+                            <span class="piece-idx mono">BWV 542</span>
+                            <span class="piece-name">Fugue in G minor</span>
+                            <span class="piece-meta mono">4 guitars + bass &middot; 115 bars &middot; 75 bpm</span>
+                            <span class="piece-get">
+                                <a class="get-part" href="/fugue/pdf/BWV_0542-2-guitar-i.pdf" title="Guitar I &mdash; PDF">I</a>
+                                <a class="get-part" href="/fugue/pdf/BWV_0542-2-guitar-ii.pdf" title="Guitar II &mdash; PDF">II</a>
+                                <a class="get-part" href="/fugue/pdf/BWV_0542-2-guitar-iii.pdf" title="Guitar III &mdash; PDF">III</a>
+                                <a class="get-part" href="/fugue/pdf/BWV_0542-2-guitar-iv.pdf" title="Guitar IV &mdash; PDF">IV</a>
+                                <a class="get-part" href="/fugue/pdf/BWV_0542-2-bass.pdf" title="Bass &mdash; PDF">BASS</a>
+                                <a class="get-gp" href="/fugue/gp/BWV_0542-2.gp5" title="Guitar Pro file, every part together">GP5</a>
+                            </span>
+                        </li>
+                        <li>
+                            <span class="piece-idx mono">BWV 543</span>
+                            <span class="piece-name">Prelude in A minor</span>
+                            <span class="piece-meta mono">3 guitars + bass &middot; 53 bars &middot; 70 bpm</span>
+                            <span class="piece-get">
+                                <a class="get-part" href="/fugue/pdf/BWV_0543-1-guitar-i.pdf" title="Guitar I &mdash; PDF">I</a>
+                                <a class="get-part" href="/fugue/pdf/BWV_0543-1-guitar-ii.pdf" title="Guitar II &mdash; PDF">II</a>
+                                <a class="get-part" href="/fugue/pdf/BWV_0543-1-guitar-iii.pdf" title="Guitar III &mdash; PDF">III</a>
+                                <a class="get-part" href="/fugue/pdf/BWV_0543-1-bass.pdf" title="Bass &mdash; PDF">BASS</a>
+                                <a class="get-gp" href="/fugue/gp/BWV_0543-1.gp5" title="Guitar Pro file, every part together">GP5</a>
+                            </span>
+                        </li>
+                        <li>
+                            <span class="piece-idx mono">BWV 543</span>
+                            <span class="piece-name">Fugue in A minor</span>
+                            <span class="piece-meta mono">3 guitars + bass &middot; 151 bars &middot; 70 bpm</span>
+                            <span class="piece-get">
+                                <a class="get-part" href="/fugue/pdf/BWV_0543-2-guitar-i.pdf" title="Guitar I &mdash; PDF">I</a>
+                                <a class="get-part" href="/fugue/pdf/BWV_0543-2-guitar-ii.pdf" title="Guitar II &mdash; PDF">II</a>
+                                <a class="get-part" href="/fugue/pdf/BWV_0543-2-guitar-iii.pdf" title="Guitar III &mdash; PDF">III</a>
+                                <a class="get-part" href="/fugue/pdf/BWV_0543-2-bass.pdf" title="Bass &mdash; PDF">BASS</a>
+                                <a class="get-gp" href="/fugue/gp/BWV_0543-2.gp5" title="Guitar Pro file, every part together">GP5</a>
+                            </span>
+                        </li>
+                        <li>
+                            <span class="piece-idx mono">BWV 543a</span>
+                            <span class="piece-name">Prelude in A minor (early version)</span>
+                            <span class="piece-meta mono">3 guitars + bass &middot; 43 bars &middot; 55 bpm</span>
+                            <span class="piece-get">
+                                <a class="get-part" href="/fugue/pdf/BWV_0543a-guitar-i.pdf" title="Guitar I &mdash; PDF">I</a>
+                                <a class="get-part" href="/fugue/pdf/BWV_0543a-guitar-ii.pdf" title="Guitar II &mdash; PDF">II</a>
+                                <a class="get-part" href="/fugue/pdf/BWV_0543a-guitar-iii.pdf" title="Guitar III &mdash; PDF">III</a>
+                                <a class="get-part" href="/fugue/pdf/BWV_0543a-bass.pdf" title="Bass &mdash; PDF">BASS</a>
+                                <a class="get-gp" href="/fugue/gp/BWV_0543a.gp5" title="Guitar Pro file, every part together">GP5</a>
+                            </span>
+                        </li>
+                        <li>
+                            <span class="piece-idx mono">BWV 544</span>
+                            <span class="piece-name">Prelude in B minor</span>
+                            <span class="piece-meta mono">4 guitars + bass &middot; 85 bars &middot; 45 bpm</span>
+                            <span class="piece-get">
+                                <a class="get-part" href="/fugue/pdf/BWV_0544-1-guitar-i.pdf" title="Guitar I &mdash; PDF">I</a>
+                                <a class="get-part" href="/fugue/pdf/BWV_0544-1-guitar-ii.pdf" title="Guitar II &mdash; PDF">II</a>
+                                <a class="get-part" href="/fugue/pdf/BWV_0544-1-guitar-iii.pdf" title="Guitar III &mdash; PDF">III</a>
+                                <a class="get-part" href="/fugue/pdf/BWV_0544-1-guitar-iv.pdf" title="Guitar IV &mdash; PDF">IV</a>
+                                <a class="get-part" href="/fugue/pdf/BWV_0544-1-bass.pdf" title="Bass &mdash; PDF">BASS</a>
+                                <a class="get-gp" href="/fugue/gp/BWV_0544-1.gp5" title="Guitar Pro file, every part together">GP5</a>
+                            </span>
+                        </li>
+                        <li>
+                            <span class="piece-idx mono">BWV 544</span>
+                            <span class="piece-name">Fugue in B minor</span>
+                            <span class="piece-meta mono">4 guitars + bass &middot; 88 bars &middot; 70 bpm</span>
+                            <span class="piece-get">
+                                <a class="get-part" href="/fugue/pdf/BWV_0544-2-guitar-i.pdf" title="Guitar I &mdash; PDF">I</a>
+                                <a class="get-part" href="/fugue/pdf/BWV_0544-2-guitar-ii.pdf" title="Guitar II &mdash; PDF">II</a>
+                                <a class="get-part" href="/fugue/pdf/BWV_0544-2-guitar-iii.pdf" title="Guitar III &mdash; PDF">III</a>
+                                <a class="get-part" href="/fugue/pdf/BWV_0544-2-guitar-iv.pdf" title="Guitar IV &mdash; PDF">IV</a>
+                                <a class="get-part" href="/fugue/pdf/BWV_0544-2-bass.pdf" title="Bass &mdash; PDF">BASS</a>
+                                <a class="get-gp" href="/fugue/gp/BWV_0544-2.gp5" title="Guitar Pro file, every part together">GP5</a>
+                            </span>
+                        </li>
+                        <li>
+                            <span class="piece-idx mono">BWV 545</span>
+                            <span class="piece-name">Prelude in C major</span>
+                            <span class="piece-meta mono">4 guitars + bass &middot; 31 bars &middot; 60 bpm</span>
+                            <span class="piece-get">
+                                <a class="get-part" href="/fugue/pdf/BWV_0545-1-guitar-i.pdf" title="Guitar I &mdash; PDF">I</a>
+                                <a class="get-part" href="/fugue/pdf/BWV_0545-1-guitar-ii.pdf" title="Guitar II &mdash; PDF">II</a>
+                                <a class="get-part" href="/fugue/pdf/BWV_0545-1-guitar-iii.pdf" title="Guitar III &mdash; PDF">III</a>
+                                <a class="get-part" href="/fugue/pdf/BWV_0545-1-guitar-iv.pdf" title="Guitar IV &mdash; PDF">IV</a>
+                                <a class="get-part" href="/fugue/pdf/BWV_0545-1-bass.pdf" title="Bass &mdash; PDF">BASS</a>
+                                <a class="get-gp" href="/fugue/gp/BWV_0545-1.gp5" title="Guitar Pro file, every part together">GP5</a>
+                            </span>
+                        </li>
+                        <li>
+                            <span class="piece-idx mono">BWV 545</span>
+                            <span class="piece-name">Fugue in C major</span>
+                            <span class="piece-meta mono">3 guitars + bass &middot; 111 bars &middot; 140 bpm</span>
+                            <span class="piece-get">
+                                <a class="get-part" href="/fugue/pdf/BWV_0545-2-guitar-i.pdf" title="Guitar I &mdash; PDF">I</a>
+                                <a class="get-part" href="/fugue/pdf/BWV_0545-2-guitar-ii.pdf" title="Guitar II &mdash; PDF">II</a>
+                                <a class="get-part" href="/fugue/pdf/BWV_0545-2-guitar-iii.pdf" title="Guitar III &mdash; PDF">III</a>
+                                <a class="get-part" href="/fugue/pdf/BWV_0545-2-bass.pdf" title="Bass &mdash; PDF">BASS</a>
+                                <a class="get-gp" href="/fugue/gp/BWV_0545-2.gp5" title="Guitar Pro file, every part together">GP5</a>
+                            </span>
+                        </li>
+                        <li>
+                            <span class="piece-idx mono">BWV 545a</span>
+                            <span class="piece-name">Prelude in C major (early version)</span>
+                            <span class="piece-meta mono">3 guitars + bass &middot; 25 bars &middot; 70 bpm</span>
+                            <span class="piece-get">
+                                <a class="get-part" href="/fugue/pdf/BWV_0545a-1-guitar-i.pdf" title="Guitar I &mdash; PDF">I</a>
+                                <a class="get-part" href="/fugue/pdf/BWV_0545a-1-guitar-ii.pdf" title="Guitar II &mdash; PDF">II</a>
+                                <a class="get-part" href="/fugue/pdf/BWV_0545a-1-guitar-iii.pdf" title="Guitar III &mdash; PDF">III</a>
+                                <a class="get-part" href="/fugue/pdf/BWV_0545a-1-bass.pdf" title="Bass &mdash; PDF">BASS</a>
+                                <a class="get-gp" href="/fugue/gp/BWV_0545a-1.gp5" title="Guitar Pro file, every part together">GP5</a>
+                            </span>
+                        </li>
+                        <li>
+                            <span class="piece-idx mono">BWV 545a</span>
+                            <span class="piece-name">Fugue in C major (early version)</span>
+                            <span class="piece-meta mono">3 guitars + bass &middot; 111 bars &middot; 140 bpm</span>
+                            <span class="piece-get">
+                                <a class="get-part" href="/fugue/pdf/BWV_0545a-2-guitar-i.pdf" title="Guitar I &mdash; PDF">I</a>
+                                <a class="get-part" href="/fugue/pdf/BWV_0545a-2-guitar-ii.pdf" title="Guitar II &mdash; PDF">II</a>
+                                <a class="get-part" href="/fugue/pdf/BWV_0545a-2-guitar-iii.pdf" title="Guitar III &mdash; PDF">III</a>
+                                <a class="get-part" href="/fugue/pdf/BWV_0545a-2-bass.pdf" title="Bass &mdash; PDF">BASS</a>
+                                <a class="get-gp" href="/fugue/gp/BWV_0545a-2.gp5" title="Guitar Pro file, every part together">GP5</a>
+                            </span>
+                        </li>
+                        <li>
+                            <span class="piece-idx mono">BWV 545b</span>
+                            <span class="piece-name">Prelude in B flat major</span>
+                            <span class="piece-meta mono">3 guitars + bass &middot; 151 bars &middot; 72 bpm</span>
+                            <span class="piece-get">
+                                <a class="get-part" href="/fugue/pdf/BWV_0545b-1-guitar-i.pdf" title="Guitar I &mdash; PDF">I</a>
+                                <a class="get-part" href="/fugue/pdf/BWV_0545b-1-guitar-ii.pdf" title="Guitar II &mdash; PDF">II</a>
+                                <a class="get-part" href="/fugue/pdf/BWV_0545b-1-guitar-iii.pdf" title="Guitar III &mdash; PDF">III</a>
+                                <a class="get-part" href="/fugue/pdf/BWV_0545b-1-bass.pdf" title="Bass &mdash; PDF">BASS</a>
+                                <a class="get-gp" href="/fugue/gp/BWV_0545b-1.gp5" title="Guitar Pro file, every part together">GP5</a>
+                            </span>
+                        </li>
+                        <li>
+                            <span class="piece-idx mono">BWV 545b</span>
+                            <span class="piece-name">Fugue in B flat major</span>
+                            <span class="piece-meta mono">3 guitars + bass &middot; 116 bars &middot; 60 bpm</span>
+                            <span class="piece-get">
+                                <a class="get-part" href="/fugue/pdf/BWV_0545b-2-guitar-i.pdf" title="Guitar I &mdash; PDF">I</a>
+                                <a class="get-part" href="/fugue/pdf/BWV_0545b-2-guitar-ii.pdf" title="Guitar II &mdash; PDF">II</a>
+                                <a class="get-part" href="/fugue/pdf/BWV_0545b-2-guitar-iii.pdf" title="Guitar III &mdash; PDF">III</a>
+                                <a class="get-part" href="/fugue/pdf/BWV_0545b-2-bass.pdf" title="Bass &mdash; PDF">BASS</a>
+                                <a class="get-gp" href="/fugue/gp/BWV_0545b-2.gp5" title="Guitar Pro file, every part together">GP5</a>
+                            </span>
+                        </li>
+                        <li>
+                            <span class="piece-idx mono">BWV 546</span>
+                            <span class="piece-name">Prelude in C minor</span>
+                            <span class="piece-meta mono">4 guitars + bass &middot; 144 bars &middot; 95 bpm</span>
+                            <span class="piece-get">
+                                <a class="get-part" href="/fugue/pdf/BWV_0546-1-guitar-i.pdf" title="Guitar I &mdash; PDF">I</a>
+                                <a class="get-part" href="/fugue/pdf/BWV_0546-1-guitar-ii.pdf" title="Guitar II &mdash; PDF">II</a>
+                                <a class="get-part" href="/fugue/pdf/BWV_0546-1-guitar-iii.pdf" title="Guitar III &mdash; PDF">III</a>
+                                <a class="get-part" href="/fugue/pdf/BWV_0546-1-guitar-iv.pdf" title="Guitar IV &mdash; PDF">IV</a>
+                                <a class="get-part" href="/fugue/pdf/BWV_0546-1-bass.pdf" title="Bass &mdash; PDF">BASS</a>
+                                <a class="get-gp" href="/fugue/gp/BWV_0546-1.gp5" title="Guitar Pro file, every part together">GP5</a>
+                            </span>
+                        </li>
+                        <li>
+                            <span class="piece-idx mono">BWV 546</span>
+                            <span class="piece-name">Fugue in C minor</span>
+                            <span class="piece-meta mono">3 guitars + bass &middot; 159 bars &middot; 95 bpm</span>
+                            <span class="piece-get">
+                                <a class="get-part" href="/fugue/pdf/BWV_0546-2-guitar-i.pdf" title="Guitar I &mdash; PDF">I</a>
+                                <a class="get-part" href="/fugue/pdf/BWV_0546-2-guitar-ii.pdf" title="Guitar II &mdash; PDF">II</a>
+                                <a class="get-part" href="/fugue/pdf/BWV_0546-2-guitar-iii.pdf" title="Guitar III &mdash; PDF">III</a>
+                                <a class="get-part" href="/fugue/pdf/BWV_0546-2-bass.pdf" title="Bass &mdash; PDF">BASS</a>
+                                <a class="get-gp" href="/fugue/gp/BWV_0546-2.gp5" title="Guitar Pro file, every part together">GP5</a>
+                            </span>
+                        </li>
+                        <li>
+                            <span class="piece-idx mono">BWV 547</span>
+                            <span class="piece-name">Prelude in C major</span>
+                            <span class="piece-meta mono">3 guitars + bass &middot; 88 bars &middot; 100 bpm</span>
+                            <span class="piece-get">
+                                <a class="get-part" href="/fugue/pdf/BWV_0547-1-guitar-i.pdf" title="Guitar I &mdash; PDF">I</a>
+                                <a class="get-part" href="/fugue/pdf/BWV_0547-1-guitar-ii.pdf" title="Guitar II &mdash; PDF">II</a>
+                                <a class="get-part" href="/fugue/pdf/BWV_0547-1-guitar-iii.pdf" title="Guitar III &mdash; PDF">III</a>
+                                <a class="get-part" href="/fugue/pdf/BWV_0547-1-bass.pdf" title="Bass &mdash; PDF">BASS</a>
+                                <a class="get-gp" href="/fugue/gp/BWV_0547-1.gp5" title="Guitar Pro file, every part together">GP5</a>
+                            </span>
+                        </li>
+                        <li>
+                            <span class="piece-idx mono">BWV 547</span>
+                            <span class="piece-name">Fugue in C major</span>
+                            <span class="piece-meta mono">4 guitars + bass &middot; 72 bars &middot; 60 bpm</span>
+                            <span class="piece-get">
+                                <a class="get-part" href="/fugue/pdf/BWV_0547-2-guitar-i.pdf" title="Guitar I &mdash; PDF">I</a>
+                                <a class="get-part" href="/fugue/pdf/BWV_0547-2-guitar-ii.pdf" title="Guitar II &mdash; PDF">II</a>
+                                <a class="get-part" href="/fugue/pdf/BWV_0547-2-guitar-iii.pdf" title="Guitar III &mdash; PDF">III</a>
+                                <a class="get-part" href="/fugue/pdf/BWV_0547-2-guitar-iv.pdf" title="Guitar IV &mdash; PDF">IV</a>
+                                <a class="get-part" href="/fugue/pdf/BWV_0547-2-bass.pdf" title="Bass &mdash; PDF">BASS</a>
+                                <a class="get-gp" href="/fugue/gp/BWV_0547-2.gp5" title="Guitar Pro file, every part together">GP5</a>
+                            </span>
+                        </li>
+                        <li>
+                            <span class="piece-idx mono">BWV 548</span>
+                            <span class="piece-name">Prelude in E minor</span>
+                            <span class="piece-meta mono">4 guitars + bass &middot; 137 bars &middot; 70 bpm</span>
+                            <span class="piece-get">
+                                <a class="get-part" href="/fugue/pdf/BWV_0548-1-guitar-i.pdf" title="Guitar I &mdash; PDF">I</a>
+                                <a class="get-part" href="/fugue/pdf/BWV_0548-1-guitar-ii.pdf" title="Guitar II &mdash; PDF">II</a>
+                                <a class="get-part" href="/fugue/pdf/BWV_0548-1-guitar-iii.pdf" title="Guitar III &mdash; PDF">III</a>
+                                <a class="get-part" href="/fugue/pdf/BWV_0548-1-guitar-iv.pdf" title="Guitar IV &mdash; PDF">IV</a>
+                                <a class="get-part" href="/fugue/pdf/BWV_0548-1-bass.pdf" title="Bass &mdash; PDF">BASS</a>
+                                <a class="get-gp" href="/fugue/gp/BWV_0548-1.gp5" title="Guitar Pro file, every part together">GP5</a>
+                            </span>
+                        </li>
+                        <li>
+                            <span class="piece-idx mono">BWV 548</span>
+                            <span class="piece-name">Fugue in E minor</span>
+                            <span class="piece-meta mono">3 guitars + bass &middot; 231 bars &middot; 70 bpm</span>
+                            <span class="piece-get">
+                                <a class="get-part" href="/fugue/pdf/BWV_0548-2-guitar-i.pdf" title="Guitar I &mdash; PDF">I</a>
+                                <a class="get-part" href="/fugue/pdf/BWV_0548-2-guitar-ii.pdf" title="Guitar II &mdash; PDF">II</a>
+                                <a class="get-part" href="/fugue/pdf/BWV_0548-2-guitar-iii.pdf" title="Guitar III &mdash; PDF">III</a>
+                                <a class="get-part" href="/fugue/pdf/BWV_0548-2-bass.pdf" title="Bass &mdash; PDF">BASS</a>
+                                <a class="get-gp" href="/fugue/gp/BWV_0548-2.gp5" title="Guitar Pro file, every part together">GP5</a>
+                            </span>
+                        </li>
+                        <li>
+                            <span class="piece-idx mono">BWV 549</span>
+                            <span class="piece-name">Prelude in C minor</span>
+                            <span class="piece-meta mono">4 guitars + bass &middot; 29 bars &middot; 75 bpm</span>
+                            <span class="piece-get">
+                                <a class="get-part" href="/fugue/pdf/BWV_0549-1-guitar-i.pdf" title="Guitar I &mdash; PDF">I</a>
+                                <a class="get-part" href="/fugue/pdf/BWV_0549-1-guitar-ii.pdf" title="Guitar II &mdash; PDF">II</a>
+                                <a class="get-part" href="/fugue/pdf/BWV_0549-1-guitar-iii.pdf" title="Guitar III &mdash; PDF">III</a>
+                                <a class="get-part" href="/fugue/pdf/BWV_0549-1-guitar-iv.pdf" title="Guitar IV &mdash; PDF">IV</a>
+                                <a class="get-part" href="/fugue/pdf/BWV_0549-1-bass.pdf" title="Bass &mdash; PDF">BASS</a>
+                                <a class="get-gp" href="/fugue/gp/BWV_0549-1.gp5" title="Guitar Pro file, every part together">GP5</a>
+                            </span>
+                        </li>
+                        <li>
+                            <span class="piece-idx mono">BWV 549</span>
+                            <span class="piece-name">Fugue in C minor</span>
+                            <span class="piece-meta mono">2 guitars + bass &middot; 59 bars &middot; 75 bpm</span>
+                            <span class="piece-get">
+                                <a class="get-part" href="/fugue/pdf/BWV_0549-2-guitar-i.pdf" title="Guitar I &mdash; PDF">I</a>
+                                <a class="get-part" href="/fugue/pdf/BWV_0549-2-guitar-ii.pdf" title="Guitar II &mdash; PDF">II</a>
+                                <a class="get-part" href="/fugue/pdf/BWV_0549-2-bass.pdf" title="Bass &mdash; PDF">BASS</a>
+                                <a class="get-gp" href="/fugue/gp/BWV_0549-2.gp5" title="Guitar Pro file, every part together">GP5</a>
+                            </span>
+                        </li>
+                        <li>
+                            <span class="piece-idx mono">BWV 549a</span>
+                            <span class="piece-name">Prelude in C minor (early version)</span>
+                            <span class="piece-meta mono">4 guitars + bass &middot; 29 bars &middot; 75 bpm</span>
+                            <span class="piece-get">
+                                <a class="get-part" href="/fugue/pdf/BWV_0549a-1-guitar-i.pdf" title="Guitar I &mdash; PDF">I</a>
+                                <a class="get-part" href="/fugue/pdf/BWV_0549a-1-guitar-ii.pdf" title="Guitar II &mdash; PDF">II</a>
+                                <a class="get-part" href="/fugue/pdf/BWV_0549a-1-guitar-iii.pdf" title="Guitar III &mdash; PDF">III</a>
+                                <a class="get-part" href="/fugue/pdf/BWV_0549a-1-guitar-iv.pdf" title="Guitar IV &mdash; PDF">IV</a>
+                                <a class="get-part" href="/fugue/pdf/BWV_0549a-1-bass.pdf" title="Bass &mdash; PDF">BASS</a>
+                                <a class="get-gp" href="/fugue/gp/BWV_0549a-1.gp5" title="Guitar Pro file, every part together">GP5</a>
+                            </span>
+                        </li>
+                        <li>
+                            <span class="piece-idx mono">BWV 549a</span>
+                            <span class="piece-name">Fugue in C minor (early version)</span>
+                            <span class="piece-meta mono">3 guitars + bass &middot; 59 bars &middot; 75 bpm</span>
+                            <span class="piece-get">
+                                <a class="get-part" href="/fugue/pdf/BWV_0549a-2-guitar-i.pdf" title="Guitar I &mdash; PDF">I</a>
+                                <a class="get-part" href="/fugue/pdf/BWV_0549a-2-guitar-ii.pdf" title="Guitar II &mdash; PDF">II</a>
+                                <a class="get-part" href="/fugue/pdf/BWV_0549a-2-guitar-iii.pdf" title="Guitar III &mdash; PDF">III</a>
+                                <a class="get-part" href="/fugue/pdf/BWV_0549a-2-bass.pdf" title="Bass &mdash; PDF">BASS</a>
+                                <a class="get-gp" href="/fugue/gp/BWV_0549a-2.gp5" title="Guitar Pro file, every part together">GP5</a>
+                            </span>
+                        </li>
+                        <li>
+                            <span class="piece-idx mono">BWV 550</span>
+                            <span class="piece-name">Prelude in G major</span>
+                            <span class="piece-meta mono">3 guitars + bass &middot; 58 bars &middot; 120 bpm</span>
+                            <span class="piece-get">
+                                <a class="get-part" href="/fugue/pdf/BWV_0550-1-guitar-i.pdf" title="Guitar I &mdash; PDF">I</a>
+                                <a class="get-part" href="/fugue/pdf/BWV_0550-1-guitar-ii.pdf" title="Guitar II &mdash; PDF">II</a>
+                                <a class="get-part" href="/fugue/pdf/BWV_0550-1-guitar-iii.pdf" title="Guitar III &mdash; PDF">III</a>
+                                <a class="get-part" href="/fugue/pdf/BWV_0550-1-bass.pdf" title="Bass &mdash; PDF">BASS</a>
+                                <a class="get-gp" href="/fugue/gp/BWV_0550-1.gp5" title="Guitar Pro file, every part together">GP5</a>
+                            </span>
+                        </li>
+                        <li>
+                            <span class="piece-idx mono">BWV 550</span>
+                            <span class="piece-name">Fugue in G major</span>
+                            <span class="piece-meta mono">3 guitars + bass &middot; 152 bars &middot; 120 bpm</span>
+                            <span class="piece-get">
+                                <a class="get-part" href="/fugue/pdf/BWV_0550-2-guitar-i.pdf" title="Guitar I &mdash; PDF">I</a>
+                                <a class="get-part" href="/fugue/pdf/BWV_0550-2-guitar-ii.pdf" title="Guitar II &mdash; PDF">II</a>
+                                <a class="get-part" href="/fugue/pdf/BWV_0550-2-guitar-iii.pdf" title="Guitar III &mdash; PDF">III</a>
+                                <a class="get-part" href="/fugue/pdf/BWV_0550-2-bass.pdf" title="Bass &mdash; PDF">BASS</a>
+                                <a class="get-gp" href="/fugue/gp/BWV_0550-2.gp5" title="Guitar Pro file, every part together">GP5</a>
+                            </span>
+                        </li>
+                        <li>
+                            <span class="piece-idx mono">BWV 551</span>
+                            <span class="piece-name">Prelude and Fugue in A minor</span>
+                            <span class="piece-meta mono">4 guitars + bass &middot; 89 bars &middot; 80 bpm</span>
+                            <span class="piece-get">
+                                <a class="get-part" href="/fugue/pdf/BWV_0551-guitar-i.pdf" title="Guitar I &mdash; PDF">I</a>
+                                <a class="get-part" href="/fugue/pdf/BWV_0551-guitar-ii.pdf" title="Guitar II &mdash; PDF">II</a>
+                                <a class="get-part" href="/fugue/pdf/BWV_0551-guitar-iii.pdf" title="Guitar III &mdash; PDF">III</a>
+                                <a class="get-part" href="/fugue/pdf/BWV_0551-guitar-iv.pdf" title="Guitar IV &mdash; PDF">IV</a>
+                                <a class="get-part" href="/fugue/pdf/BWV_0551-bass.pdf" title="Bass &mdash; PDF">BASS</a>
+                                <a class="get-gp" href="/fugue/gp/BWV_0551.gp5" title="Guitar Pro file, every part together">GP5</a>
+                            </span>
+                        </li>
+                        <li>
+                            <span class="piece-idx mono">BWV 552</span>
+                            <span class="piece-name">Prelude in E flat major</span>
+                            <span class="piece-meta mono">4 guitars + bass &middot; 205 bars &middot; 85 bpm</span>
+                            <span class="piece-get">
+                                <a class="get-part" href="/fugue/pdf/BWV_0552-1-guitar-i.pdf" title="Guitar I &mdash; PDF">I</a>
+                                <a class="get-part" href="/fugue/pdf/BWV_0552-1-guitar-ii.pdf" title="Guitar II &mdash; PDF">II</a>
+                                <a class="get-part" href="/fugue/pdf/BWV_0552-1-guitar-iii.pdf" title="Guitar III &mdash; PDF">III</a>
+                                <a class="get-part" href="/fugue/pdf/BWV_0552-1-guitar-iv.pdf" title="Guitar IV &mdash; PDF">IV</a>
+                                <a class="get-part" href="/fugue/pdf/BWV_0552-1-bass.pdf" title="Bass &mdash; PDF">BASS</a>
+                                <a class="get-gp" href="/fugue/gp/BWV_0552-1.gp5" title="Guitar Pro file, every part together">GP5</a>
+                            </span>
+                        </li>
+                        <li>
+                            <span class="piece-idx mono">BWV 552</span>
+                            <span class="piece-name">Fugue in E flat major</span>
+                            <span class="piece-meta mono">4 guitars + bass &middot; 117 bars &middot; 100 bpm</span>
+                            <span class="piece-get">
+                                <a class="get-part" href="/fugue/pdf/BWV_0552-2-guitar-i.pdf" title="Guitar I &mdash; PDF">I</a>
+                                <a class="get-part" href="/fugue/pdf/BWV_0552-2-guitar-ii.pdf" title="Guitar II &mdash; PDF">II</a>
+                                <a class="get-part" href="/fugue/pdf/BWV_0552-2-guitar-iii.pdf" title="Guitar III &mdash; PDF">III</a>
+                                <a class="get-part" href="/fugue/pdf/BWV_0552-2-guitar-iv.pdf" title="Guitar IV &mdash; PDF">IV</a>
+                                <a class="get-part" href="/fugue/pdf/BWV_0552-2-bass.pdf" title="Bass &mdash; PDF">BASS</a>
+                                <a class="get-gp" href="/fugue/gp/BWV_0552-2.gp5" title="Guitar Pro file, every part together">GP5</a>
+                            </span>
+                        </li>
+                </ul>
+
+                <div class="set-head">
+                    <h2>The Art of Fugue</h2>
+                    <span class="mono">BWV 1080 &middot; 16 movements</span>
+                </div>
+                <ul class="pieces">
+                        <li>
+                            <span class="piece-idx mono">BWV 1080</span>
+                            <span class="piece-name">Contrapunctus I</span>
+                            <span class="piece-meta mono">3 guitars + bass &middot; 78 bars &middot; 120 bpm</span>
+                            <span class="piece-get">
+                                <a class="get-part" href="/fugue/pdf/contrapunctusI-guitar-i.pdf" title="Guitar I &mdash; PDF">I</a>
+                                <a class="get-part" href="/fugue/pdf/contrapunctusI-guitar-ii.pdf" title="Guitar II &mdash; PDF">II</a>
+                                <a class="get-part" href="/fugue/pdf/contrapunctusI-guitar-iii.pdf" title="Guitar III &mdash; PDF">III</a>
+                                <a class="get-part" href="/fugue/pdf/contrapunctusI-bass.pdf" title="Bass &mdash; PDF">BASS</a>
+                                <a class="get-gp" href="/fugue/gp/contrapunctusI.gp5" title="Guitar Pro file, every part together">GP5</a>
+                            </span>
+                        </li>
+                        <li>
+                            <span class="piece-idx mono">BWV 1080</span>
+                            <span class="piece-name">Contrapunctus II</span>
+                            <span class="piece-meta mono">3 guitars + bass &middot; 84 bars &middot; 115 bpm</span>
+                            <span class="piece-get">
+                                <a class="get-part" href="/fugue/pdf/contrapunctusII-guitar-i.pdf" title="Guitar I &mdash; PDF">I</a>
+                                <a class="get-part" href="/fugue/pdf/contrapunctusII-guitar-ii.pdf" title="Guitar II &mdash; PDF">II</a>
+                                <a class="get-part" href="/fugue/pdf/contrapunctusII-guitar-iii.pdf" title="Guitar III &mdash; PDF">III</a>
+                                <a class="get-part" href="/fugue/pdf/contrapunctusII-bass.pdf" title="Bass &mdash; PDF">BASS</a>
+                                <a class="get-gp" href="/fugue/gp/contrapunctusII.gp5" title="Guitar Pro file, every part together">GP5</a>
+                            </span>
+                        </li>
+                        <li>
+                            <span class="piece-idx mono">BWV 1080</span>
+                            <span class="piece-name">Contrapunctus III</span>
+                            <span class="piece-meta mono">3 guitars + bass &middot; 72 bars &middot; 115 bpm</span>
+                            <span class="piece-get">
+                                <a class="get-part" href="/fugue/pdf/contrapunctusIII-guitar-i.pdf" title="Guitar I &mdash; PDF">I</a>
+                                <a class="get-part" href="/fugue/pdf/contrapunctusIII-guitar-ii.pdf" title="Guitar II &mdash; PDF">II</a>
+                                <a class="get-part" href="/fugue/pdf/contrapunctusIII-guitar-iii.pdf" title="Guitar III &mdash; PDF">III</a>
+                                <a class="get-part" href="/fugue/pdf/contrapunctusIII-bass.pdf" title="Bass &mdash; PDF">BASS</a>
+                                <a class="get-gp" href="/fugue/gp/contrapunctusIII.gp5" title="Guitar Pro file, every part together">GP5</a>
+                            </span>
+                        </li>
+                        <li>
+                            <span class="piece-idx mono">BWV 1080</span>
+                            <span class="piece-name">Contrapunctus IV</span>
+                            <span class="piece-meta mono">3 guitars + bass &middot; 138 bars &middot; 120 bpm</span>
+                            <span class="piece-get">
+                                <a class="get-part" href="/fugue/pdf/contrapunctusIV-guitar-i.pdf" title="Guitar I &mdash; PDF">I</a>
+                                <a class="get-part" href="/fugue/pdf/contrapunctusIV-guitar-ii.pdf" title="Guitar II &mdash; PDF">II</a>
+                                <a class="get-part" href="/fugue/pdf/contrapunctusIV-guitar-iii.pdf" title="Guitar III &mdash; PDF">III</a>
+                                <a class="get-part" href="/fugue/pdf/contrapunctusIV-bass.pdf" title="Bass &mdash; PDF">BASS</a>
+                                <a class="get-gp" href="/fugue/gp/contrapunctusIV.gp5" title="Guitar Pro file, every part together">GP5</a>
+                            </span>
+                        </li>
+                        <li>
+                            <span class="piece-idx mono">BWV 1080</span>
+                            <span class="piece-name">Contrapunctus V</span>
+                            <span class="piece-meta mono">3 guitars + bass &middot; 91 bars &middot; 120 bpm</span>
+                            <span class="piece-get">
+                                <a class="get-part" href="/fugue/pdf/contrapunctusV-guitar-i.pdf" title="Guitar I &mdash; PDF">I</a>
+                                <a class="get-part" href="/fugue/pdf/contrapunctusV-guitar-ii.pdf" title="Guitar II &mdash; PDF">II</a>
+                                <a class="get-part" href="/fugue/pdf/contrapunctusV-guitar-iii.pdf" title="Guitar III &mdash; PDF">III</a>
+                                <a class="get-part" href="/fugue/pdf/contrapunctusV-bass.pdf" title="Bass &mdash; PDF">BASS</a>
+                                <a class="get-gp" href="/fugue/gp/contrapunctusV.gp5" title="Guitar Pro file, every part together">GP5</a>
+                            </span>
+                        </li>
+                        <li>
+                            <span class="piece-idx mono">BWV 1080</span>
+                            <span class="piece-name">Contrapunctus VI, in Stylo Francese</span>
+                            <span class="piece-meta mono">3 guitars + bass &middot; 79 bars &middot; 90 bpm</span>
+                            <span class="piece-get">
+                                <a class="get-part" href="/fugue/pdf/contrapunctusVI-guitar-i.pdf" title="Guitar I &mdash; PDF">I</a>
+                                <a class="get-part" href="/fugue/pdf/contrapunctusVI-guitar-ii.pdf" title="Guitar II &mdash; PDF">II</a>
+                                <a class="get-part" href="/fugue/pdf/contrapunctusVI-guitar-iii.pdf" title="Guitar III &mdash; PDF">III</a>
+                                <a class="get-part" href="/fugue/pdf/contrapunctusVI-bass.pdf" title="Bass &mdash; PDF">BASS</a>
+                                <a class="get-gp" href="/fugue/gp/contrapunctusVI.gp5" title="Guitar Pro file, every part together">GP5</a>
+                            </span>
+                        </li>
+                        <li>
+                            <span class="piece-idx mono">BWV 1080</span>
+                            <span class="piece-name">Contrapunctus VII, per Augmentationem et Diminutionem</span>
+                            <span class="piece-meta mono">3 guitars + bass &middot; 61 bars &middot; 65 bpm</span>
+                            <span class="piece-get">
+                                <a class="get-part" href="/fugue/pdf/contrapunctusVII-guitar-i.pdf" title="Guitar I &mdash; PDF">I</a>
+                                <a class="get-part" href="/fugue/pdf/contrapunctusVII-guitar-ii.pdf" title="Guitar II &mdash; PDF">II</a>
+                                <a class="get-part" href="/fugue/pdf/contrapunctusVII-guitar-iii.pdf" title="Guitar III &mdash; PDF">III</a>
+                                <a class="get-part" href="/fugue/pdf/contrapunctusVII-bass.pdf" title="Bass &mdash; PDF">BASS</a>
+                                <a class="get-gp" href="/fugue/gp/contrapunctusVII.gp5" title="Guitar Pro file, every part together">GP5</a>
+                            </span>
+                        </li>
+                        <li>
+                            <span class="piece-idx mono">BWV 1080</span>
+                            <span class="piece-name">Contrapunctus VIII, a 3</span>
+                            <span class="piece-meta mono">2 guitars + bass &middot; 188 bars &middot; 100 bpm</span>
+                            <span class="piece-get">
+                                <a class="get-part" href="/fugue/pdf/contrapunctusVIII-guitar-i.pdf" title="Guitar I &mdash; PDF">I</a>
+                                <a class="get-part" href="/fugue/pdf/contrapunctusVIII-guitar-ii.pdf" title="Guitar II &mdash; PDF">II</a>
+                                <a class="get-part" href="/fugue/pdf/contrapunctusVIII-bass.pdf" title="Bass &mdash; PDF">BASS</a>
+                                <a class="get-gp" href="/fugue/gp/contrapunctusVIII.gp5" title="Guitar Pro file, every part together">GP5</a>
+                            </span>
+                        </li>
+                        <li>
+                            <span class="piece-idx mono">BWV 1080</span>
+                            <span class="piece-name">Contrapunctus IX, alla Duodecima</span>
+                            <span class="piece-meta mono">3 guitars + bass &middot; 130 bars &middot; 110 bpm</span>
+                            <span class="piece-get">
+                                <a class="get-part" href="/fugue/pdf/contrapunctusIX-guitar-i.pdf" title="Guitar I &mdash; PDF">I</a>
+                                <a class="get-part" href="/fugue/pdf/contrapunctusIX-guitar-ii.pdf" title="Guitar II &mdash; PDF">II</a>
+                                <a class="get-part" href="/fugue/pdf/contrapunctusIX-guitar-iii.pdf" title="Guitar III &mdash; PDF">III</a>
+                                <a class="get-part" href="/fugue/pdf/contrapunctusIX-bass.pdf" title="Bass &mdash; PDF">BASS</a>
+                                <a class="get-gp" href="/fugue/gp/contrapunctusIX.gp5" title="Guitar Pro file, every part together">GP5</a>
+                            </span>
+                        </li>
+                        <li>
+                            <span class="piece-idx mono">BWV 1080</span>
+                            <span class="piece-name">Contrapunctus X, alla Decima</span>
+                            <span class="piece-meta mono">3 guitars + bass &middot; 120 bars &middot; 110 bpm</span>
+                            <span class="piece-get">
+                                <a class="get-part" href="/fugue/pdf/contrapunctusX-guitar-i.pdf" title="Guitar I &mdash; PDF">I</a>
+                                <a class="get-part" href="/fugue/pdf/contrapunctusX-guitar-ii.pdf" title="Guitar II &mdash; PDF">II</a>
+                                <a class="get-part" href="/fugue/pdf/contrapunctusX-guitar-iii.pdf" title="Guitar III &mdash; PDF">III</a>
+                                <a class="get-part" href="/fugue/pdf/contrapunctusX-bass.pdf" title="Bass &mdash; PDF">BASS</a>
+                                <a class="get-gp" href="/fugue/gp/contrapunctusX.gp5" title="Guitar Pro file, every part together">GP5</a>
+                            </span>
+                        </li>
+                        <li>
+                            <span class="piece-idx mono">BWV 1080</span>
+                            <span class="piece-name">Contrapunctus XI, a 4</span>
+                            <span class="piece-meta mono">3 guitars + bass &middot; 184 bars &middot; 90 bpm</span>
+                            <span class="piece-get">
+                                <a class="get-part" href="/fugue/pdf/contrapunctusXI-guitar-i.pdf" title="Guitar I &mdash; PDF">I</a>
+                                <a class="get-part" href="/fugue/pdf/contrapunctusXI-guitar-ii.pdf" title="Guitar II &mdash; PDF">II</a>
+                                <a class="get-part" href="/fugue/pdf/contrapunctusXI-guitar-iii.pdf" title="Guitar III &mdash; PDF">III</a>
+                                <a class="get-part" href="/fugue/pdf/contrapunctusXI-bass.pdf" title="Bass &mdash; PDF">BASS</a>
+                                <a class="get-gp" href="/fugue/gp/contrapunctusXI.gp5" title="Guitar Pro file, every part together">GP5</a>
+                            </span>
+                        </li>
+                        <li>
+                            <span class="piece-idx mono">BWV 1080</span>
+                            <span class="piece-name">Contrapunctus XII, rectus et inversus</span>
+                            <span class="piece-meta mono">1 guitar + bass &middot; 179 bars &middot; 90 bpm</span>
+                            <span class="piece-get">
+                                <a class="get-part" href="/fugue/pdf/contrapunctusXII-guitar.pdf" title="Guitar &mdash; PDF">Guitar</a>
+                                <a class="get-part" href="/fugue/pdf/contrapunctusXII-bass.pdf" title="Bass &mdash; PDF">BASS</a>
+                                <a class="get-gp" href="/fugue/gp/contrapunctusXII.gp5" title="Guitar Pro file, every part together">GP5</a>
+                            </span>
+                        </li>
+                        <li>
+                            <span class="piece-idx mono">BWV 1080</span>
+                            <span class="piece-name">Contrapunctus XIII, a 3</span>
+                            <span class="piece-meta mono">1 guitar + bass &middot; 145 bars &middot; 150 bpm</span>
+                            <span class="piece-get">
+                                <a class="get-part" href="/fugue/pdf/contrapunctusXIII-guitar.pdf" title="Guitar &mdash; PDF">Guitar</a>
+                                <a class="get-part" href="/fugue/pdf/contrapunctusXIII-bass.pdf" title="Bass &mdash; PDF">BASS</a>
+                                <a class="get-gp" href="/fugue/gp/contrapunctusXIII.gp5" title="Guitar Pro file, every part together">GP5</a>
+                            </span>
+                        </li>
+                        <li>
+                            <span class="piece-idx mono">BWV 1080</span>
+                            <span class="piece-name">Contrapunctus XIV</span>
+                            <span class="piece-meta mono">1 guitar + bass &middot; 82 bars &middot; 110 bpm</span>
+                            <span class="piece-get">
+                                <a class="get-part" href="/fugue/pdf/contrapunctusXIV-guitar.pdf" title="Guitar &mdash; PDF">Guitar</a>
+                                <a class="get-part" href="/fugue/pdf/contrapunctusXIV-bass.pdf" title="Bass &mdash; PDF">BASS</a>
+                                <a class="get-gp" href="/fugue/gp/contrapunctusXIV.gp5" title="Guitar Pro file, every part together">GP5</a>
+                            </span>
+                        </li>
+                        <li>
+                            <span class="piece-idx mono">BWV 1080</span>
+                            <span class="piece-name">Contrapunctus XV, Canon</span>
+                            <span class="piece-meta mono">1 guitar + bass &middot; 109 bars &middot; 100 bpm</span>
+                            <span class="piece-get">
+                                <a class="get-part" href="/fugue/pdf/contrapunctusXV-guitar.pdf" title="Guitar &mdash; PDF">Guitar</a>
+                                <a class="get-part" href="/fugue/pdf/contrapunctusXV-bass.pdf" title="Bass &mdash; PDF">BASS</a>
+                                <a class="get-gp" href="/fugue/gp/contrapunctusXV.gp5" title="Guitar Pro file, every part together">GP5</a>
+                            </span>
+                        </li>
+                        <li>
+                            <span class="piece-idx mono">BWV 1080</span>
+                            <span class="piece-name">Contrapunctus XIX, Fuga a 3 Soggetti</span>
+                            <span class="piece-meta mono">3 guitars + bass &middot; 239 bars &middot; 120 bpm</span>
+                            <span class="piece-get">
+                                <a class="get-part" href="/fugue/pdf/contrapunctusXIX-guitar-i.pdf" title="Guitar I &mdash; PDF">I</a>
+                                <a class="get-part" href="/fugue/pdf/contrapunctusXIX-guitar-ii.pdf" title="Guitar II &mdash; PDF">II</a>
+                                <a class="get-part" href="/fugue/pdf/contrapunctusXIX-guitar-iii.pdf" title="Guitar III &mdash; PDF">III</a>
+                                <a class="get-part" href="/fugue/pdf/contrapunctusXIX-bass.pdf" title="Bass &mdash; PDF">BASS</a>
+                                <a class="get-gp" href="/fugue/gp/contrapunctusXIX.gp5" title="Guitar Pro file, every part together">GP5</a>
+                            </span>
+                        </li>
+                </ul>
+
+                <p class="setup">Bach's music is public domain; these arrangements are mine, and you are welcome
+                    to play them. The converter is in
+                    <a href="https://github.com/Leonid-Elkin/Leonid-Elkin.github.io/tree/main/FugueSplit_source">FugueSplit_source</a>
+                    if you would like to run it over something of your own.</p>
+            </div>
+        </section>
+    </main>
+
+    <footer id="contact">
+        <div class="wrap">
+            <p class="col-label">Contact</p>
+            <ul class="foot-links">
+                <li><a href="mailto:lnd.elkn@gmail.com">lnd.elkn@gmail.com</a></li>
+                <li><a href="https://github.com/Leonid-Elkin" target="_blank" rel="noopener">GitHub</a></li>
+                <li><a href="https://elkyy.itch.io/" target="_blank" rel="noopener">itch.io</a></li>
+            </ul>
+            <span class="colophon">Set in Archivo, Inter Tight and JetBrains Mono. Black stock, one red &mdash; and one visitor in blue. Static HTML, no build step.</span>
+        </div>
+    </footer>
+
+    <script src="/shared/script.js?v=13"></script>
+    <script src="/shared/motion.js"></script>
+</body>
+
+</html>

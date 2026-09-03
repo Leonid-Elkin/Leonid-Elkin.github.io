@@ -1,0 +1,11 @@
+# core.autocrlf is on for this checkout, and Git's text/binary guess reads
+# some of these as text -- a generated PDF has no NUL byte near the front.
+# Left alone, Git would rewrite their line endings and corrupt the file.
+*.pdf   binary
+*.gp    binary
+*.gp3   binary
+*.gp4   binary
+*.gp5   binary
+*.gpx   binary
+*.mid   binary
+*.midi  binary

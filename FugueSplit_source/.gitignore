@@ -1,0 +1,10 @@
+__pycache__/
+*.pyc
+
+# Generated artefacts. The MIDI sources are other people's transcriptions,
+# and the tabs are regenerable from them -- the published copies live in
+# /fugue/ at the site root.
+out/
+out-art-of-fugue/
+pdf/
+midi/

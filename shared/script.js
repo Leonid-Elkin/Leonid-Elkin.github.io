@@ -101,6 +101,18 @@ const projects = [
     ],
   },
   {
+    title: "FugueSplit",
+    cat: "software",
+    status: "live",
+    caption:
+      "Turns an organ fugue into a band. A fugue is already written as independent melodic lines, so instead of hacking chords apart it works out which line is which and hands each one to a different player - one voice per instrument, the pedal line on the bass, strictly one note at a time. 70 movements of Bach are arranged and published: 295 parts, one PDF per player, notation over tablature. Every voice stays on the same instrument for the whole piece, a line is folded only by whole octaves and never by anything else, and it will not write a double-stop no hand could hold. Prelude and fugue are separated automatically, by the metre change between them or by the pedal falling silent as the subject enters.",
+    tags: ["Python", "PyGuitarPro", "mido", "MuseScore"],
+    links: [
+      { name: "the tabs", url: "/fugue/" },
+      { name: "source", url: "https://github.com/Leonid-Elkin/Leonid-Elkin.github.io/tree/main/FugueSplit_source" },
+    ],
+  },
+  {
     title: "Sheet2Tab",
     cat: "software",
     status: "wip",
