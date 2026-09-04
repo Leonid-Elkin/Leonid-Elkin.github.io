@@ -884,6 +884,35 @@ def _write_musicxml(path: str) -> None:
         handle.write(MUSICXML)
 
 
+PADDED_BAR = """<?xml version="1.0" encoding="UTF-8"?>
+<score-partwise version="3.1">
+  <part-list><score-part id="P1"><part-name>Keyboard</part-name></score-part></part-list>
+  <part id="P1">
+    <measure number="1">
+      <attributes>
+        <divisions>96</divisions>
+        <key><fifths>0</fifths></key>
+        <time><beats>4</beats><beat-type>4</beat-type></time>
+      </attributes>
+      <note><pitch><step>C</step><octave>4</octave></pitch>
+        <duration>384</duration><voice>1</voice><type>whole</type></note>
+    </measure>
+    <measure number="2">
+      <forward><duration>288</duration></forward>
+      <note><rest/><duration>384</duration><voice>1</voice><type>whole</type></note>
+      <backup><duration>672</duration></backup>
+      <note><pitch><step>D</step><octave>4</octave></pitch>
+        <duration>384</duration><voice>2</voice><type>whole</type></note>
+    </measure>
+    <measure number="3">
+      <note><pitch><step>E</step><octave>4</octave></pitch>
+        <duration>384</duration><voice>1</voice><type>whole</type></note>
+    </measure>
+  </part>
+</score-partwise>
+"""
+
+
 class TestMusicXML(unittest.TestCase):
     """An engraving already knows what the separator would have to guess."""
 
@@ -900,6 +929,24 @@ class TestMusicXML(unittest.TestCase):
         self.assertEqual(sorted(score.track_names.values()),
                          ["Manual s1 v1", "Manual s1 v2", "Manual s2 v5",
                           "Pedal s1 v1"])
+
+    def test_a_rest_drawn_past_the_bar_line_does_not_lengthen_the_bar(self):
+        """Typesetters pad a bar to place a whole rest where it looks best.
+
+        Taken literally that bar is seven beats long, and every bar line
+        after it is out of step with the music.
+        """
+        directory = tempfile.mkdtemp()
+        path = os.path.join(directory, "padded.xml")
+        with open(path, "w", encoding="utf-8") as handle:
+            handle.write(PADDED_BAR)
+        score = musicxml_in.read_musicxml(path)
+        bars = rhythm.build_bars(score, score.end_tick)
+        self.assertEqual([b.length for b in bars[:3]],
+                         [4 * rhythm.GP_QUARTER] * 3)
+        # And so the third bar's note falls where it was written.
+        third = [n for n in score.notes if n.pitch == 64]
+        self.assertEqual(third[0].start, 2 * 384)
 
     def test_a_tie_is_one_note(self):
         score, _path = self._score()
@@ -1136,6 +1183,56 @@ class TestProof(unittest.TestCase):
         result = proof.proof(self._known(bars=4), self._known(bars=8), upto_bar=4)
         self.assertEqual(result.found, result.known)
         self.assertEqual(len(result.bars), 4)
+
+
+class TestSplice(unittest.TestCase):
+    """Joining a torso to a completion of it."""
+
+    def _join(self):
+        import splice as splice_tool
+
+        d = tempfile.mkdtemp()
+        torso_path = os.path.join(d, "torso.mid")
+        whole_path = os.path.join(d, "whole.mid")
+        _make_test_midi(torso_path)
+        _make_continued_midi(whole_path)
+        torso = midi_in.read_midi(torso_path)
+        whole = midi_in.read_midi(whole_path)
+        lanes, names, dropped = splice_tool.splice(torso, whole)
+        return torso, whole, lanes, names, dropped, d, torso_path
+
+    def test_the_torso_survives_the_join_intact(self):
+        torso, _whole, lanes, _names, _dropped, _d, _p = self._join()
+        joined = {(round(s * torso.ppq / 384), p)
+                  for lane in lanes for s, _e, p in lane}
+        for note in torso.notes:
+            self.assertIn((note.start, note.pitch), joined,
+                          "a note of the torso went missing in the join")
+
+    def test_no_voice_holds_two_notes_at_once(self):
+        _torso, _whole, lanes, _names, _dropped, _d, _p = self._join()
+        for lane in lanes:
+            for (start, end, _p1), (later, _e2, _p2) in zip(lane, lane[1:]):
+                self.assertLessEqual(end, later,
+                                     "a spliced voice overlaps itself")
+
+    def test_the_completion_carries_on_past_the_torso(self):
+        torso, _whole, lanes, _names, _dropped, _d, _p = self._join()
+        end = torso.end_tick * 384 // torso.ppq
+        later = [s for lane in lanes for s, _e, _p in lane if s >= end]
+        self.assertTrue(later, "nothing was added after the torso")
+
+    def test_the_joined_file_reads_back_as_a_score(self):
+        import splice as splice_tool
+
+        torso, _whole, lanes, names, _dropped, d, _p = self._join()
+        out = os.path.join(d, "joined.mid")
+        numerator, denominator = torso.time_sig_at(0)
+        splice_tool.write_midi(lanes, names, out, 384, torso.tempo_at(0),
+                               numerator, denominator, torso.key)
+        again = midi_in.read_midi(out)
+        self.assertEqual(len(again.notes_by_track()), len(lanes))
+        self.assertEqual(again.key, torso.key)
 
 
 class TestVerify(unittest.TestCase):

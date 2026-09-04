@@ -108,6 +108,7 @@ class _Part:
     def __init__(self):
         self.notes: list[_Entry] = []
         self.bars: list[int] = []
+        self.sounding: list[int] = []   # how far the *notes* of each bar reach
         self.signatures: dict[int, tuple[int, int]] = {}
         self.key: tuple[int, int] = (0, 0)
         self.tempo: float | None = None
@@ -124,7 +125,7 @@ def _read_part(part: ET.Element, ppq: int) -> _Part:
     tied: dict[tuple[str, str, int], _Entry] = {}
 
     for index, measure in enumerate(part.findall("measure")):
-        cursor = longest = 0
+        cursor = longest = sounding = 0
         previous = 0          # onset of the last note, for <chord>
         for node in measure:
             if node.tag == "attributes":
@@ -169,6 +170,7 @@ def _read_part(part: ET.Element, ppq: int) -> _Part:
                 pitch = _pitch(node.find("pitch"))
                 if pitch is None:       # a rest: it only moves the clock
                     continue
+                sounding = max(sounding, onset + length)
                 staff = (node.findtext("staff") or "1").strip()
                 voice = (node.findtext("voice") or "1").strip()
                 ties = {t.get("type") for t in node.findall("tie")}
@@ -185,6 +187,7 @@ def _read_part(part: ET.Element, ppq: int) -> _Part:
                 if "start" in ties:
                     tied[key] = entry
         out.bars.append(max(longest, 0))
+        out.sounding.append(sounding)
         # A tie may not cross a repeat or a section break; if the far end
         # never arrives, the note simply ends where it was written.
         tied = {k: v for k, v in tied.items() if v.measure >= index - 1}
@@ -197,6 +200,13 @@ def _read_part(part: ET.Element, ppq: int) -> _Part:
     for index, length in enumerate(out.bars):
         want = signature_length[index]
         if length == 0 or abs(length - want) <= SLOP:
+            out.bars[index] = want
+        elif length > want and out.sounding[index] <= want + SLOP:
+            # Only rests reach past the bar line. Engravers park a whole
+            # rest wherever it looks best and typesetters pad the bar to
+            # place it, which is a drawing instruction, not three extra
+            # beats -- and taking it literally moves every bar line after
+            # it out of step with the music.
             out.bars[index] = want
     return out
 

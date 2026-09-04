@@ -132,6 +132,8 @@ def convert(midi_path: str, out_path: str, settings: Settings) -> Report:
 
     reference = _reference(settings)
     plan = _plan_parts(score, settings, bass_tracks)
+    if reference:
+        _hand_back(plan.parts, plan.streams, reference, score.ppq)
     parts, streams = plan.parts, plan.streams
     prefolded = plan.prefolded
     handed_off, added_guitar = plan.handed_off, plan.added_guitar
@@ -677,6 +679,46 @@ def _reference(settings: Settings) -> _Reference | None:
                 key = (rhythm.to_gp(was.start, report.source.ppq), was.pitch)
                 where.setdefault(key, (part.name, note.pitch))
     return _Reference(where, opening)
+
+
+def _hand_back(parts, streams, reference, ppq) -> int:
+    """Give a shared note back to the player the reference gave it to.
+
+    Pinning the octave is not enough on its own: the completed score is a
+    different edition, its voices are laid out differently, and the
+    separator can hand a line to another guitar than the one that has
+    already been learned. A note the reference played is moved back to
+    that part, as long as it is free to take it -- and it usually is,
+    since in the reference it was playing exactly this note here.
+    """
+    home = {part.name: index for index, part in enumerate(parts)}
+    spans = [sorted((n.start, n.end) for n in stream) for stream in streams]
+    moved = 0
+    for index, stream in enumerate(streams):
+        keep = []
+        for note in stream:
+            entry = reference.where.get((rhythm.to_gp(note.start, ppq),
+                                         note.pitch))
+            target = home.get(entry[0]) if entry else None
+            if target is None or target == index or _busy(spans[target],
+                                                          note.start, note.end):
+                keep.append(note)
+                continue
+            streams[target].append(note)
+            bisect.insort(spans[target], (note.start, note.end))
+            moved += 1
+        streams[index] = keep
+    for index, stream in enumerate(streams):
+        stream.sort(key=lambda n: n.start)
+    return moved
+
+
+def _busy(spans, start, end) -> bool:
+    """Is this part already sounding anywhere in [start, end)?"""
+    at = bisect.bisect_left(spans, (start, -1))
+    if at < len(spans) and spans[at][0] < end:
+        return True
+    return at > 0 and spans[at - 1][1] > start
 
 
 def _write_as_reference(notes, reference, part_name, origin, ppq, offset=0):

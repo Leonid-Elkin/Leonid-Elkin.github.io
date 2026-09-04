@@ -351,12 +351,42 @@ python -m fuguesplit completion.xml --like contrapunctusXIX.mid -o completed.gp5
 ```
 
 `--like` arranges the reference first and writes every note the two scores
-share the way the reference wrote it: same player, same octave. Notes the
-reference gave to a different part are left in this arrangement's own octave
-and counted separately, so the report says how much really lined up. A
-completion padded with a bar of silence at the front still lines up, since
-the two openings are matched by where each score's music begins rather than
-by tick zero.
+share the way the reference wrote it: same player, same octave. A note the
+reference gave to another guitar is handed back to that guitar wherever it is
+free to take it — pinning the octave alone is not enough, because a completion
+is a different edition whose voices are laid out differently, and the
+separator will otherwise give a line to a player who has not learned it. A
+completion padded with a bar of silence at the front still lines up, since the
+two openings are matched by where each score's music begins rather than by
+tick zero.
+
+That gets an opening to about 99% of the torso's own tab. The last per cent is
+the edition itself: every completion reprints Bach's 239 bars from its own
+source, with a different accidental here, an ornament written out there. So
+`splice.py` joins the two scores instead of matching them —
+
+```
+python splice.py torso.mid completion.xml -o joined.mid
+python -m fuguesplit joined.mid --like torso.mid -o completed.gp5
+```
+
+— taking Bach's own notes up to the bar he stopped in and the completion's
+from there on, with the completion's voices matched to the torso's by register
+so the four lines carry through the join. A note that would collide with what
+its own voice is already holding goes to the nearest voice that is free, so
+the joined file stays as cleanly separated as the torso it continues.
+
+**The Art of Fugue, finished.** Contrapunctus XIV breaks off at bar 239;
+[Donald Tovey's 1931 completion](https://peterbillam.gitlab.io/pjb_arrangements/index.html)
+carries it to bar 317. Peter Billam's typesetting of it is free, and muscript
+— the program he typeset it with — writes MusicXML directly (`muscript -xml`),
+so no page has to be recognised at all. Checked against Bach's own text with
+`fuguesplit.proof`, that edition agrees with the torso on **2611 of 2620
+notes**; the nine are editorial readings, mostly B flat against B natural.
+Spliced and arranged, the tab runs to 317 bars, **3851 notes, every one traced
+back to its source**, and its first 239 bars are the torso's tab exactly:
+2620 of 2620 notes on the same guitar, at the same instant, at the same pitch,
+ringing for the same length.
 
 ## Is it the right piece? (`fuguesplit.verify`)
 
@@ -415,7 +445,7 @@ Every tab is credited to Leonid Elkin as arranger, with Bach as composer.
 python -m unittest discover -s tests -v
 ```
 
-122 tests. The assignment solver is checked against brute-force optimality; the
+127 tests. The assignment solver is checked against brute-force optimality; the
 notation layer is checked exhaustively (every offset and length on a 32nd grid
 in both simple and compound metre reconstructs to exactly the right number of
 ticks); and end-to-end tests parse the generated `.gp5` back and assert every
@@ -423,7 +453,10 @@ bar is exactly filled, every beat holds at most one note, and every fret lies
 within the tuning, and that the bass never leaves the lower neck. A canon
 and a longer continuation of it check that `--like` holds an opening still,
 and a tune with a bar taken out of it checks that `proof` reports the bar
-where two readings stop being in step. A thick
+where two readings stop being in step; a bar padded to place a whole rest
+checks that the bar lines after it stay where they were engraved, and a
+spliced canon checks that the torso survives the join and no voice ends up
+holding two notes at once. A thick
 synthetic texture checks the ensemble grows until no note is left in a
 stave's second voice, and stops at `--max-parts`. A scrap of MusicXML checks
 that voices, ties, chords, a pickup bar and the key survive the read, and that
