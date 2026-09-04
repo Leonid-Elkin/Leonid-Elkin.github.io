@@ -20,7 +20,8 @@ import mido
 from guitarpro import models as M
 
 from fuguesplit import (arrange, check, compare, fretting, hungarian,
-                        midi_in, musicxml_in, rhythm, verify, voices)
+                        midi_in, musicxml_in, pipeline, rhythm, verify,
+                        voices)
 from fuguesplit.pipeline import (Settings, convert, read_source,
                                  _drop_unplayable_chords)
 from fuguesplit.score import (Note, Part, Score, TempoEvent,
@@ -760,12 +761,43 @@ class TestThickTexture(unittest.TestCase):
                          "an explicit ensemble size is never grown")
         self.assertGreater(report.second_voice, 0)
 
-    def test_the_ensemble_grows_past_the_estimate(self):
+    def test_more_players_rescue_notes_from_the_grey(self):
+        """Room for more players means fewer notes greyed into voice two.
+
+        This used to assert that the ensemble *grew past its estimate*, but
+        a player now has to earn the stand: growth is refused when it would
+        rescue only a note or two. On this texture the estimate is already
+        right, so nothing is added and nothing should be.
+        """
         thin = self._convert(Settings(max_parts=3), lines=5)
-        grown = self._convert(Settings(), lines=5)
+        grown = self._convert(Settings(max_parts=7), lines=5)
         self.assertGreater(self._guitars(grown), self._guitars(thin))
-        self.assertGreater(grown.added_voices, 0)
         self.assertLess(grown.second_voice, thin.second_voice)
+
+    def test_a_player_is_not_seated_to_rescue_a_note_or_two(self):
+        """The stand has to be worth turning up for.
+
+        Accepting any improvement at all put a guitarist on BWV 664c who
+        played five notes in the whole piece. A new player must rescue at
+        least a hundredth of the music.
+        """
+        report = self._convert(Settings(max_parts=7), lines=5)
+        busiest = max(p.notes for p in report.parts)
+        for part in report.parts:
+            self.assertGreater(
+                part.notes, max(4, busiest * 0.01),
+                f"{part.name} barely plays; it should not have been seated")
+
+    def test_the_default_band_is_a_five_piece(self):
+        """Four guitars and a bass. Past that it stops being a band.
+
+        A thick texture can always use one more player, so without a
+        ceiling the arranger will seat a seventh guitarist to cover a
+        handful of notes. Five is the size that keeps every part worth
+        turning up for.
+        """
+        report = self._convert(Settings(), lines=7)
+        self.assertLessEqual(len(report.parts), 5)
 
     def test_growth_stops_at_max_parts(self):
         report = self._convert(Settings(max_parts=3), lines=5)
@@ -1378,6 +1410,66 @@ class TestBWV544(unittest.TestCase):
             self.assertTrue(all(e.numerator >= 1 and e.denominator >= 1
                                 for e in score.time_sigs),
                             "a 0/4 should never reach the score")
+
+    def test_a_guitar_with_a_handful_of_notes_is_folded_away(self):
+        """Nobody stands up for eleven notes if somebody else is free."""
+        q = 480
+        # Three real voices, and a stray note that sounds while one of them
+        # happens to be resting -- so it can be taken without a collision.
+        notes = []
+        for v, pitch in enumerate((72, 67, 60)):
+            for k in range(24):
+                t = k * q
+                notes.append(Note(pitch, t, t + q // 2, 90, src_track=v))
+        notes.append(Note(64, 6 * q + q // 2, 7 * q, 90, src_track=3))
+        score = Score(ppq=q, notes=notes)
+        parts = [Part(name=f"Guitar {i}") for i in range(4)]
+        streams = [[n for n in notes if n.src_track == i] for i in range(4)]
+        kept, out, prefolded, spilled = pipeline._condense_thin_parts(
+            parts, streams, set(), Settings())
+        self.assertEqual(spilled, [], "no note may be lost condensing")
+        self.assertEqual(len(kept), 3, "the one-note part should be gone")
+        self.assertEqual(sum(len(s) for s in out), len(notes),
+                         "every note must survive on some part")
+
+    def test_a_sparse_part_that_truly_collides_is_left_alone(self):
+        """A voice that sounds against all the others is a voice.
+
+        Sparse but real: more notes than the handful the arranger treats
+        as an artefact, and every one of them sounding while the other
+        parts play, so there is nowhere to put them.
+        """
+        q = 480
+        notes = []
+        for v, pitch in enumerate((72, 67, 60)):
+            for k in range(24):
+                t = k * q
+                notes.append(Note(pitch, t, t + q, 90, src_track=v))
+        # these sound exactly when every other part is playing
+        for k in range(8):
+            notes.append(Note(64, k * q, k * q + q, 90, src_track=3))
+        parts = [Part(name=f"Guitar {i}") for i in range(4)]
+        streams = [[n for n in notes if n.src_track == i] for i in range(4)]
+        kept, out, _pf, spilled = pipeline._condense_thin_parts(
+            parts, streams, set(), Settings())
+        self.assertEqual(spilled, [], "a real voice loses nothing")
+        self.assertEqual(len(kept), 4, "it cannot be absorbed, so it stays")
+
+    def test_a_three_note_part_is_not_treated_as_a_voice(self):
+        """Below a handful of notes it is an artefact of the guess."""
+        q = 480
+        notes = []
+        for v, pitch in enumerate((72, 67, 60)):
+            for k in range(24):
+                t = k * q
+                notes.append(Note(pitch, t, t + q, 90, src_track=v))
+        for k in range(3):
+            notes.append(Note(64, k * q, k * q + q, 90, src_track=3))
+        parts = [Part(name=f"Guitar {i}") for i in range(4)]
+        streams = [[n for n in notes if n.src_track == i] for i in range(4)]
+        kept, _out, _pf, _spilled = pipeline._condense_thin_parts(
+            parts, streams, set(), Settings())
+        self.assertEqual(len(kept), 3, "three notes do not earn a stand")
 
     def test_the_pedal_line_is_never_fragmented_across_guitars(self):
         """A pedal phrase that sits too high drops an octave on the bass.

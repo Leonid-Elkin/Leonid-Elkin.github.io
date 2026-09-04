@@ -13,7 +13,7 @@ from .score import Note, Part, Score
 @dataclass
 class Settings:
     guitars: int = 0              # 0 = as many as the music needs
-    max_parts: int = 7            # ceiling on that; past it a note goes
+    max_parts: int = 5            # ceiling on that; past it a note goes
                                   # into the stave's second voice instead
     bass: bool = True
     guitar_tuning: str = "standard"
@@ -27,11 +27,14 @@ class Settings:
     transpose: int = 0            # semitones applied to the guitars
     bass_transpose: int = 0       # semitones applied to the bass
     bass_comfort_fret: int = 12
-    legato_quarters: float = 1.0  # ring across rests shorter than this; 0 = off
+    legato_quarters: float = 1.5  # ring across rests shorter than this; 0 = off
     chords: str = "some"          # "some" = only held ones and endings,
                                   # "all" = every one, "none" = no chords
     chord_min_quarters: float = 1.0   # length that counts as a held chord
     hand_span: int = 4            # frets one hand can hold at once
+    condense_parts: bool = True   # fold a barely-playing guitar into the rest
+    thin_part_notes: int = 12     # fewer notes than this and it is not a part
+    thin_part_share: float = 0.04  # ... nor is 4% of what the busiest plays
     ties: str = "few"             # "few" = tie only where unavoidable,
                                   # "beats" = also split at every beat line
     relieve_bass: bool = True
@@ -107,8 +110,12 @@ def read_source(path: str) -> Score:
 
 def convert(midi_path: str, out_path: str, settings: Settings) -> Report:
     score = read_source(midi_path)
-    source_total = len(score.notes)
     score = _clip_bars(score, settings)
+    # Count the notes we actually set out to arrange. Counting the whole
+    # file instead makes a movement look as though it threw most of the
+    # music away: the prelude of BWV 532 is 31 bars of 244, and reported
+    # keeping 12% of the notes when it had in fact kept all of its own.
+    source_total = len(score.notes)
 
     bass_tracks = (
         voices.detect_bass_tracks(score)
@@ -340,7 +347,15 @@ def _plan_parts(score: Score, settings: Settings, bass_tracks: set[int]) -> _Pla
     plan = _assign_parts(score, settings, bass_tracks, guitars)
     while plan.crowded and plan.guitars < cap:
         trial = _assign_parts(score, settings, bass_tracks, plan.guitars + 1)
-        if trial.crowded >= plan.crowded:
+        # A player has to earn the stand. Accepting any improvement at all
+        # seats a whole guitarist to rescue five notes -- which is how BWV
+        # 664c ended up with a Guitar III that played for three per cent of
+        # the piece. What counts as worth it depends on the size of the
+        # piece: five notes is real in a short chorale and nothing in a
+        # toccata, so ask for a hundredth of the music. Below that the
+        # notes stay in the second voice, where they are still heard.
+        worth_it = max(4, len(score.notes) // 100)
+        if plan.crowded - trial.crowded < worth_it:
             break
         trial.added_voices = trial.guitars - guitars
         plan = trial
@@ -385,6 +400,14 @@ def _assign_parts(
     # An orphaned run of notes goes to one guitar that is free for all of
     # it, so a line parked in a spare track stays in one pair of hands.
     leftovers = _place_orphan_lines(parts, streams, leftovers, score.ppq)
+    # A guitar left holding a handful of notes is not a voice. Give them to
+    # the players who are actually playing, and take the stand away.
+    parts, streams, prefolded, spilled = _condense_thin_parts(
+        parts, streams, prefolded, settings, getattr(score, "engraved", False)
+    )
+    leftovers = list(leftovers) + spilled
+    # Whoever starts the piece is Guitar I.
+    parts, streams, prefolded = _number_by_entry(parts, streams, prefolded)
     # Whatever is left could not be taken monophonically at all; it is kept
     # as a second note on whichever part is already playing at that instant.
     lost = _assign_extras(parts, streams, leftovers, score.ppq,
@@ -400,6 +423,166 @@ def _assign_parts(
         added_guitar=added_guitar,
         crowded=lost + _crowded(parts, streams, settings, score.ppq),
     )
+
+
+def _number_by_entry(parts, streams, prefolded):
+    """Number the guitars in the order they first play.
+
+    A fugue hands its subject to one voice alone, and whoever states it is
+    the player the piece begins with. Numbering by register instead means
+    the person reading Guitar IV is the one who starts, and everybody else
+    waits several bars for a cue that never looks like theirs. So the first
+    to sound is Guitar I, and ties -- an ensemble that starts together --
+    are settled by register, highest first, as a score usually is.
+
+    The bass keeps its name and its place at the foot of the score.
+    """
+    order = list(range(len(parts)))
+    guitars = [i for i in order if not parts[i].is_bass]
+    if len(guitars) < 2:
+        return parts, streams, prefolded
+
+    def entry(i):
+        if not streams[i]:
+            return (1, 0, 0)              # silent parts sort to the back
+        first = min(n.start for n in streams[i])
+        mean = sum(n.pitch for n in streams[i]) / len(streams[i])
+        return (0, first, -mean)
+
+    ranked = sorted(guitars, key=entry)
+    if ranked == guitars:
+        return parts, streams, prefolded
+
+    keep = ranked + [i for i in order if parts[i].is_bass]
+    shift = {old: new for new, old in enumerate(keep)}
+    parts = [parts[i] for i in keep]
+    streams = [streams[i] for i in keep]
+    prefolded = {shift[i] for i in prefolded if i in shift}
+    for part, name in zip([p for p in parts if not p.is_bass],
+                          _guitar_names(len(ranked))):
+        part.name = name
+    return parts, streams, prefolded
+
+
+def _condense_thin_parts(parts, streams, prefolded, settings, engraved=False):
+    """Fold a barely-playing guitar into the players who are really playing.
+
+    One instrument per voice sometimes asks for a player too many. The last
+    guitar is then left with a handful of notes -- one, in BWV 536 -- which
+    is not a voice but whatever would not fit anywhere else. Nobody wants a
+    stave, a stand and a part for eleven notes in four minutes.
+
+    So a thin part's notes are offered to the guitars that are free at the
+    time, nearest register first, and the part is struck out either way.
+    Anything that could not be taken as a note of somebody's line is handed
+    back, to be written as a double-stop on whoever is playing there: still
+    heard, and without a player sitting out three minutes for it.
+
+    Returns the parts that remain and the notes nobody could take.
+    """
+    if not settings.condense_parts:
+        return parts, streams, prefolded, []
+    live = [i for i, p in enumerate(parts) if not p.is_bass]
+    if len(live) < 2:
+        return parts, streams, prefolded, []
+    busiest = max((len(streams[i]) for i in live), default=0)
+    if busiest <= 0:
+        return parts, streams, prefolded, []
+    floor = max(settings.thin_part_notes, busiest * settings.thin_part_share)
+
+    dropped: set[int] = set()
+    spilled: list = []
+    for index in sorted(live, key=lambda i: len(streams[i])):
+        if len(live) - len(dropped) < 2:
+            break
+        notes = streams[index]
+        if not notes or len(notes) >= floor:
+            continue
+        hosts = [i for i in live if i != index and i not in dropped]
+        if not hosts:
+            continue
+        centre = sum(n.pitch for n in notes) / len(notes)
+        hosts.sort(key=lambda i: abs(
+            (sum(n.pitch for n in streams[i]) / len(streams[i]))
+            - centre) if streams[i] else 0.0)
+
+        # Try it on paper first. A part is only worth dissolving if every
+        # one of its notes can be taken as a real note of somebody's line:
+        # spilling the remainder into double-stops loses music, and a
+        # sparse part that genuinely sounds against everything else is a
+        # voice, however few notes it has.
+        trial = {i: (list(streams[i]), [n.start for n in streams[i]])
+                 for i in hosts}
+        refused = []
+        for note in sorted(notes, key=lambda n: n.start):
+            for i in hosts:
+                stream, starts = trial[i]
+                if _span_free(stream, starts, note.start, note.end):
+                    at = bisect.bisect_left(starts, note.start)
+                    stream.insert(at, note)
+                    starts.insert(at, note.start)
+                    break
+            else:
+                refused.append(note)
+        if refused:
+            # The rest of it collides with everything else, and there is
+            # nowhere to put those notes that survives: a double-stop gets
+            # thinned away and a second voice gets cut by the monophony
+            # pass. A part whose notes genuinely sound against all the
+            # others is a voice, however few of them there are, so as a
+            # rule it keeps its stand.
+            #
+            # Not for three notes, though. Below `absurd` the part is not
+            # a voice by any reading, and losing a note or two of it is a
+            # smaller price than a player, a stave and a stand for music
+            # that lasts a second.
+            # An engraving names its own voices, so a three-note voice
+            # there is one Bach wrote and every note of it is kept. Where
+            # the voices were inferred from a MIDI file, a part this small
+            # is far more likely to be an artefact of the guess.
+            absurd = 0 if engraved else max(2, settings.thin_part_notes // 3)
+            if len(notes) > absurd:
+                continue
+            spilled.extend(refused)
+        for i in hosts:
+            streams[i] = trial[i][0]
+        streams[index] = []
+        dropped.add(index)
+
+    # The bass can be the one left holding nothing. A chorale setting whose
+    # pedal touches three notes does not need a bassist sitting through it;
+    # the guitars can take them.
+    absurd = 0 if engraved else max(2, settings.thin_part_notes // 3)
+    bass_index = next((i for i, p in enumerate(parts)
+                       if p.is_bass and i not in dropped), None)
+    guitars_left = [i for i in live if i not in dropped]
+    if (bass_index is not None and guitars_left and absurd
+            and 0 < len(streams[bass_index]) < floor):
+        starts = {i: [n.start for n in streams[i]] for i in guitars_left}
+        for note in sorted(streams[bass_index], key=lambda n: n.start):
+            for i in guitars_left:
+                if _span_free(streams[i], starts[i], note.start, note.end):
+                    at = bisect.bisect_left(starts[i], note.start)
+                    streams[i].insert(at, note)
+                    starts[i].insert(at, note.start)
+                    break
+            else:
+                spilled.append(note)
+        streams[bass_index] = []
+        dropped.add(bass_index)
+
+    if not dropped:
+        return parts, streams, prefolded, spilled
+    keep = [i for i in range(len(parts)) if i not in dropped]
+    shift = {old: new for new, old in enumerate(keep)}
+    parts = [parts[i] for i in keep]
+    streams = [streams[i] for i in keep]
+    prefolded = {shift[i] for i in prefolded if i in shift}
+    for part, name in zip([p for p in parts if not p.is_bass],
+                          _guitar_names(sum(1 for p in parts
+                                            if not p.is_bass))):
+        part.name = name
+    return parts, streams, prefolded, spilled
 
 
 def _crowded(parts: list[Part], streams: list, settings: Settings,

@@ -33,7 +33,7 @@ def build_parser() -> argparse.ArgumentParser:
                         "player for as long as notes are still being "
                         "crammed into a stave's second voice, so no note is "
                         "dropped; give a number to fix the ensemble instead")
-    p.add_argument("--max-parts", type=int, default=7, metavar="N",
+    p.add_argument("--max-parts", type=int, default=5, metavar="N",
                    help="ceiling on the ensemble when the part count is "
                         "worked out for you: staves, bass included. A "
                         "thicker moment than this can be covered is written "
@@ -104,7 +104,7 @@ def build_parser() -> argparse.ArgumentParser:
                    help="hand the pedal line to a guitar instead. By "
                         "default the bass plays it, which is what the bass "
                         "is for")
-    p.add_argument("--legato", type=float, default=1.0, metavar="Q",
+    p.add_argument("--legato", type=float, default=1.5, metavar="Q",
                    help="let a note ring across a rest shorter than Q "
                         "quarter notes, so a running passage reads as one "
                         "line instead of fragments (default 1; 0 = write "
