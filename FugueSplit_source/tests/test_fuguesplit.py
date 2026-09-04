@@ -1235,6 +1235,88 @@ class TestSplice(unittest.TestCase):
         self.assertEqual(again.key, torso.key)
 
 
+FRAGMENT = os.path.join(os.path.dirname(os.path.dirname(os.path.abspath(__file__))),
+                        "midi", "art-of-fugue", "contrapunctusXIX.mid")
+FIRST_FUGUE = os.path.join(os.path.dirname(os.path.dirname(os.path.abspath(__file__))),
+                           "midi", "art-of-fugue", "contrapunctusI.mid")
+
+
+class TestCounterpointScore(unittest.TestCase):
+    """The scorer that decides which alignment of the subjects wins."""
+
+    def _lines(self, chords):
+        out = {}
+        for beat, pitches in enumerate(chords):
+            for voice, pitch in enumerate(pitches):
+                out.setdefault(voice, []).append((float(beat), beat + 1.0, pitch))
+        return out
+
+    def test_a_triad_counts_as_harmony(self):
+        import complete
+
+        # D5, A4, F4: a D minor triad, three different notes of it.
+        _total, faults = complete.score(self._lines([(74, 69, 65), (74, 69, 65)]))
+        self.assertEqual(faults["loose"], 0)
+        self.assertGreater(faults["chords"], 0)
+
+    def test_a_cluster_does_not(self):
+        import complete
+
+        _total, faults = complete.score(self._lines([(74, 73, 72), (74, 73, 72)]))
+        self.assertEqual(faults["chords"], 0)
+        self.assertGreater(faults["loose"], 0)
+
+    def test_parallel_fifths_are_counted(self):
+        import complete
+
+        # Two voices a fifth apart, both rising a tone: the textbook fault.
+        _total, faults = complete.score(self._lines([(69, 62), (71, 64)]))
+        self.assertGreater(faults["parallels"], 0)
+
+    def test_a_note_outside_its_voice_is_counted(self):
+        import complete
+
+        _total, faults = complete.score({3: [(0.0, 1.0, 84)]})   # bass on high C
+        self.assertGreater(faults["range"], 0)
+
+
+@unittest.skipUnless(os.path.exists(FRAGMENT) and os.path.exists(FIRST_FUGUE),
+                     "the Art of Fugue MIDI files are not present")
+class TestCompletion(unittest.TestCase):
+    """Deriving an ending from Bach's own four subjects."""
+
+    @classmethod
+    def setUpClass(cls):
+        import complete
+
+        cls.complete = complete
+        cls.subjects = complete.read_subjects(FRAGMENT, FIRST_FUGUE)
+
+    def test_it_finds_the_four_subjects(self):
+        self.assertEqual(sorted(self.subjects), ["BACH", "I", "II", "theme"])
+
+    def test_bach_is_b_flat_a_c_b(self):
+        steps = [s for _o, s, _l in self.subjects["BACH"].steps]
+        self.assertEqual(steps, [0, -1, 2, 1], "B flat, A, C, B natural")
+
+    def test_the_theme_is_the_one_the_whole_work_is_built_on(self):
+        steps = [s for _o, s, _l in self.subjects["theme"].steps]
+        self.assertEqual(steps[:5], [0, 7, 3, 0, -1], "D A F D C sharp")
+
+    def test_the_first_subject_is_the_one_the_fugue_opens_with(self):
+        steps = [s for _o, s, _l in self.subjects["I"].steps]
+        self.assertEqual(steps[:4], [0, 7, 5, 3], "D A G F")
+
+    def test_the_chosen_combination_is_playable_counterpoint(self):
+        best = self.complete.best_combination(self.subjects, spread=(0.0, 4.0))
+        total, faults, _order, _shifts, _offsets, lines = best
+        self.assertEqual(len(lines), 4, "all four subjects sound together")
+        self.assertEqual(faults["range"], 0, "every voice stays in its range")
+        self.assertEqual(faults["collision"], 0, "no two voices on one note")
+        self.assertGreater(faults["chords"], faults["loose"],
+                           "more of the full beats make a chord than do not")
+
+
 class TestVerify(unittest.TestCase):
     """Every written note has to trace back to the note it came from."""
 

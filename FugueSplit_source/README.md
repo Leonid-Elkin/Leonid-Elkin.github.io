@@ -278,6 +278,46 @@ each piece offers MusicXML beside its MIDI. Drop the `.xml` next to the `.mid`
 and `convert_all.py` prefers it automatically, taking the tempo from the MIDI
 since editions carry none.
 
+## Finishing it without a completer (`complete.py`)
+
+```
+python complete.py -o finale.mid
+python splice.py contrapunctusXIX.mid finale.mid -o whole.mid
+python -m fuguesplit whole.mid --like contrapunctusXIX.mid -o whole.gp5
+```
+
+Bach's last fugue stops in bar 239, three subjects in, with the theme of
+the whole work never yet heard. Göncz's insight was that the four subjects
+were *built* to combine — the piece is permutational, and its ending is
+less composed than solved. So this does not try to write like Bach. It takes
+his four subjects exactly as he wrote them — the fugue's own, the second
+fugue's, B-A-C-H, and the theme of Contrapunctus I — and searches the
+alignments in which they fit each other best: which voice takes which
+subject, at what transposition, entering how far apart, each short subject
+restated until the passage is covered.
+
+Every candidate is scored as counterpoint, and the scoring is where the
+judgement lives:
+
+| | |
+|---|---|
+| harmony | on each beat where three or more different notes sound, do they make a triad or a seventh? |
+| parallels | consecutive fifths or octaves between the same two voices |
+| range | a voice outside the compass it keeps to in the fragment |
+| collisions | two voices on the same note |
+
+Bach's own 239 bars score **74%** on the harmony test. The finale this
+picks scores **80%**, with no collisions, nothing out of range and one
+parallel in forty bars: three four-subject combinations in different voice
+permutations, a dominant pedal with B-A-C-H in stretto above it, the theme
+alone in the bass, and a Picardy third.
+
+That is a derivation, not an inspiration. There are no episodes and no free
+counterpoint — where a completion by a musician breathes, this one states
+the material and stops. But every note in it is Bach's, the joins are where
+he put them, and the arithmetic is checkable, which is the most an
+arranger's program can honestly claim.
+
 ## Reading it off the page (`omr.py`)
 
 When a piece exists only on paper, [Audiveris](https://audiveris.github.io)
@@ -445,7 +485,7 @@ Every tab is credited to Leonid Elkin as arranger, with Bach as composer.
 python -m unittest discover -s tests -v
 ```
 
-127 tests. The assignment solver is checked against brute-force optimality; the
+136 tests. The assignment solver is checked against brute-force optimality; the
 notation layer is checked exhaustively (every offset and length on a 32nd grid
 in both simple and compound metre reconstructs to exactly the right number of
 ticks); and end-to-end tests parse the generated `.gp5` back and assert every
@@ -456,7 +496,10 @@ and a tune with a bar taken out of it checks that `proof` reports the bar
 where two readings stop being in step; a bar padded to place a whole rest
 checks that the bar lines after it stay where they were engraved, and a
 spliced canon checks that the torso survives the join and no voice ends up
-holding two notes at once. A thick
+holding two notes at once; the counterpoint scorer is checked against a
+triad, a cluster and a pair of parallel fifths, and the completion against
+Bach's four subjects, which it has to find in his text before it can use
+them. A thick
 synthetic texture checks the ensemble grows until no note is left in a
 stave's second voice, and stops at `--max-parts`. A scrap of MusicXML checks
 that voices, ties, chords, a pickup bar and the key survive the read, and that
