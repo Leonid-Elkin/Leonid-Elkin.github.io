@@ -306,11 +306,17 @@ judgement lives:
 | range | a voice outside the compass it keeps to in the fragment |
 | collisions | two voices on the same note |
 
-Bach's own 239 bars score **74%** on the harmony test. The finale this
-picks scores **80%**, with no collisions, nothing out of range and one
-parallel in forty bars: three four-subject combinations in different voice
-permutations, a dominant pedal with B-A-C-H in stretto above it, the theme
-alone in the bass, and a Picardy third.
+Bach's own 239 bars score **74%** on the harmony test, and so does the
+finale this picks — with no collisions, nothing out of range and one
+parallel in thirty bars: four combinations of all four subjects in
+different voice permutations, the last with the theme itself in the bass,
+then a dominant pedal with B-A-C-H in stretto over it and a Picardy third.
+
+Silence is scored too, because the first version of this had four bars of
+it. Each block now begins a bar before the last has finished and a voice
+that runs out of subject holds its note rather than dropping out, so the
+four parts play 79-89% of the time — Bach's own are between 79% and 88% —
+and at no point does everything stop.
 
 That is a derivation, not an inspiration. There are no episodes and no free
 counterpoint — where a completion by a musician breathes, this one states

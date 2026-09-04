@@ -85,6 +85,13 @@ class Subject:
         while at < until:
             notes += [(s, e, p) for s, e, p in self.at(at, pitch) if s < until]
             at += step
+        # A voice that has run out of subject before the others have
+        # finished holds its last note rather than dropping out: four
+        # voices that keep stopping is not a fugue, it is a rehearsal.
+        if notes:
+            last = max(notes, key=lambda n: n[1])
+            if last[1] < until:
+                notes[notes.index(last)] = (last[0], until, last[2])
         return notes
 
 
@@ -210,7 +217,7 @@ def score(lines: dict[int, list]) -> tuple[int, dict]:
 
 def best_combination(subjects: dict[str, Subject], tonic: int = 62,
                      spread: list[float] = (0.0, 2.0, 4.0, 6.0, 8.0),
-                     avoid: set = frozenset()):
+                     avoid: set = frozenset(), require: dict | None = None):
     """Search the alignments of the four subjects for the cleanest one.
 
     `avoid` rules out voice permutations already used, so a later
@@ -222,6 +229,9 @@ def best_combination(subjects: dict[str, Subject], tonic: int = 62,
     best = None
     for order in itertools.permutations(range(4)):
         if order in avoid:
+            continue
+        if require and any(order[slot] != index
+                           for slot, index in require.items()):
             continue
         for shifts in itertools.product(keys, repeat=3):
             for offsets in itertools.product(spread, repeat=3):
@@ -272,8 +282,16 @@ def finale(subjects: dict[str, Subject], start_bar: float) -> list:
     at += 2 * BAR
 
     used: set = set()
-    for key in (tonic, tonic + 7, tonic):
-        best = best_combination(subjects, key, avoid=used)
+    # Three statements of the combination, then a fourth with the theme
+    # itself in the bass. Each begins a bar before the last has finished,
+    # so an entry arrives against the end of the previous one instead of
+    # after a bar of silence.
+    blocks = [(tonic, None), (tonic + 7, None), (tonic, None),
+              (tonic, {3: 0})]
+    for key, require in blocks:
+        best = best_combination(subjects, key, avoid=used, require=require)
+        if best is None:
+            continue
         total, faults, order, _shifts, _offsets, lines = best
         used.add(order)
         span = 0.0
@@ -282,25 +300,22 @@ def finale(subjects: dict[str, Subject], start_bar: float) -> list:
                 written.append((slot, at + note_start, at + note_end, pitch))
                 span = max(span, note_end)
         plan.append((at / BAR + 1, total, faults))
-        at += (int(span / BAR) + 1) * BAR
+        at += max(BAR, (int((span - 0.001) / BAR)) * BAR)
 
     # The dominant pedal, with B-A-C-H above it in stretto, and out on a
     # Picardy third -- the ending every completion of this fugue writes.
-    pedal = at
-    written.append((3, pedal, pedal + 4 * BAR, 45))                    # A2
+    pedal = max(end for _v, _s, end, _p in written) - BAR
     bach = subjects["BACH"]
     for voice, pitch, delay in ((0, 70, 0.0), (1, 63, 2.0), (2, 58, 4.0)):
         for note_start, note_end, note_pitch in bach.at(pedal + delay, pitch):
             written.append((voice, note_start, note_end,
                             _into(note_pitch, RANGES[voice])))
-    at = pedal + 6 * BAR
-
-    # The theme itself has the last word, in the bass, alone until the
-    # final chord: nothing a machine writes over it would improve on it.
-    theme = subjects["theme"]
-    for note_start, note_end, pitch in theme.at(at, 38):
-        written.append((3, note_start, note_end, _into(pitch, RANGES[3])))
-    close = at + theme.span
+    # The chord falls on a bar line, and the pedal holds until it does:
+    # a rest between the last entry and the final chord is the one thing
+    # an ending cannot have.
+    reached = max(end for _v, _s, end, _p in written)
+    close = (int((reached - 0.001) / BAR) + 1) * BAR
+    written.append((3, pedal, close, 45))                              # A2
     # A Picardy third: the major chord Bach would have ended on, spaced
     # so no voice leaves its range and the third is on top where it tells.
     for voice, pitch in ((0, 78), (1, 74), (2, 69), (3, 38)):          # D major
@@ -334,6 +349,20 @@ def main(argv: list[str]) -> int:
               f"{subject.span:g} quarters: {pitches}")
 
     written, plan = finale(subjects, args.from_bar - 1)
+    first = min(s for _v, s, _e, _p in written)
+    last = max(e for _v, _s, e, _p in written)
+    print()
+    print("how much of the time each voice is playing:")
+    for voice in sorted(RANGES):
+        sounding = sum(e - s for v, s, e, _p in written if v == voice)
+        print(f"  voice {voice + 1}: {100 * sounding / (last - first):.0f}%"
+              f"   (Bach's own text: 79-88%)")
+    quiet, cursor = 0.0, first
+    for s, e in sorted((s, e) for _v, s, e, _p in written):
+        if s > cursor:
+            quiet += s - cursor
+        cursor = max(cursor, e)
+    print(f"  nothing sounding at all: {quiet:g} quarters")
     print("\nthe combinations the search chose:")
     for bar, total, faults in plan:
         full = faults["chords"] + faults["loose"]
