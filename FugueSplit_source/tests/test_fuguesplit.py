@@ -21,8 +21,8 @@ import mido
 from guitarpro import models as M
 
 from fuguesplit import (arrange, check, compare, fretting, hungarian,
-                        midi_in, musicxml_in, pipeline, rhythm, verify,
-                        voices)
+                        midi_in, musicxml_in, pipeline, proof, rhythm,
+                        verify, voices)
 from fuguesplit.pipeline import (Settings, convert, read_source,
                                  _drop_unplayable_chords)
 from fuguesplit.score import (Note, Part, Score, TempoEvent,
@@ -1092,6 +1092,50 @@ class TestContinuation(unittest.TestCase):
         """Without --like the arrangement is free to move a phrase."""
         _first, _second, report = self._openings(Settings(like=""))
         self.assertEqual(report.matched, 0)
+
+
+class TestProof(unittest.TestCase):
+    """Checking a recognised score against music that is already known."""
+
+    def _known(self, bars=8, drop=None, wrong=None):
+        """A tune in 4/4, optionally with a bar missing or a wrong note."""
+        notes = []
+        for bar in range(bars):
+            if bar == drop:
+                continue
+            for beat in range(4):
+                pitch = 60 + (bar + beat) % 7
+                if wrong is not None and bar == wrong and beat == 0:
+                    pitch += 1
+                start = (bar - (1 if drop is not None and bar > drop else 0)) * 1920
+                notes.append(Note(pitch, start + beat * 480,
+                                  start + beat * 480 + 480, 90))
+        score = Score(ppq=480, notes=notes)
+        score.time_sigs = [TimeSigEvent(0, 4, 4)]
+        return score
+
+    def test_a_faithful_reading_agrees_everywhere(self):
+        result = proof.proof(self._known(), self._known())
+        self.assertEqual(result.found, result.known)
+        self.assertIsNone(result.drift_at)
+
+    def test_a_wrong_note_is_pinned_to_its_bar(self):
+        result = proof.proof(self._known(wrong=3), self._known())
+        self.assertEqual(result.known - result.found, 1)
+        bad = [b for b in result.bars if b.missed]
+        self.assertEqual([b.number for b in bad], [4], "bars count from one")
+        self.assertEqual(bad[0].extra, 1, "and the misread note is reported too")
+
+    def test_a_dropped_bar_puts_everything_after_it_out_of_step(self):
+        """The failure that matters: after it, comparing bars means nothing."""
+        result = proof.proof(self._known(drop=2), self._known())
+        self.assertIsNotNone(result.drift_at)
+        self.assertEqual(result.drift_at, 3)
+
+    def test_only_the_shared_opening_can_be_checked(self):
+        result = proof.proof(self._known(bars=4), self._known(bars=8), upto_bar=4)
+        self.assertEqual(result.found, result.known)
+        self.assertEqual(len(result.bars), 4)
 
 
 class TestVerify(unittest.TestCase):

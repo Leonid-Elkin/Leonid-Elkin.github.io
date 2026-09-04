@@ -278,6 +278,62 @@ each piece offers MusicXML beside its MIDI. Drop the `.xml` next to the `.mid`
 and `convert_all.py` prefers it automatically, taking the tempo from the MIDI
 since editions carry none.
 
+## Reading it off the page (`omr.py`)
+
+When a piece exists only on paper, [Audiveris](https://audiveris.github.io)
+can be pointed at a PDF and asked for MusicXML, which is a format this
+already reads:
+
+```
+python omr.py score.pdf -o score.gp5           # PDF -> MusicXML -> tab
+python omr.py score.pdf --xml-only             # stop at the MusicXML
+```
+
+Install Audiveris separately; `omr.py` finds it in the usual places, or set
+`AUDIVERIS` to the executable.
+
+**Expect a draft, not an edition.** Run over the Tobis PDF of the Passacaglia
+— a digital-native file, the friendliest case there is — against the same
+publisher's own MusicXML of the same engraving, 17 pages took three minutes
+and came back:
+
+| | recognised |
+|---|---|
+| the pedal staff, one voice on its own | **99.8%** of its notes |
+| the manual staves, two voices each | 88-91% |
+| the piece as one stream of pitches | **91.1%** |
+| notes in the right place in the right bar | 38.2% |
+
+That last row is the one to look at. Recognition errors are not spread evenly:
+the notes come back well, and then one misread bar knocks the bar lines out of
+step and everything after it lands in the wrong place. Here that happened at
+bar 121, and everything from there on counted as wrong even where the pitches
+were right. Key signature, pickup bar and total length all came back correct.
+
+## Proofreading what comes back (`fuguesplit.proof`)
+
+Where part of the music is already known, every recognition error in that part
+can be found exactly:
+
+```
+python -m fuguesplit.proof recognised.mxl --against torso.mid --bars 239
+```
+
+This is written for completions. The first 239 bars of a completed
+Contrapunctus XIV *are* the unfinished fugue, note for note, so any
+disagreement there is a misreading and nothing else — and the same misreadings
+usually recur in the new material. It reports the bars that disagree, worst
+first, and the bar where the two stop being in step at all, which is the one
+to open in a notation editor:
+
+```
+BWV_0582.mxl against BWV_0582.xml
+  2117 of 5545 known notes recognised (38.2%); the bar lines go out of step at bar 121
+  up to that point, 40 bars disagree
+    bar   51: 15 of 18 notes missing, 15 not in the original
+    bar   64: 13 of 23 notes missing, 13 not in the original
+```
+
 ## Finishing an unfinished piece
 
 The Art of Fugue breaks off in the middle of bar 239. Play a completion of
@@ -359,13 +415,15 @@ Every tab is credited to Leonid Elkin as arranger, with Bach as composer.
 python -m unittest discover -s tests -v
 ```
 
-118 tests. The assignment solver is checked against brute-force optimality; the
+122 tests. The assignment solver is checked against brute-force optimality; the
 notation layer is checked exhaustively (every offset and length on a 32nd grid
 in both simple and compound metre reconstructs to exactly the right number of
 ticks); and end-to-end tests parse the generated `.gp5` back and assert every
 bar is exactly filled, every beat holds at most one note, and every fret lies
 within the tuning, and that the bass never leaves the lower neck. A canon
-and a longer continuation of it check that `--like` holds an opening still. A thick
+and a longer continuation of it check that `--like` holds an opening still,
+and a tune with a bar taken out of it checks that `proof` reports the bar
+where two readings stop being in step. A thick
 synthetic texture checks the ensemble grows until no note is left in a
 stave's second voice, and stops at `--max-parts`. A scrap of MusicXML checks
 that voices, ties, chords, a pickup bar and the key survive the read, and that
@@ -383,6 +441,9 @@ skipped if the file is not present.
   hand movement but does not model finger stretch, so a dense passage can still
   ask for an awkward shape.
 - **Repeats are written out**, not folded into repeat barlines.
+- **Optical recognition is a draft.** Roughly one note in eleven comes back
+  wrong or missing even from a clean PDF, and a single misread bar moves every
+  bar line after it. Proofread before playing.
 - **Ornaments in an engraving stay symbols.** A MIDI file of the same piece
   plays trills and mordents out as real notes; MusicXML marks them, and those
   marks are not realised, so they are not in the tab.
