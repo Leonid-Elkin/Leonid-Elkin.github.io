@@ -43,6 +43,8 @@ class Settings:
     bass_tracks: set[int] | None = None   # None = auto-detect
     title: str | None = None
     artist: str = ""
+    like: str | None = None       # a score whose arrangement this one must
+                                  # reproduce wherever the two share a note
     credit: str = "Leonid Elkin"
     voice_config: voices.VoiceConfig = field(default_factory=voices.VoiceConfig)
 
@@ -72,6 +74,9 @@ class Report:
     bass_tracks: set[int]
     handed_off: int = 0          # notes lifted off the bass onto a guitar
     pulled_back: int = 0         # notes a transposition pushed off the neck
+    matched: int = 0             # notes written as the reference wrote them
+    remapped: int = 0            # of those, ones a reference part wrote and
+                                 # this arrangement gave to another part
     added_guitar: bool = False
     added_voices: int = 0        # players added because the texture thickened
     parts: list[PartReport] = field(default_factory=list)
@@ -125,6 +130,7 @@ def convert(midi_path: str, out_path: str, settings: Settings) -> Report:
     if not settings.bass:
         bass_tracks = set()
 
+    reference = _reference(settings)
     plan = _plan_parts(score, settings, bass_tracks)
     parts, streams = plan.parts, plan.streams
     prefolded = plan.prefolded
@@ -140,7 +146,13 @@ def convert(midi_path: str, out_path: str, settings: Settings) -> Report:
 
     laid_out, positions = [], []
     pulled_back = 0
+    matched = remapped = 0
     end_gp = 0
+    origin = {note.uid: note for note in score.notes}
+    offset = 0
+    if reference:
+        offset = (min((rhythm.to_gp(n.start, score.ppq) for n in score.notes),
+                      default=0) - reference.begins)
     for index, (part, stream) in enumerate(zip(parts, streams)):
         if index in prefolded:
             folded, shift = stream, part.octave_shift
@@ -167,6 +179,12 @@ def convert(midi_path: str, out_path: str, settings: Settings) -> Report:
         quantised = arrange.fill_short_rests(
             quantised, rhythm.GP_QUARTER, settings.legato_quarters
         )
+        if reference:
+            hits, strays = _write_as_reference(
+                quantised, reference, part.name, origin, score.ppq, offset
+            )
+            matched += hits
+            remapped += strays
         part.notes = quantised
         part.octave_shift = shift
         # The bass has already been folded to sit low on the neck, so hold
@@ -197,7 +215,14 @@ def convert(midi_path: str, out_path: str, settings: Settings) -> Report:
                 moved, part.tuning, part_limit
             )
             pulled_back += off_neck
-            setattr(part, name, rhythm.quantize(moved, score.ppq, grid))
+            moved = rhythm.quantize(moved, score.ppq, grid)
+            if reference:
+                hits, strays = _write_as_reference(
+                    moved, reference, part.name, origin, score.ppq, offset
+                )
+                matched += hits
+                remapped += strays
+            setattr(part, name, moved)
         # Most double-stops are a stray sixteenth inside somebody's run.
         # Keep the held ones and the ones at endings; drop the rest.
         if settings.chords == "none":
@@ -273,6 +298,8 @@ def convert(midi_path: str, out_path: str, settings: Settings) -> Report:
         key=score.key,
         bass_tracks=bass_tracks,
         handed_off=handed_off,
+        matched=matched,
+        remapped=remapped,
         added_guitar=added_guitar,
         added_voices=plan.added_voices,
         pulled_back=pulled_back,
@@ -612,6 +639,77 @@ def _crowded(parts: list[Part], streams: list, settings: Settings,
         )
         count += len(part.extras) - len(kept)
     return count
+
+
+@dataclass
+class _Reference:
+    """Where every note of a reference arrangement was written."""
+
+    where: dict          # (onset in GP ticks, source pitch) -> (part, pitch)
+    begins: int          # the reference's first onset, in GP ticks
+
+
+def _reference(settings: Settings) -> _Reference | None:
+    """Arrange the reference score, and note where every note of it went.
+
+    Keyed by the source note itself -- its onset in Guitar Pro ticks and
+    its written pitch -- because that is what two editions of the same
+    music have in common. A completion of an unfinished fugue shares its
+    whole opening with the torso, and the point of this is that the
+    opening comes out identical: same player, same octave, note for note.
+    """
+    if not settings.like:
+        return None
+    plain = replace(settings, like=None, title=None)
+    report = convert(settings.like, os.devnull, plain)
+    source = {note.uid: note for note in report.source.notes}
+    # Where the reference's own music begins, so a completion padded with a
+    # bar of silence -- sequencers do this -- still lines up with it.
+    opening = min((rhythm.to_gp(n.start, report.source.ppq)
+                   for n in report.source.notes), default=0)
+    where: dict[tuple[int, int], tuple[str, int]] = {}
+    for part in report.arranged:
+        for group in (part.notes, part.extras, part.second):
+            for note in group:
+                was = source.get(note.uid)
+                if was is None:
+                    continue
+                key = (rhythm.to_gp(was.start, report.source.ppq), was.pitch)
+                where.setdefault(key, (part.name, note.pitch))
+    return _Reference(where, opening)
+
+
+def _write_as_reference(notes, reference, part_name, origin, ppq, offset=0):
+    """Put shared notes in the octave the reference put them in.
+
+    Folding chooses an octave per phrase by a dynamic program over the
+    whole part, so music added at the end can move a phrase near it --
+    which is exactly what must not happen to the opening of a completed
+    fugue. Where the reference already wrote a note, it is written the
+    same way here.
+
+    A note the reference gave to a different player is left alone and
+    counted: its octave belongs to that part's range, not this one's.
+    """
+    hits = strays = 0
+    for note in notes:
+        was = origin.get(note.uid)
+        if was is None:
+            continue
+        at = rhythm.to_gp(was.start, ppq)
+        entry = reference.where.get((at, was.pitch))
+        if entry is None and offset:
+            entry = reference.where.get((at - offset, was.pitch))
+        if entry is None:
+            continue
+        name, pitch = entry
+        if name != part_name:
+            strays += 1
+            continue
+        if note.pitch != pitch:
+            note.pitch = pitch
+        hits += 1
+    return hits, strays
 
 
 def _bass_onto_guitar(parts, streams, settings):

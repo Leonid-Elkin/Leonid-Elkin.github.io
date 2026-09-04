@@ -129,6 +129,11 @@ def build_parser() -> argparse.ArgumentParser:
     p.add_argument("--no-bass-relief", action="store_true",
                    help="let the bass play high up the neck instead of "
                         "folding the line down into a comfortable span")
+    p.add_argument("--like", metavar="SCORE",
+                   help="a score this one continues -- the unfinished fugue "
+                        "a completion finishes, say. Every note the two "
+                        "share is written exactly as it was written there, "
+                        "same player and same octave, so the openings match")
     p.add_argument("--title", help="title written into the tab")
     p.add_argument("--artist", default="", help="composer credit")
     p.add_argument("--credit", default="Leonid Elkin",
@@ -177,6 +182,7 @@ def main(argv: list[str] | None = None) -> int:
         from_bar=args.from_bar,
         to_bar=args.to_bar,
         bass_tracks=set(args.bass_track) if args.bass_track else None,
+        like=args.like,
         title=args.title,
         artist=args.artist,
         credit=args.credit,
@@ -242,6 +248,13 @@ def _print_report(report: Report, out: str) -> None:
         if report.second_voice:
             print(f"  {report.second_voice} notes written into the stave's "
                   f"second voice (they start inside a held note)")
+    if report.matched:
+        print()
+        print(f"  {report.matched} notes written as the reference score "
+              f"writes them")
+        if report.remapped:
+            print(f"  {report.remapped} more are on a different part here, "
+                  f"and keep this part's octave")
     if report.pulled_back:
         print()
         print(f"  {report.pulled_back} notes folded back an octave to stay "

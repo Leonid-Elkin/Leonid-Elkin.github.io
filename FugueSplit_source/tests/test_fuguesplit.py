@@ -12,6 +12,7 @@ import sys
 import tempfile
 import unittest
 import zipfile
+from dataclasses import replace
 
 sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
@@ -1011,6 +1012,86 @@ class TestChordTones(unittest.TestCase):
         part = self._part([Note(41, 0, 960, 90)])
         part.notes = [Note(60, 0, 960, 90)]
         self.assertEqual(_drop_unplayable_chords(part, [(2, 10)], 4), [])
+
+
+def _make_continued_midi(path: str) -> None:
+    """The canon again, with four more statements a register lower.
+
+    The shape of a completion: the same opening, then music that pulls the
+    piece's register down and so tempts the octave fold to move a phrase
+    that has already been engraved once.
+    """
+    mid = mido.MidiFile(ticks_per_beat=480)
+    meta = mido.MidiTrack()
+    meta.append(mido.MetaMessage("set_tempo", tempo=mido.bpm2tempo(96), time=0))
+    meta.append(mido.MetaMessage("time_signature", numerator=4, denominator=4,
+                                 time=0))
+    meta.append(mido.MetaMessage("key_signature", key="G", time=0))
+    mid.tracks.append(meta)
+
+    subject = [0, 2, 4, 5, 7, 5, 4, 2]
+    for name, base, delay in [("MANUAL", 72, 0), ("MANUAL", 64, 480),
+                              ("PEDAL", 43, 960)]:
+        track = mido.MidiTrack()
+        track.append(mido.MetaMessage("track_name", name=name, time=0))
+        prev = 0
+        for rep in range(8):
+            drop = 12 if rep >= 4 else 0
+            for i, step in enumerate(subject):
+                on = delay + (rep * 8 + i) * 480
+                track.append(mido.Message("note_on", note=base + step - drop,
+                                          velocity=90, time=on - prev))
+                track.append(mido.Message("note_off", note=base + step - drop,
+                                          time=460))
+                prev = on + 460
+        mid.tracks.append(track)
+    mid.save(path)
+
+
+class TestContinuation(unittest.TestCase):
+    """A completion has to start exactly where the torso starts."""
+
+    def _openings(self, settings):
+        """Both tabs, cut off where the torso itself stops."""
+        with tempfile.TemporaryDirectory() as d:
+            short = os.path.join(d, "torso.mid")
+            long_ = os.path.join(d, "whole.mid")
+            _make_test_midi(short)
+            _make_continued_midi(long_)
+            first = os.path.join(d, "torso.gp5")
+            second = os.path.join(d, "whole.gp5")
+            convert(short, first, Settings())
+            report = convert(long_, second, replace(settings, like=short)
+                             if settings.like is None else settings)
+            torso = verify.read_tab(first)
+            whole = verify.read_tab(second)
+            cut = max(start for notes in torso.values() for start, _p, _d in notes)
+
+            def head(tab):
+                return {k: sorted(n for n in v if n[0] <= cut)
+                        for k, v in tab.items()}
+
+            return head(torso), head(whole), report
+
+    def test_the_opening_is_written_the_same_way(self):
+        """Every note of the torso's tab is in the completed one, unchanged.
+
+        Not equality of the two windows: the continuation is already
+        playing where the torso had fallen silent, so it adds notes there.
+        What must not change is a note the torso already wrote.
+        """
+        first, second, report = self._openings(Settings())
+        self.assertGreater(report.matched, 0, "notes should have been matched")
+        for name, notes in first.items():
+            written = set(second.get(name, []))
+            missing = [n for n in notes if n not in written]
+            self.assertEqual(missing, [],
+                             f"{name}: the completion writes these differently")
+
+    def test_nothing_is_pinned_without_a_reference(self):
+        """Without --like the arrangement is free to move a phrase."""
+        _first, _second, report = self._openings(Settings(like=""))
+        self.assertEqual(report.matched, 0)
 
 
 class TestVerify(unittest.TestCase):

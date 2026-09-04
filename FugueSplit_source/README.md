@@ -155,6 +155,7 @@ python -m fuguesplit INPUT.mid [-o OUTPUT.gp5] [options]
 | `--no-extra-guitar` | never add a guitar to cover the bass |
 | `--from-bar N`, `--to-bar N` | convert only part of the piece |
 | `--bass-track N` | force a source track to the bass (repeatable) |
+| `--like SCORE` | write every note this score shares with `SCORE` exactly as `SCORE`'s own tab writes it |
 | `--title TEXT` | title written into the tab |
 | `--list-tracks` | show the source file's tracks and exit |
 
@@ -277,6 +278,30 @@ each piece offers MusicXML beside its MIDI. Drop the `.xml` next to the `.mid`
 and `convert_all.py` prefers it automatically, taking the tempo from the MIDI
 since editions carry none.
 
+## Finishing an unfinished piece
+
+The Art of Fugue breaks off in the middle of bar 239. Play a completion of
+it and the first 239 bars are Bach's, note for note — so a tab of the
+completed fugue ought to open exactly as the tab of the torso does, or nobody
+who has learned one can read the other.
+
+That is not automatic. Octaves are chosen a phrase at a time by a dynamic
+program over the whole part, so music added at the end can move a phrase near
+it: appending a low-lying ending to Contrapunctus XIV shifted seventeen notes
+of Guitar I an octave, two hundred bars earlier.
+
+```
+python -m fuguesplit completion.xml --like contrapunctusXIX.mid -o completed.gp5
+```
+
+`--like` arranges the reference first and writes every note the two scores
+share the way the reference wrote it: same player, same octave. Notes the
+reference gave to a different part are left in this arrangement's own octave
+and counted separately, so the report says how much really lined up. A
+completion padded with a bar of silence at the front still lines up, since
+the two openings are matched by where each score's music begins rather than
+by tick zero.
+
 ## Is it the right piece? (`fuguesplit.verify`)
 
 ```
@@ -334,12 +359,13 @@ Every tab is credited to Leonid Elkin as arranger, with Bach as composer.
 python -m unittest discover -s tests -v
 ```
 
-111 tests. The assignment solver is checked against brute-force optimality; the
+118 tests. The assignment solver is checked against brute-force optimality; the
 notation layer is checked exhaustively (every offset and length on a 32nd grid
 in both simple and compound metre reconstructs to exactly the right number of
 ticks); and end-to-end tests parse the generated `.gp5` back and assert every
 bar is exactly filled, every beat holds at most one note, and every fret lies
-within the tuning, and that the bass never leaves the lower neck. A thick
+within the tuning, and that the bass never leaves the lower neck. A canon
+and a longer continuation of it check that `--like` holds an opening still. A thick
 synthetic texture checks the ensemble grows until no note is left in a
 stave's second voice, and stops at `--max-parts`. A scrap of MusicXML checks
 that voices, ties, chords, a pickup bar and the key survive the read, and that
