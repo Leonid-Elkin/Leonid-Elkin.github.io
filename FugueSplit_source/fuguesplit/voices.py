@@ -28,6 +28,11 @@ from .hungarian import solve
 from .score import Note, Score
 
 BASS_NAME_RE = re.compile(r"pedal|bass|basso|b\.c\.|continuo", re.I)
+# Only names that actually name the instrument. "Klavier" and "Clavier" are
+# deliberately absent: 147 of the organ MIDIs here label their tracks
+# "Klavier rechte Hand" / "Klavier linke Hand" and have a pedal underneath
+# regardless, so the word says nothing about which instrument is playing.
+PIANO_NAME_RE = re.compile(r"pianoforte|piano|harpsichord|cembalo", re.I)
 
 
 @dataclass
@@ -58,6 +63,60 @@ class _PartState:
     free_at: int = -10 ** 9
     last_src_track: int | None = None
     notes: list[Note] = field(default_factory=list)
+
+
+def looks_like_piano(score: Score) -> bool:
+    """Is this written for two hands, rather than manuals and a pedal board?
+
+    One thing turns on the answer. An organ's pedal board is a third limb
+    playing a line of its own, so the whole of it can be handed to the
+    bassist and left out of the assignment -- that is what
+    `detect_bass_tracks` is for. A piano's left hand is not a third limb.
+    Its bottom line crosses between the staves, doubles the right hand and
+    breaks into chords, and handing one staff of it straight to a single
+    monophonic bass would give the bassist an accompaniment figure and lose
+    the line wherever it moved.
+
+    So a piano score is arranged with nothing pre-routed: the bass takes
+    the lowest line through the same assignment as every other part, and
+    the six stages after that are identical to the organ's.
+
+    A name settles it where there is one -- an engraving that says Pedal,
+    or says Piano, has answered the question. Failing that, a part written
+    across at most two staves is for one pair of hands; three staves is the
+    organ layout, two manuals over the pedals.
+    """
+    names = " ".join(score.track_names.values())
+    if BASS_NAME_RE.search(names):
+        return False
+    if PIANO_NAME_RE.search(names):
+        return True
+    if score.engraved:
+        # One part, on no more than two staves. Both halves matter: an
+        # organ engraving gives the pedal board a part of its own, and its
+        # manuals still span two staves, so counting staves alone calls
+        # BWV 582 a piano.
+        parts = {n.src_channel for n in score.notes}
+        return len(parts) == 1 and 0 < _max_staves_per_part(score) <= 2
+    # A MIDI file has no staves to count, and nothing else in it separates
+    # a two-track piano export from a two-track organ chorale whose second
+    # track is the pedal -- of the 283 organ MIDIs this was written
+    # against, 147 are exactly that shape. Guessing costs more than it
+    # saves, so an unnamed MIDI is read as organ and `--source piano`
+    # says otherwise.
+    return False
+
+
+def _max_staves_per_part(score: Score) -> int:
+    """The most staves any one engraved part is written across."""
+    if not score.track_staves:
+        return 0
+    staves: dict[int, set[int]] = {}
+    for note in score.notes:
+        staff = score.track_staves.get(note.src_track)
+        if staff is not None:
+            staves.setdefault(note.src_channel, set()).add(staff)
+    return max((len(s) for s in staves.values()), default=0)
 
 
 def detect_bass_tracks(score: Score) -> set[int]:

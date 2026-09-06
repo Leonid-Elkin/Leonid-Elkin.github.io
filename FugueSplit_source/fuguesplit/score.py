@@ -53,6 +53,11 @@ class Score:
     time_sigs: list[TimeSigEvent] = field(default_factory=list)
     title: str = ""
     track_names: dict[int, str] = field(default_factory=dict)
+    track_staves: dict[int, int] = field(default_factory=dict)
+                                    # track -> the staff it was engraved on,
+                                    # which says how many hands (or feet) the
+                                    # writing is for. Empty for MIDI, which
+                                    # has no staves.
     key: tuple[int, int] = (0, 0)   # (sharps: -7..7, is_minor: 0/1)
     engraved: bool = False          # tracks are the engraving's own voices,
                                     # and src_channel the staff group they

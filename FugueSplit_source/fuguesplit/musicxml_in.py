@@ -71,6 +71,13 @@ def read_musicxml(path: str) -> Score:
                 score.track_names[tracks[key]] = _track_name(
                     names.get(part.get("id"), ""), pi, entry.staff, entry.voice
                 )
+                # Keep the staff itself, not just its number in the name:
+                # how many staves a part spans is what separates two hands
+                # at a piano from two manuals and a pedal board.
+                try:
+                    score.track_staves[tracks[key]] = int(entry.staff)
+                except ValueError:
+                    pass
             start = starts[entry.measure] + entry.offset
             score.notes.append(Note(
                 pitch=entry.pitch,

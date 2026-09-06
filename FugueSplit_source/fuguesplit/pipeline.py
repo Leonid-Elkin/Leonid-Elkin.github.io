@@ -41,6 +41,10 @@ class Settings:
     from_bar: int | None = None
     to_bar: int | None = None
     bass_tracks: set[int] | None = None   # None = auto-detect
+    source: str = "auto"          # "organ" reads a pedal board and hands it
+                                  # whole to the bass; "piano" has no third
+                                  # limb, so the bass is assigned like any
+                                  # other part. "auto" reads it off the score.
     title: str | None = None
     artist: str = ""
     like: str | None = None       # a score whose arrangement this one must
@@ -72,6 +76,9 @@ class Report:
     tempo: int
     key: tuple[int, int]
     bass_tracks: set[int]
+    read_as: str = "organ"       # "organ" or "piano": whether a pedal board
+                                 # was read off the score and handed to the
+                                 # bass, or the bass was assigned like the rest
     handed_off: int = 0          # notes lifted off the bass onto a guitar
     pulled_back: int = 0         # notes a transposition pushed off the neck
     matched: int = 0             # notes written as the reference wrote them
@@ -113,6 +120,23 @@ def read_source(path: str) -> Score:
     return midi_in.read_midi(path)
 
 
+SOURCES = ("auto", "organ", "piano")
+
+
+def resolve_source(score: Score, choice: str) -> str:
+    """Settle whether to read `score` as organ writing or as piano writing.
+
+    Only `auto` looks at the music; naming an instrument is taken at its
+    word, so a piece engraved without a part name can still be arranged
+    the way its player would read it.
+    """
+    if choice not in SOURCES:
+        raise ValueError(f"source must be one of {SOURCES}, not {choice!r}")
+    if choice != "auto":
+        return choice
+    return "piano" if voices.looks_like_piano(score) else "organ"
+
+
 def convert(midi_path: str, out_path: str, settings: Settings) -> Report:
     score = read_source(midi_path)
     score = _clip_bars(score, settings)
@@ -122,11 +146,15 @@ def convert(midi_path: str, out_path: str, settings: Settings) -> Report:
     # keeping 12% of the notes when it had in fact kept all of its own.
     source_total = len(score.notes)
 
-    bass_tracks = (
-        voices.detect_bass_tracks(score)
-        if settings.bass_tracks is None
-        else settings.bass_tracks
-    )
+    source = resolve_source(score, settings.source)
+    if settings.bass_tracks is not None:
+        bass_tracks = settings.bass_tracks
+    elif source == "piano":
+        # Two hands, no third limb: nothing is pre-routed, and the bass
+        # picks up the lowest line through the ordinary assignment.
+        bass_tracks = set()
+    else:
+        bass_tracks = voices.detect_bass_tracks(score)
     if not settings.bass:
         bass_tracks = set()
 
@@ -299,6 +327,7 @@ def convert(midi_path: str, out_path: str, settings: Settings) -> Report:
         tempo=tempo,
         key=score.key,
         bass_tracks=bass_tracks,
+        read_as=source,
         handed_off=handed_off,
         matched=matched,
         remapped=remapped,

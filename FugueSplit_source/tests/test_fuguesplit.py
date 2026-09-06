@@ -293,6 +293,107 @@ class TestVoices(unittest.TestCase):
         self.assertEqual(kept, [60, 72], "outer voices survive")
 
 
+class TestPianoSource(unittest.TestCase):
+    """Piano writing has two hands and no pedal board.
+
+    The organ reading hands a whole low staff to the bassist, which is
+    right for a pedal line playing on its own and wrong for a left hand,
+    whose bottom line breaks into chords and crosses to the other staff.
+    """
+
+    def _keyboard(self, parts=1, staves=(1, 2), names=None):
+        """An engraving: `staves` per part, one track per staff."""
+        notes, tracks, staff_of = [], {}, {}
+        for part in range(parts):
+            for staff in staves:
+                track = len(tracks)
+                tracks[(part, staff)] = track
+                staff_of[track] = staff
+                # Upper staff sits high, lower staff low, so the pitch
+                # test on its own would call the bottom one a pedal.
+                base = 72 if staff == 1 else 40
+                for i in range(20):
+                    notes.append(Note(base + i % 4, i * 240, i * 240 + 240, 90,
+                                      src_track=track, src_channel=part))
+        score = Score(ppq=480, notes=notes, engraved=True,
+                      tempos=[TempoEvent(0, 120)],
+                      time_sigs=[TimeSigEvent(0, 4, 4)])
+        score.track_staves = staff_of
+        score.track_names = names or {
+            t: f"Part {p + 1} s{s} v1" for (p, s), t in tracks.items()
+        }
+        return score
+
+    def test_two_staves_one_part_is_a_piano(self):
+        self.assertTrue(voices.looks_like_piano(self._keyboard()))
+
+    def test_a_pedal_part_is_not_a_piano(self):
+        # Manuals over two staves plus a pedal part: BWV 582's layout.
+        score = self._keyboard(parts=2)
+        self.assertFalse(voices.looks_like_piano(score))
+
+    def test_three_staves_is_not_a_piano(self):
+        score = self._keyboard(staves=(1, 2, 3))
+        self.assertFalse(voices.looks_like_piano(score))
+
+    def test_a_named_pedal_beats_the_staff_count(self):
+        score = self._keyboard()
+        score.track_names = {0: "Manual s1 v1", 1: "PEDAL s2 v1"}
+        self.assertFalse(voices.looks_like_piano(score))
+
+    def test_a_named_piano_beats_the_staff_count(self):
+        score = self._keyboard(staves=(1, 2, 3))
+        score.track_names = {t: "Piano" for t in score.track_staves}
+        self.assertTrue(voices.looks_like_piano(score))
+
+    def test_klavier_is_not_a_piano_name(self):
+        # 147 of the organ MIDIs label their tracks this way and have a
+        # pedal underneath regardless, so the word must not decide it.
+        notes = [Note(70, i * 240, i * 240 + 240, 90, src_track=1)
+                 for i in range(20)]
+        notes += [Note(40, i * 240, i * 240 + 240, 90, src_track=2)
+                  for i in range(20)]
+        score = Score(ppq=480, notes=notes, track_names={
+            1: "Klavier rechte Hand", 2: "Klavier linke Hand"})
+        self.assertFalse(voices.looks_like_piano(score))
+        self.assertEqual(voices.detect_bass_tracks(score), {2},
+                         "its pedal is still found and still routed")
+
+    def test_an_unnamed_midi_is_read_as_organ(self):
+        # No staves to count, and a two-track organ chorale looks exactly
+        # like a two-track piano export.
+        notes = [Note(70, i * 240, i * 240 + 240, 90, src_track=1)
+                 for i in range(20)]
+        notes += [Note(40, i * 240, i * 240 + 240, 90, src_track=2)
+                  for i in range(20)]
+        score = Score(ppq=480, notes=notes)
+        self.assertFalse(voices.looks_like_piano(score))
+
+    def test_piano_does_not_route_a_staff_to_the_bass(self):
+        score = self._keyboard()
+        self.assertEqual(voices.detect_bass_tracks(score), {1},
+                         "the organ reading takes the low staff whole")
+        self.assertEqual(pipeline.resolve_source(score, "auto"), "piano")
+
+    def test_naming_the_source_overrides_the_score(self):
+        piano = self._keyboard()
+        self.assertEqual(pipeline.resolve_source(piano, "organ"), "organ")
+        organ = self._keyboard(parts=2)
+        self.assertEqual(pipeline.resolve_source(organ, "piano"), "piano")
+
+    def test_an_unknown_source_is_rejected(self):
+        with self.assertRaises(ValueError):
+            pipeline.resolve_source(self._keyboard(), "spinet")
+
+    def test_the_bass_still_takes_the_lowest_line(self):
+        # Nothing is pre-routed, but the bass is still the bottom part:
+        # tracks are laid out by register, so the low staff lands on it.
+        score = self._keyboard()
+        streams = voices.separate(score, voices.VoiceConfig(n_parts=2), set())
+        self.assertTrue(all(n.pitch < 60 for n in streams[-1]))
+        self.assertTrue(all(n.pitch >= 60 for n in streams[0]))
+
+
 class TestCascade(unittest.TestCase):
     def _score(self, notes):
         return Score(ppq=480, notes=notes, tempos=[TempoEvent(0, 120)],

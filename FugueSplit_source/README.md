@@ -140,6 +140,7 @@ python -m fuguesplit INPUT.mid [-o OUTPUT.gp5] [options]
 |---|---|
 | `-g, --guitars N` | fix the number of guitar parts; the default works it out from the texture and grows it while notes are still being crammed into a second voice |
 | `--max-parts N` | ceiling on that growth, staves including the bass (default 7) |
+| `--source NAME` | `organ`, `piano`, or `auto` (default): whether the score has a pedal board to hand the bassist. See [Piano, not organ](#piano-not-organ) |
 | `--no-bass` | do not create a bass part |
 | `--tuning NAME` | `standard`, `drop-d`, `eb`, `d-standard` |
 | `--bass-tuning NAME` | `bass`, `bass5`, `bass-drop-d` |
@@ -277,6 +278,62 @@ already uses, are at [Tobis Notenarchiv](https://tobis-notenarchiv.de/):
 each piece offers MusicXML beside its MIDI. Drop the `.xml` next to the `.mid`
 and `convert_all.py` prefers it automatically, taking the tempo from the MIDI
 since editions carry none.
+
+## Piano, not organ
+
+Piano music goes through the same six stages, and needs one thing turned
+off to do it.
+
+An organ has a third limb. The pedal board plays a line of its own, on its
+own staff, and stage 2 uses that: a part named `PEDAL`, `Bass` or
+`Continuo` — or, failing a name, one sitting a fifth below everything else
+— is handed to the bassist whole and never enters the assignment. That is
+right for a line the feet are playing on their own, and wrong for a piano.
+
+A piano's left hand is not a third limb. Its bottom line breaks into
+chords, doubles the right hand, and crosses to the other staff whenever
+the writing wants it to. Handing one staff of that straight to a single
+monophonic bass gives the bassist an accompaniment figure and loses the
+line wherever it moves. So on a piano score nothing is pre-routed: the
+bass takes the lowest line through the same minimum-cost assignment as
+every other part, and stages 3 to 6 are untouched.
+
+```
+python -m fuguesplit BWV_0533a.xml -o manualiter.gp5
+```
+
+```
+"BWV_0533a"  ->  manualiter.gp5
+  70 bars, 79 bpm, 1 sharp
+  read as piano: no pedal board, so the bass is assigned with the rest
+  1380 source notes -> 1300 written
+```
+
+**Working out which it is.** `--source auto`, the default, reads it off
+the score, and only two things are trusted.
+
+A name, where the engraving gives one: a part that says `Piano`,
+`Harpsichord` or `Cembalo` is a piano, and one that says `Pedal` is not.
+`Klavier` and `Clavier` are deliberately *not* piano names — 147 of the
+organ MIDIs here label their tracks `Klavier rechte Hand` and `Klavier
+linke Hand` and have a pedal underneath regardless, so the word settles
+nothing.
+
+Failing a name, the engraved layout: **one part written across at most two
+staves** is a piano. Both halves of that matter. An organ engraving gives
+the pedal board a part of its own while its manuals still span two staves,
+so counting staves alone calls BWV 582 a piano.
+
+A MIDI file has neither. It has no staves, and nothing in it separates a
+two-track piano export from a two-track organ chorale whose second track
+is the pedal — of the 283 organ MIDIs here, 147 are exactly that shape.
+Guessing there costs more than it saves, so **an unnamed MIDI is read as
+an organ**, and `--source piano` is how you say otherwise.
+
+Run over all 376 scores in this repository, auto-detection changes the
+bass routing of **none** of them. The two it does call piano are the two
+that are: `BWV_0533a`, the *manualiter* version with no pedal part, and
+Tovey's completion of Contrapunctus XIX, engraved on two staves.
 
 ## Finishing it without a completer (`complete.py`)
 

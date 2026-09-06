@@ -39,6 +39,12 @@ def build_parser() -> argparse.ArgumentParser:
                         "thicker moment than this can be covered is written "
                         "as a double-stop or in a stave's second voice "
                         "(default 7)")
+    p.add_argument("--source", default="auto", choices=["auto", "organ", "piano"],
+                   help="what the score is written for. An organ's pedal "
+                        "board is a line of its own and goes to the bass "
+                        "whole; a piano has two hands and no third limb, so "
+                        "its bass is assigned like every other part. The "
+                        "default reads it off the score")
     p.add_argument("--no-bass", action="store_true",
                    help="do not create a bass part")
     p.add_argument("--tuning", default="standard", choices=sorted(arrange.TUNINGS),
@@ -147,7 +153,7 @@ def main(argv: list[str] | None = None) -> int:
     args = build_parser().parse_args(argv)
 
     if args.list_tracks:
-        return _list_tracks(args.midi)
+        return _list_tracks(args.midi, args.source)
 
     out = args.out or os.path.splitext(args.midi)[0] + ".gp5"
     settings = Settings(
@@ -182,6 +188,7 @@ def main(argv: list[str] | None = None) -> int:
         from_bar=args.from_bar,
         to_bar=args.to_bar,
         bass_tracks=set(args.bass_track) if args.bass_track else None,
+        source=args.source,
         like=args.like,
         title=args.title,
         artist=args.artist,
@@ -198,12 +205,14 @@ def main(argv: list[str] | None = None) -> int:
     return 0
 
 
-def _list_tracks(path: str) -> int:
-    from .pipeline import read_source
+def _list_tracks(path: str, source: str = "auto") -> int:
+    from .pipeline import read_source, resolve_source
 
     score = read_source(path)
-    detected = voices.detect_bass_tracks(score)
-    print(f"{path}: {len(score.notes)} notes, {score.ppq} ticks/beat")
+    read_as = resolve_source(score, source)
+    detected = set() if read_as == "piano" else voices.detect_bass_tracks(score)
+    print(f"{path}: {len(score.notes)} notes, {score.ppq} ticks/beat"
+          f"{', read as piano' if read_as == 'piano' else ''}")
     print(f"{'trk':>4}  {'notes':>6}  {'range':>9}  name")
     for ti, notes in sorted(score.notes_by_track().items()):
         pitches = [n.pitch for n in notes]
@@ -224,6 +233,9 @@ def _print_report(report: Report, out: str) -> None:
     if report.bass_tracks:
         print(f"  bass taken from source track(s): "
               f"{', '.join(str(t) for t in sorted(report.bass_tracks))}")
+    elif report.read_as == "piano":
+        print("  read as piano: no pedal board, so the bass is assigned "
+              "with the rest")
     print(f"  {report.source_notes} source notes -> "
           f"{report.written_notes} written")
     print()
