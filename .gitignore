@@ -3,3 +3,7 @@
 .claude/
 .cursor/
 .impeccable/
+
+# stray bytecode, wherever a script gets run
+__pycache__/
+*.pyc

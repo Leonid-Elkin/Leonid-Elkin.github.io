@@ -485,6 +485,29 @@ as ten fingers can hold.
 
 Every tab is credited to Leonid Elkin as arranger, with Bach as composer.
 
+## Dropping the high parts an octave (`octave_down.py`)
+
+```
+python octave_down.py
+```
+
+The published tabs put some parts higher than a guitar wants to sit. This walks
+the arrangements in `../fugue/` -- the copies served at `/fugue/` on the site --
+and drops a part an octave where that helps.
+
+A part is too high when its mean sounding pitch is 27 semitones or more above
+its lowest open string: G4 on a guitar, G3 on a bass. Mean pitch is the register
+the part actually occupies, where mean fret would only say which strings the
+fretting algorithm happened to pick. A part moves only if every note survives
+the move -- the lowest note has to stay on the neck after -12. Where it would
+fall short of the open low string the bottom string is dropped, to D, or to C
+for the parts needing another whole tone, which reaches those notes and loses
+none. Anything still short is left where it was.
+
+Everything that moves is re-fretted with FugueSplit's own Viterbi, so the tab
+still keeps the hand in one place. The rewritten sections land in
+`../fugue/transposed/`, beside a `changes.csv` listing what moved and why.
+
 ## Tests
 
 ```
