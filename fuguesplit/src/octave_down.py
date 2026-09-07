@@ -48,11 +48,11 @@ def _tied_note_value(self, note):
 
 guitarpro.gp3.GP3File.getTiedNoteValue = _tied_note_value
 
-# The published tabs, which live at /fugue/ in the site root -- one level
-# up from this file. Read from there, and write the transposed copies
-# back beside them.
+# The published tabs, one level up from this file. Each shelf keeps its
+# straight reading in gp/ and its octave-dropped one in 8ve/, so the two
+# sit beside each other rather than in a parallel tree.
 SRC = os.path.normpath(
-    os.path.join(os.path.dirname(os.path.abspath(__file__)), os.pardir, "fugue"))
+    os.path.join(os.path.dirname(os.path.abspath(__file__)), os.pardir, "bach"))
 DST = os.path.join(SRC, "transposed")
 SECTIONS = ["art-of-fugue", "chorales", "fugues", "preludes-and-fugues", "trio-sonatas"]
 

@@ -1,16 +1,18 @@
-"""Write the new shelves into the published /fugue/ page.
+"""Write the new shelves into the published /fuguesplit/ page.
 
     python build_index.py
 
-Reads every ../fugue/<shelf>/shelf.json that `build_shelves.py` left and
-rewrites one marked block in ../fugue/index.html. The block is delimited by
+Reads every ../bach/<shelf>/shelf.json that `build_shelves.py` left and
+rewrites one marked block in ../index.html. The block is delimited by
 HTML comments, so running this again replaces what it wrote last time
-instead of piling a second copy on top; everything the page had before the
-markers -- the five hand-built organ shelves -- is left alone.
+instead of piling a second copy on top.
 
-New shelves carry a GP5 link only. The per-part PDFs on the organ shelves
-are made outside this repository, and the page already says of its later
-shelves that they are Guitar Pro files for now.
+Every shelf on the page is generated now, the five organ ones included --
+they were hand-written HTML until shelf_from_tabs.py recovered their
+metadata from the tabs themselves. That is what makes the octave-dropped
+readings in 8ve/ reachable; they were linked from nowhere before. Where a
+piece has per-part PDFs those are linked too, so nothing the hand-written
+page offered is lost.
 """
 
 from __future__ import annotations
@@ -24,14 +26,21 @@ import os
 import sys
 
 HERE = os.path.dirname(os.path.abspath(__file__))
-SITE = os.path.normpath(os.path.join(HERE, os.pardir, "fugue"))
-INDEX = os.path.join(SITE, "index.html")
+SITE = os.path.normpath(os.path.join(HERE, os.pardir, "bach"))
+INDEX = os.path.normpath(os.path.join(HERE, os.pardir, "index.html"))
 
 BEGIN = "                <!-- shelves:begin (build_index.py) -->"
 END = "                <!-- shelves:end -->"
 
 # The order the shelves read in on the page.
 ORDER = [
+    # The organ works first: they are what the page opened with.
+    "preludes-and-fugues",
+    "art-of-fugue",
+    "fugues",
+    "trio-sonatas",
+    "chorales",
+    "organ-other",
     "well-tempered-clavier",
     "inventions-and-sinfonias",
     "keyboard-suites",
@@ -62,12 +71,33 @@ CREDIT = """                <p class="setup">Bach's music is public domain. The 
                     <a href="https://creativecommons.org/licenses/by-nc-sa/4.0/" target="_blank" rel="noopener">CC
                     BY-NC-SA 4.0</a>, so these arrangements carry the same licence: credit the source, keep it
                     non-commercial, share it alike. The converter is in
-                    <a href="https://github.com/Leonid-Elkin/Leonid-Elkin.github.io/tree/main/FugueSplit_source">FugueSplit_source</a>
+                    <a href="https://github.com/Leonid-Elkin/Leonid-Elkin.github.io/tree/main/fuguesplit/src">fuguesplit/src</a>
                     if you would like to run it over something of your own.</p>"""
 
 
 def piece_html(shelf: str, piece: dict) -> str:
-    gp = f"/fugue/{shelf}/gp/{piece['stem']}.gp5"
+    gp = f"/fuguesplit/bach/{shelf}/gp/{piece['stem']}.gp5"
+    # Some shelves also carry an octave-dropped reading, made by
+    # octave_down.py and kept in 8ve/ beside the straight one. Link it
+    # where it exists rather than leaving 356 files reachable from nowhere,
+    # which is what the old parallel transposed/ folder amounted to.
+    low = os.path.join(SITE, shelf, "8ve", piece["stem"] + ".gp5")
+    octave = (f'\n                                <a class="get-gp" '
+              f'href="/fuguesplit/bach/{shelf}/8ve/{piece["stem"]}.gp5" '
+              f'title="the same arrangement with over-high parts dropped an '
+              f'octave">8VE</a>') if os.path.exists(low) else ""
+
+    # The organ shelves carry a PDF per player, engraved elsewhere. They
+    # predate this generator and must not be dropped by it.
+    parts = []
+    for pdf in sorted(glob.glob(os.path.join(
+            SITE, shelf, "pdf", glob.escape(piece["stem"]) + "-*.pdf"))):
+        suffix = os.path.splitext(os.path.basename(pdf))[0][len(piece["stem"]) + 1:]
+        name = suffix.replace("guitar-", "").upper()
+        parts.append(
+            f'\n                                <a class="get-part" '
+            f'href="/fuguesplit/bach/{shelf}/pdf/{os.path.basename(pdf)}" '
+            f'title="{suffix.replace("-", " ")} &mdash; PDF">{name}</a>')
     meta = f"{piece['band']} &middot; {piece['bars']} bars"
     if piece.get("tempo"):
         meta += f" &middot; {piece['tempo']} bpm"
@@ -81,8 +111,8 @@ def piece_html(shelf: str, piece: dict) -> str:
                             <span class="piece-idx mono">{html.escape(piece['label'])}</span>
                             <span class="piece-name">{html.escape(name)}</span>
                             <span class="piece-meta mono">{meta}</span>
-                            <span class="piece-get">
-                                <a class="get-gp" href="{gp}" title="Guitar Pro file, every part together">GP5</a>
+                            <span class="piece-get">{"".join(parts)}
+                                <a class="get-gp" href="{gp}" title="Guitar Pro file, every part together">GP5</a>{octave}
                             </span>
                         </li>"""
 
@@ -123,10 +153,13 @@ def main(argv: list[str] | None = None) -> int:
     with io.open(args.index, encoding="utf-8") as fh:
         page = fh.read()
 
+    first_shelf = page.find('                <div class="set-head">')
     if BEGIN in page and END in page:
-        before = page[:page.index(BEGIN)]
-        after = page[page.index(END) + len(END):]
-        page = before + block + after
+        # Everything from the first shelf to the end marker is ours now:
+        # the five organ shelves were hand-written HTML, and once they have
+        # a shelf.json they would otherwise appear twice on the page.
+        start = first_shelf if 0 <= first_shelf < page.index(BEGIN) else page.index(BEGIN)
+        page = page[:start] + block + page[page.index(END) + len(END):]
     else:
         # First run: land the block after the last hand-built shelf, which
         # is the last </ul> before the closing note, and put the licence

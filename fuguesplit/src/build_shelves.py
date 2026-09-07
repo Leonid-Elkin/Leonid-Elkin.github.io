@@ -5,11 +5,11 @@
 
 Takes what `fetch_tobis.py` downloaded into midi/klavier/<section>/, runs
 each score through the arranger, and writes the finished .gp5 into
-../fugue/<shelf>/gp/ -- the folder the published page links to. A shelf
+../bach/<shelf>/gp/ -- the folder the published page links to. A shelf
 gathers the archive's sections into one heading a reader would recognise.
 
 Metadata for each piece (bars, tempo, the size of the band) lands in
-../fugue/<shelf>/shelf.json, which `build_index.py` turns into the page.
+../bach/<shelf>/shelf.json, which `build_index.py` turns into the page.
 
 Movements are not split. The archive publishes a prelude and its fugue as
 one score and this keeps them that way, rather than inventing a bar to cut
@@ -35,7 +35,8 @@ from fuguesplit.pipeline import Settings, convert
 from keyboard_titles import best_title, label_for, title_for
 
 HERE = os.path.dirname(os.path.abspath(__file__))
-SITE = os.path.normpath(os.path.join(HERE, os.pardir, "fugue"))
+# One tree per composer under fuguesplit/, the folder this lives in.
+SITE = os.path.normpath(os.path.join(HERE, os.pardir, "bach"))
 
 # shelf -> (heading, blurb, root under midi/, sections under that root).
 # An empty section list takes everything under the root, however deeply the

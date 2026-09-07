@@ -25,7 +25,7 @@ sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 from keyboard_titles import best_title, label_for
 
 HERE = os.path.dirname(os.path.abspath(__file__))
-SITE = os.path.normpath(os.path.join(HERE, os.pardir, "fugue"))
+SITE = os.path.normpath(os.path.join(HERE, os.pardir, "bach"))
 
 
 def main(argv: list[str] | None = None) -> int:
