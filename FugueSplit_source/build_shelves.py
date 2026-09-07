@@ -21,6 +21,7 @@ Quelle: www.tobis-notenarchiv.de -- CC BY-NC-SA 4.0.
 from __future__ import annotations
 
 import argparse
+import glob
 import json
 import os
 import sys
@@ -109,11 +110,11 @@ SHELVES: dict[str, tuple[str, str, str, list[str]]] = {
     ),
     "passions-and-masses": (
         "Passions, masses and oratorios", "BWV 225–249", "vocal",
-        ["passionen-und-oratorien", "messen-magnificat", "motetten"],
+        ["passionen", "oratorien", "messen", "magnificat", "motetten"],
     ),
     "chorales-and-songs": (
         "Four-part chorales and songs", "BWV 250–524", "vocal",
-        ["vierstimmige-choraele", "lieder-und-arien"],
+        ["vierstimmige-choraele", "lieder-arien-und-quodlibet"],
     ),
     "appendix": (
         "Appendix and doubtful works", "BWV Anh.", "appendix", [],
@@ -127,7 +128,31 @@ SHELVES: dict[str, tuple[str, str, str, list[str]]] = {
     "manuscripts": (
         "Notebooks, prints and manuscripts", "", "manuscripts", [],
     ),
+    "organ-other": (
+        "More organ works", "BWV 525–598", "organ-full", [],
+    ),
 }
+
+# The five shelves already on the page were built by hand from the same
+# archive. A shelf listed here skips anything they already hold, so the
+# organ collection contributes only what is not published yet rather than
+# a second copy of 303 pieces.
+ORIGINAL = ["art-of-fugue", "chorales", "fugues", "preludes-and-fugues",
+            "trio-sonatas"]
+AVOID = {"organ-other": ORIGINAL}
+
+
+def already_published(shelves: list[str]) -> set[str]:
+    """Stems those shelves hold, movement suffixes folded in."""
+    import re
+    held: set[str] = set()
+    for shelf in shelves:
+        pattern = os.path.join(SITE, shelf, "gp", "*.gp5")
+        for path in glob.glob(pattern):
+            stem = os.path.splitext(os.path.basename(path))[0]
+            held.add(stem)
+            held.add(re.sub(r"-\d+$", "", stem))
+    return held
 
 
 def band(report) -> str:
@@ -164,11 +189,14 @@ def build(shelf: str, midi_root: str) -> list[dict]:
     gp_dir = os.path.join(SITE, shelf, "gp")
     os.makedirs(gp_dir, exist_ok=True)
 
+    held = already_published(AVOID.get(shelf, []))
     records: list[dict] = []
     for folder in source_dirs(os.path.join(midi_root, root), sections):
         section = os.path.relpath(folder, midi_root).replace(os.sep, "/")
         for name in pick_sources(folder):
             stem = os.path.splitext(name)[0]
+            if stem in held:
+                continue
             src = os.path.join(folder, name)
             # One shelf gathers several folders, and the archive reuses a
             # name across them -- a movement called "Aria" under two
