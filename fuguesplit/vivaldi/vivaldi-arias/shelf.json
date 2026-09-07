@@ -1,0 +1,60 @@
+{
+ "shelf": "vivaldi-arias",
+ "composer": "vivaldi",
+ "heading": "Vivaldi — arias",
+ "span": "RV 690, RV 725",
+ "pieces": [
+  {
+   "stem": "rv690-DellAlmaSuperba",
+   "label": "RV 690",
+   "title": "control track",
+   "band": "2 guitars + bass",
+   "bars": 139,
+   "tempo": 90,
+   "source_notes": 1380,
+   "written_notes": 1380,
+   "read_as": "organ",
+   "broken": 1,
+   "section": "vivaldi"
+  },
+  {
+   "stem": "rv725-DelDestin",
+   "label": "RV 725",
+   "title": "control track",
+   "band": "3 guitars + bass",
+   "bars": 111,
+   "tempo": 90,
+   "source_notes": 1687,
+   "written_notes": 1687,
+   "read_as": "organ",
+   "broken": 2,
+   "section": "vivaldi"
+  },
+  {
+   "stem": "rv725-MentreDormi",
+   "label": "RV 725",
+   "title": "control track",
+   "band": "5 guitars + bass",
+   "bars": 41,
+   "tempo": 40,
+   "source_notes": 1468,
+   "written_notes": 1442,
+   "read_as": "organ",
+   "broken": 0,
+   "section": "vivaldi"
+  },
+  {
+   "stem": "rv725-SiamNavi",
+   "label": "RV 725",
+   "title": "control track",
+   "band": "5 guitars + bass",
+   "bars": 68,
+   "tempo": 80,
+   "source_notes": 3806,
+   "written_notes": 3701,
+   "read_as": "organ",
+   "broken": 43,
+   "section": "vivaldi"
+  }
+ ]
+}
