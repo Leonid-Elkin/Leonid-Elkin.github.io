@@ -183,6 +183,14 @@ def build(shelf: str, midi_root: str) -> list[dict]:
                 artist=COMPOSER,
                 legato_quarters=1.0,
                 tempo=tempo_beside(folder, name),
+                # Ensemble music has more lines at once than a keyboard
+                # piece: the first movement of the C major overture keeps
+                # 5,408 of its 7,169 notes against a ceiling of five and
+                # 7,131 against eight. Costs nothing where it is not
+                # needed -- the band only grows while notes are still
+                # being crammed into a stave's second voice, so every
+                # keyboard and chamber score tested came out identical.
+                max_parts=8,
             )
             try:
                 report = convert(src, dst, settings)

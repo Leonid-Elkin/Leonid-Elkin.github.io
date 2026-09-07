@@ -1,0 +1,111 @@
+{
+ "shelf": "canons",
+ "heading": "Canons",
+ "span": "BWV 1072–1078, 1086–1087",
+ "pieces": [
+  {
+   "stem": "BWV_1072",
+   "label": "BWV 1072",
+   "title": "BWV_1072",
+   "band": "7 guitars + bass",
+   "bars": 7,
+   "tempo": 100,
+   "source_notes": 176,
+   "written_notes": 176,
+   "read_as": "organ",
+   "broken": 0,
+   "section": "canons"
+  },
+  {
+   "stem": "BWV_1073",
+   "label": "BWV 1073",
+   "title": "BWV_1073",
+   "band": "3 guitars + bass",
+   "bars": 29,
+   "tempo": 100,
+   "source_notes": 707,
+   "written_notes": 707,
+   "read_as": "organ",
+   "broken": 6,
+   "section": "canons"
+  },
+  {
+   "stem": "BWV_1074",
+   "label": "BWV 1074",
+   "title": "BWV_1074",
+   "band": "3 guitars + bass",
+   "bars": 17,
+   "tempo": 100,
+   "source_notes": 105,
+   "written_notes": 105,
+   "read_as": "organ",
+   "broken": 0,
+   "section": "canons"
+  },
+  {
+   "stem": "BWV_1074i",
+   "label": "BWV 1074i",
+   "title": "BWV_1074i",
+   "band": "3 guitars + bass",
+   "bars": 17,
+   "tempo": 100,
+   "source_notes": 106,
+   "written_notes": 106,
+   "read_as": "organ",
+   "broken": 0,
+   "section": "canons"
+  },
+  {
+   "stem": "BWV_1075",
+   "label": "BWV 1075",
+   "title": "BWV_1075",
+   "band": "1 guitar + bass",
+   "bars": 11,
+   "tempo": 200,
+   "source_notes": 107,
+   "written_notes": 107,
+   "read_as": "organ",
+   "broken": 0,
+   "section": "canons"
+  },
+  {
+   "stem": "BWV_1076",
+   "label": "BWV 1076",
+   "title": "BWV_1076",
+   "band": "5 guitars + bass",
+   "bars": 11,
+   "tempo": 100,
+   "source_notes": 163,
+   "written_notes": 163,
+   "read_as": "organ",
+   "broken": 0,
+   "section": "canons"
+  },
+  {
+   "stem": "BWV_1077",
+   "label": "BWV 1077",
+   "title": "BWV_1077",
+   "band": "4 guitars + bass",
+   "bars": 9,
+   "tempo": 40,
+   "source_notes": 293,
+   "written_notes": 293,
+   "read_as": "organ",
+   "broken": 0,
+   "section": "canons"
+  },
+  {
+   "stem": "BWV_1078",
+   "label": "BWV 1078",
+   "title": "BWV_1078",
+   "band": "6 guitars + bass",
+   "bars": 22,
+   "tempo": 200,
+   "source_notes": 548,
+   "written_notes": 548,
+   "read_as": "organ",
+   "broken": 0,
+   "section": "canons"
+  }
+ ]
+}

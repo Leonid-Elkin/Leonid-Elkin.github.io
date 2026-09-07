@@ -23,6 +23,7 @@ import concurrent.futures as cf
 import io
 import os
 import re
+import shutil
 import sys
 import time
 import urllib.error
@@ -117,20 +118,51 @@ def downloads(section_url: str) -> dict[str, dict[str, str]]:
     return found
 
 
-def save_engraving(blob: bytes, stem: str, out_dir: str) -> str | None:
+def download(url: str, path: str, tries: int = 3) -> None:
+    """Stream a URL straight to disk.
+
+    Not `get()` plus a write: an engraving here reaches six megabytes, and
+    holding several of those in memory at once alongside the arranger is
+    what got an earlier run killed. Written to a partial file and renamed,
+    so an interrupted fetch leaves nothing that looks complete.
+    """
+    last = None
+    part = path + ".part"
+    for attempt in range(tries):
+        try:
+            req = urllib.request.Request(url, headers={"User-Agent": UA})
+            with urllib.request.urlopen(req, timeout=90) as src:
+                with open(part, "wb") as dst:
+                    shutil.copyfileobj(src, dst, 64 * 1024)
+            os.replace(part, path)
+            return
+        except (urllib.error.URLError, OSError) as exc:
+            last = exc
+            time.sleep(2 * (attempt + 1))
+    if os.path.exists(part):
+        os.remove(part)
+    raise RuntimeError(f"{url}: {last}")
+
+
+def save_engraving(url: str, stem: str, out_dir: str) -> str | None:
     """Unpack the one MusicXML inside a Tobis .zip. Returns the path."""
+    tmp = os.path.join(out_dir, stem + ".zip.tmp")
+    download(url, tmp)
     try:
-        archive = zipfile.ZipFile(io.BytesIO(blob))
+        with zipfile.ZipFile(tmp) as archive:
+            names = [n for n in archive.namelist()
+                     if n.lower().endswith((".xml", ".musicxml"))]
+            if not names:
+                return None
+            path = os.path.join(out_dir, stem + ".xml")
+            with archive.open(names[0]) as src, open(path, "wb") as dst:
+                shutil.copyfileobj(src, dst, 64 * 1024)
+            return path
     except zipfile.BadZipFile:
         return None
-    names = [n for n in archive.namelist()
-             if n.lower().endswith((".xml", ".musicxml"))]
-    if not names:
-        return None
-    path = os.path.join(out_dir, stem + ".xml")
-    with open(path, "wb") as fh:
-        fh.write(archive.read(names[0]))
-    return path
+    finally:
+        if os.path.exists(tmp):
+            os.remove(tmp)
 
 
 def fetch(index_url: str, out_dir: str, pause: float,
@@ -165,11 +197,10 @@ def fetch(index_url: str, out_dir: str, pause: float,
             if os.path.exists(xml_path) and os.path.exists(mid_path):
                 return None
             if "zip" in urls and not os.path.exists(xml_path):
-                save_engraving(get(urls["zip"]), stem, section_dir)
+                save_engraving(urls["zip"], stem, section_dir)
                 time.sleep(pause)
             if "mid" in urls and not os.path.exists(mid_path):
-                with open(mid_path, "wb") as fh:
-                    fh.write(get(urls["mid"]))
+                download(urls["mid"], mid_path)
                 time.sleep(pause)
             return stem
 
@@ -202,7 +233,7 @@ def main(argv: list[str] | None = None) -> int:
                     help="where the folders are made (default: midi/)")
     ap.add_argument("--pause", type=float, default=0.4, metavar="S",
                     help="seconds between requests; be kind to the archive")
-    ap.add_argument("--workers", type=int, default=4, metavar="N",
+    ap.add_argument("--workers", type=int, default=2, metavar="N",
                     help="downloads in flight at once (default 4); this is "
                          "a small archive, so keep it small")
     ap.add_argument("--list", action="store_true",
