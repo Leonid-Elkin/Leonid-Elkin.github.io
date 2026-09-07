@@ -81,8 +81,79 @@ def title_for(stem: str) -> str | None:
     return None
 
 
+try:                                    # only needed by readable()
+    import re as _re
+except ImportError:                     # pragma: no cover
+    _re = None
+
+# What the engravings put in their title field when they have no title:
+# "BWV 1082 - S. #" is a page marker (Seite), not a name.
+PLACEHOLDER = _re.compile(r"S(?:eite)?\.?\s*#|^\s*$|^BWV[_ ]?\d")
+
+
+def readable(stem: str) -> str:
+    """A name for a piece the catalogue tables do not cover.
+
+    Most of the archive outside the keyboard works carries no usable title
+    -- 1,886 of 2,441 scores here say only "BWV_1082" or "BWV 1082 - S. #"
+    -- so the catalogue number is turned into something a reader can scan
+    instead of a filename. "BWV_1087_05" becomes "BWV 1087, no. 5";
+    "BWV_0232_16", "BWV 232, no. 16".
+    """
+    if not stem.upper().startswith("BWV_"):
+        return stem.replace("_", " ")
+    parts = stem[4:].split("_")
+    head = parts[0]
+    # The appendix is catalogued "BWV Anh. 25", not "BWV Anh 025".
+    if head.lower().startswith("anh"):
+        parts = parts[1:]
+        name = "BWV Anh."
+        if parts and _re.fullmatch(r"\d+", parts[0]):
+            name += f" {int(parts[0])}"
+            parts = parts[1:]
+    else:
+        name = f"BWV {head.lstrip('0') or '0'}"
+        parts = parts[1:]
+    words, numbers = [], []
+    for piece in (p for p in parts if p):
+        if _re.fullmatch(r"\d+", piece):
+            numbers.append(str(int(piece)))
+        elif _re.fullmatch(r"\d+-\d+", piece):
+            lo, hi = piece.split("-")
+            numbers += [str(int(lo)), str(int(hi))]
+        else:
+            words.append(piece.replace("-", " "))
+    if words:
+        name += ", " + ", ".join(words)
+    if numbers:
+        if len(numbers) == 1:
+            name += f", no. {numbers[0]}"
+        else:
+            name += f", nos. {numbers[0]}–{numbers[-1]}"
+    return name
+
+
+def best_title(stem: str, from_score: str | None) -> str:
+    """The catalogue name, the score's own, or a readable fallback."""
+    known = title_for(stem)
+    if known:
+        return known
+    said = (from_score or "").strip()
+    # A score whose "title" is just its filename has no title.
+    if said and said != stem and not PLACEHOLDER.search(said):
+        return said
+    return readable(stem)
+
+
 def label_for(stem: str) -> str:
     """The catalogue number as the page shows it: BWV_0846 -> BWV 846."""
     if not stem.upper().startswith("BWV_"):
         return stem
-    return "BWV " + stem[4:].lstrip("0")
+    parts = stem[4:].split("_")
+    head = parts[0]
+    if head.lower().startswith("anh"):
+        rest = parts[1] if len(parts) > 1 and parts[1].isdigit() else ""
+        return "BWV Anh." + (f" {int(rest)}" if rest else "")
+    if head.lower() == "deest":
+        return "BWV deest"
+    return "BWV " + (head.lstrip("0") or "0")

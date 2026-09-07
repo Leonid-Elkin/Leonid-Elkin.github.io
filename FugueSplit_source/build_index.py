@@ -71,9 +71,15 @@ def piece_html(shelf: str, piece: dict) -> str:
     meta = f"{piece['band']} &middot; {piece['bars']} bars"
     if piece.get("tempo"):
         meta += f" &middot; {piece['tempo']} bpm"
+    # Much of the archive has no title beyond its catalogue number, and the
+    # number is already in the column to the left. Printing it twice reads
+    # as a mistake, so the name is simply left empty.
+    name = piece["title"]
+    if name.strip() == piece["label"].strip():
+        name = ""
     return f"""                        <li>
                             <span class="piece-idx mono">{html.escape(piece['label'])}</span>
-                            <span class="piece-name">{html.escape(piece['title'])}</span>
+                            <span class="piece-name">{html.escape(name)}</span>
                             <span class="piece-meta mono">{meta}</span>
                             <span class="piece-get">
                                 <a class="get-gp" href="{gp}" title="Guitar Pro file, every part together">GP5</a>

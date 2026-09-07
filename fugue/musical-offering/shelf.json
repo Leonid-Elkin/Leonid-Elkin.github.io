@@ -5,8 +5,8 @@
  "pieces": [
   {
    "stem": "BWV_1079_01",
-   "label": "BWV 1079_01",
-   "title": "BWV 1079 - S. #",
+   "label": "BWV 1079",
+   "title": "BWV 1079, no. 1",
    "band": "2 guitars + bass",
    "bars": 185,
    "tempo": 120,
@@ -18,8 +18,8 @@
   },
   {
    "stem": "BWV_1079_02",
-   "label": "BWV 1079_02",
-   "title": "BWV 1079 - S. #",
+   "label": "BWV 1079",
+   "title": "BWV 1079, no. 2",
    "band": "5 guitars + bass",
    "bars": 103,
    "tempo": 120,
@@ -31,7 +31,7 @@
   },
   {
    "stem": "BWV_1079_03_1",
-   "label": "BWV 1079_03_1",
+   "label": "BWV 1079",
    "title": "- # -",
    "band": "2 guitars + bass",
    "bars": 49,
@@ -44,8 +44,8 @@
   },
   {
    "stem": "BWV_1079_03_2",
-   "label": "BWV 1079_03_2",
-   "title": "BWV 1079 - S. #",
+   "label": "BWV 1079",
+   "title": "BWV 1079, nos. 3–2",
    "band": "2 guitars + bass",
    "bars": 173,
    "tempo": 89,
@@ -57,7 +57,7 @@
   },
   {
    "stem": "BWV_1079_03_3",
-   "label": "BWV 1079_03_3",
+   "label": "BWV 1079",
    "title": "- # -",
    "band": "2 guitars + bass",
    "bars": 30,
@@ -70,7 +70,7 @@
   },
   {
    "stem": "BWV_1079_03_4",
-   "label": "BWV 1079_03_4",
+   "label": "BWV 1079",
    "title": "- # -",
    "band": "2 guitars + bass",
    "bars": 113,
@@ -83,7 +83,7 @@
   },
   {
    "stem": "BWV_1079_04_01",
-   "label": "BWV 1079_04_01",
+   "label": "BWV 1079",
    "title": "- # -",
    "band": "1 guitar + bass",
    "bars": 18,
@@ -96,7 +96,7 @@
   },
   {
    "stem": "BWV_1079_04_02",
-   "label": "BWV 1079_04_02",
+   "label": "BWV 1079",
    "title": "- # -",
    "band": "2 guitars + bass",
    "bars": 33,
@@ -109,7 +109,7 @@
   },
   {
    "stem": "BWV_1079_04_03",
-   "label": "BWV 1079_04_03",
+   "label": "BWV 1079",
    "title": "- # -",
    "band": "2 guitars + bass",
    "bars": 16,
@@ -122,7 +122,7 @@
   },
   {
    "stem": "BWV_1079_04_04",
-   "label": "BWV 1079_04_04",
+   "label": "BWV 1079",
    "title": "- # -",
    "band": "2 guitars + bass",
    "bars": 37,
@@ -135,7 +135,7 @@
   },
   {
    "stem": "BWV_1079_04_05",
-   "label": "BWV 1079_04_05",
+   "label": "BWV 1079",
    "title": "- # -",
    "band": "2 guitars + bass",
    "bars": 49,
@@ -148,7 +148,7 @@
   },
   {
    "stem": "BWV_1079_04_06",
-   "label": "BWV 1079_04_06",
+   "label": "BWV 1079",
    "title": "- # -",
    "band": "2 guitars + bass",
    "bars": 78,
@@ -161,7 +161,7 @@
   },
   {
    "stem": "BWV_1079_04_07",
-   "label": "BWV 1079_04_07",
+   "label": "BWV 1079",
    "title": "- # -",
    "band": "2 guitars + bass",
    "bars": 20,
@@ -174,8 +174,8 @@
   },
   {
    "stem": "BWV_1079_04_08",
-   "label": "BWV 1079_04_08",
-   "title": "BWV 1079 - S. #",
+   "label": "BWV 1079",
+   "title": "BWV 1079, nos. 4–8",
    "band": "2 guitars + bass",
    "bars": 45,
    "tempo": 150,
@@ -187,7 +187,7 @@
   },
   {
    "stem": "BWV_1079_04_09a1",
-   "label": "BWV 1079_04_09a1",
+   "label": "BWV 1079",
    "title": "- # -",
    "band": "1 guitar + bass",
    "bars": 41,
@@ -200,7 +200,7 @@
   },
   {
    "stem": "BWV_1079_04_09a2",
-   "label": "BWV 1079_04_09a2",
+   "label": "BWV 1079",
    "title": "- # -",
    "band": "1 guitar + bass",
    "bars": 41,
@@ -213,7 +213,7 @@
   },
   {
    "stem": "BWV_1079_04_09b1",
-   "label": "BWV 1079_04_09b1",
+   "label": "BWV 1079",
    "title": "- # -",
    "band": "1 guitar + bass",
    "bars": 41,
@@ -226,7 +226,7 @@
   },
   {
    "stem": "BWV_1079_04_09b2",
-   "label": "BWV 1079_04_09b2",
+   "label": "BWV 1079",
    "title": "- # -",
    "band": "1 guitar + bass",
    "bars": 41,
@@ -239,7 +239,7 @@
   },
   {
    "stem": "BWV_1079_04_10",
-   "label": "BWV 1079_04_10",
+   "label": "BWV 1079",
    "title": "- # -",
    "band": "3 guitars + bass",
    "bars": 85,

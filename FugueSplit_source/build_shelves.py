@@ -32,7 +32,7 @@ sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 from convert_all import COMPOSER, pick_sources, tempo_beside
 from fuguesplit import check
 from fuguesplit.pipeline import Settings, convert
-from keyboard_titles import label_for, title_for
+from keyboard_titles import best_title, label_for, title_for
 
 HERE = os.path.dirname(os.path.abspath(__file__))
 SITE = os.path.normpath(os.path.join(HERE, os.pardir, "fugue"))
@@ -230,7 +230,7 @@ def build(shelf: str, midi_root: str) -> list[dict]:
             records.append({
                 "stem": stem,
                 "label": label_for(stem),
-                "title": title_for(stem) or report.title or stem,
+                "title": best_title(stem, report.title),
                 "band": band(report),
                 "bars": report.bars,
                 "tempo": report.tempo,

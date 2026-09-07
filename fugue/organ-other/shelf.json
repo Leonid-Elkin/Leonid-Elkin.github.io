@@ -5,8 +5,8 @@
  "pieces": [
   {
    "stem": "BWV_0525_1_2",
-   "label": "BWV 525_1_2",
-   "title": "BWV_0525_1_2",
+   "label": "BWV 525",
+   "title": "BWV 525, nos. 1–2",
    "band": "2 guitars + bass",
    "bars": 63,
    "tempo": 80,
@@ -18,8 +18,8 @@
   },
   {
    "stem": "BWV_0525_2_2",
-   "label": "BWV 525_2_2",
-   "title": "BWV_0525_2_2",
+   "label": "BWV 525",
+   "title": "BWV 525, nos. 2–2",
    "band": "2 guitars + bass",
    "bars": 30,
    "tempo": 80,
@@ -31,8 +31,8 @@
   },
   {
    "stem": "BWV_0525_3_2",
-   "label": "BWV 525_3_2",
-   "title": "BWV_0525_3_2",
+   "label": "BWV 525",
+   "title": "BWV 525, nos. 3–2",
    "band": "2 guitars + bass",
    "bars": 64,
    "tempo": 120,
@@ -44,8 +44,8 @@
   },
   {
    "stem": "BWV_0526_2",
-   "label": "BWV 526_2",
-   "title": "BWV_0526_2",
+   "label": "BWV 526",
+   "title": "BWV 526, no. 2",
    "band": "2 guitars + bass",
    "bars": 48,
    "tempo": 45,
@@ -57,8 +57,8 @@
   },
   {
    "stem": "BWV_0527_2",
-   "label": "BWV 527_2",
-   "title": "BWV_0527_2",
+   "label": "BWV 527",
+   "title": "BWV 527, no. 2",
    "band": "2 guitars + bass",
    "bars": 34,
    "tempo": 55,
@@ -70,8 +70,8 @@
   },
   {
    "stem": "BWV_0528_2",
-   "label": "BWV 528_2",
-   "title": "BWV_0528_2",
+   "label": "BWV 528",
+   "title": "BWV 528, no. 2",
    "band": "2 guitars + bass",
    "bars": 45,
    "tempo": 40,
@@ -83,8 +83,8 @@
   },
   {
    "stem": "BWV_0529_2",
-   "label": "BWV 529_2",
-   "title": "BWV_0529_2",
+   "label": "BWV 529",
+   "title": "BWV 529, no. 2",
    "band": "2 guitars + bass",
    "bars": 54,
    "tempo": 40,
@@ -96,8 +96,8 @@
   },
   {
    "stem": "BWV_0530_2",
-   "label": "BWV 530_2",
-   "title": "BWV_0530_2",
+   "label": "BWV 530",
+   "title": "BWV 530, no. 2",
    "band": "2 guitars + bass",
    "bars": 43,
    "tempo": 40,
@@ -110,7 +110,7 @@
   {
    "stem": "BWV_0560",
    "label": "BWV 560",
-   "title": "BWV_0560",
+   "title": "BWV 560",
    "band": "4 guitars + bass",
    "bars": 82,
    "tempo": 60,
@@ -123,7 +123,7 @@
   {
    "stem": "BWV_0567",
    "label": "BWV 567",
-   "title": "BWV_0567",
+   "title": "BWV 567",
    "band": "3 guitars + bass",
    "bars": 34,
    "tempo": 80,
@@ -136,7 +136,7 @@
   {
    "stem": "BWV_0568",
    "label": "BWV 568",
-   "title": "BWV_0568",
+   "title": "BWV 568",
    "band": "4 guitars + bass",
    "bars": 57,
    "tempo": 80,
@@ -149,7 +149,7 @@
   {
    "stem": "BWV_0569",
    "label": "BWV 569",
-   "title": "BWV_0569",
+   "title": "BWV 569",
    "band": "4 guitars + bass",
    "bars": 152,
    "tempo": 100,
@@ -162,7 +162,7 @@
   {
    "stem": "BWV_0570",
    "label": "BWV 570",
-   "title": "BWV_0570",
+   "title": "BWV 570",
    "band": "3 guitars + bass",
    "bars": 42,
    "tempo": 70,
@@ -175,7 +175,7 @@
   {
    "stem": "BWV_0571",
    "label": "BWV 571",
-   "title": "BWV_0571",
+   "title": "BWV 571",
    "band": "4 guitars + bass",
    "bars": 127,
    "tempo": 90,
@@ -188,7 +188,7 @@
   {
    "stem": "BWV_0572",
    "label": "BWV 572",
-   "title": "BWV_0572",
+   "title": "BWV 572",
    "band": "5 guitars + bass",
    "bars": 203,
    "tempo": 80,
@@ -200,8 +200,8 @@
   },
   {
    "stem": "BWV_0572_I",
-   "label": "BWV 572_I",
-   "title": "BWV_0572_I",
+   "label": "BWV 572",
+   "title": "BWV 572, I",
    "band": "5 guitars + bass",
    "bars": 205,
    "tempo": 80,
@@ -214,7 +214,7 @@
   {
    "stem": "BWV_0573",
    "label": "BWV 573",
-   "title": "BWV_0573",
+   "title": "BWV 573",
    "band": "4 guitars + bass",
    "bars": 13,
    "tempo": 80,
@@ -226,8 +226,8 @@
   },
   {
    "stem": "BWV_0573_bl",
-   "label": "BWV 573_bl",
-   "title": "BWV_0573_bl",
+   "label": "BWV 573",
+   "title": "BWV 573, bl",
    "band": "4 guitars + bass",
    "bars": 36,
    "tempo": 90,
@@ -240,7 +240,7 @@
   {
    "stem": "BWV_0587",
    "label": "BWV 587",
-   "title": "BWV_0587",
+   "title": "BWV 587",
    "band": "2 guitars + bass",
    "bars": 106,
    "tempo": 120,
@@ -252,8 +252,8 @@
   },
   {
    "stem": "BWV_0587_1",
-   "label": "BWV 587_1",
-   "title": "BWV_0587_1",
+   "label": "BWV 587",
+   "title": "BWV 587, no. 1",
    "band": "3 guitars + bass",
    "bars": 106,
    "tempo": 120,
@@ -266,7 +266,7 @@
   {
    "stem": "BWV_0588",
    "label": "BWV 588",
-   "title": "BWV 588 - S. #",
+   "title": "BWV 588",
    "band": "3 guitars + bass",
    "bars": 169,
    "tempo": 150,
@@ -279,7 +279,7 @@
   {
    "stem": "BWV_0589",
    "label": "BWV 589",
-   "title": "BWV_0589",
+   "title": "BWV 589",
    "band": "4 guitars + bass",
    "bars": 197,
    "tempo": 160,
@@ -292,7 +292,7 @@
   {
    "stem": "BWV_0590",
    "label": "BWV 590",
-   "title": "BWV_0590",
+   "title": "BWV 590",
    "band": "4 guitars + bass",
    "bars": 185,
    "tempo": 108,
@@ -305,7 +305,7 @@
   {
    "stem": "BWV_0591",
    "label": "BWV 591",
-   "title": "BWV_0591",
+   "title": "BWV 591",
    "band": "4 guitars + bass",
    "bars": 51,
    "tempo": 60,
@@ -318,7 +318,7 @@
   {
    "stem": "BWV_0592",
    "label": "BWV 592",
-   "title": "BWV_0592",
+   "title": "BWV 592",
    "band": "4 guitars + bass",
    "bars": 274,
    "tempo": 80,
@@ -331,7 +331,7 @@
   {
    "stem": "BWV_0592a",
    "label": "BWV 592a",
-   "title": "BWV_0592a",
+   "title": "BWV 592a",
    "band": "2 guitars + bass",
    "bars": 272,
    "tempo": 78,
@@ -344,7 +344,7 @@
   {
    "stem": "BWV_0593",
    "label": "BWV 593",
-   "title": "BWV_0593",
+   "title": "BWV 593",
    "band": "4 guitars + bass",
    "bars": 287,
    "tempo": 90,
@@ -357,7 +357,7 @@
   {
    "stem": "BWV_0594",
    "label": "BWV 594",
-   "title": "BWV_0594",
+   "title": "BWV 594",
    "band": "4 guitars + bass",
    "bars": 491,
    "tempo": 110,
@@ -370,7 +370,7 @@
   {
    "stem": "BWV_0595",
    "label": "BWV 595",
-   "title": "BWV_0595",
+   "title": "BWV 595",
    "band": "4 guitars + bass",
    "bars": 81,
    "tempo": 100,
@@ -383,7 +383,7 @@
   {
    "stem": "BWV_0596",
    "label": "BWV 596",
-   "title": "BWV_0596",
+   "title": "BWV 596",
    "band": "5 guitars + bass",
    "bars": 200,
    "tempo": 100,
@@ -396,7 +396,7 @@
   {
    "stem": "BWV_0597",
    "label": "BWV 597",
-   "title": "BWV_0597",
+   "title": "BWV 597",
    "band": "2 guitars + bass",
    "bars": 123,
    "tempo": 80,
@@ -409,7 +409,7 @@
   {
    "stem": "BWV_0598",
    "label": "BWV 598",
-   "title": "BWV_0598",
+   "title": "BWV 598",
    "band": "1 guitar",
    "bars": 31,
    "tempo": 80,
@@ -421,8 +421,8 @@
   },
   {
    "stem": "BWV_0645_2",
-   "label": "BWV 645_2",
-   "title": "BWV_0645_2",
+   "label": "BWV 645",
+   "title": "BWV 645, no. 2",
    "band": "2 guitars + bass",
    "bars": 56,
    "tempo": 60,
@@ -434,8 +434,8 @@
   },
   {
    "stem": "BWV_0655_2",
-   "label": "BWV 655_2",
-   "title": "BWV_0655_2",
+   "label": "BWV 655",
+   "title": "BWV 655, no. 2",
    "band": "2 guitars + bass",
    "bars": 39,
    "tempo": 64,
@@ -448,7 +448,7 @@
   {
    "stem": "BWV_0704",
    "label": "BWV 704",
-   "title": "BWV_0704",
+   "title": "BWV 704",
    "band": "2 guitars + bass",
    "bars": 23,
    "tempo": 120,
@@ -461,7 +461,7 @@
   {
    "stem": "BWV_0743",
    "label": "BWV 743",
-   "title": "BWV_0743",
+   "title": "BWV 743",
    "band": "4 guitars + bass",
    "bars": 43,
    "tempo": 60,
@@ -474,7 +474,7 @@
   {
    "stem": "BWV_0744",
    "label": "BWV 744",
-   "title": "BWV_0744",
+   "title": "BWV 744",
    "band": "3 guitars + bass",
    "bars": 34,
    "tempo": 80,
@@ -486,8 +486,8 @@
   },
   {
    "stem": "BWV_0744_2",
-   "label": "BWV 744_2",
-   "title": "BWV_0744_2",
+   "label": "BWV 744",
+   "title": "BWV 744, no. 2",
    "band": "3 guitars + bass",
    "bars": 16,
    "tempo": 85,
@@ -604,7 +604,7 @@
   {
    "stem": "wer_nur_",
    "label": "wer_nur_",
-   "title": "wer_nur_",
+   "title": "wer nur ",
    "band": "4 guitars + bass",
    "bars": 150,
    "tempo": 120,
@@ -617,7 +617,7 @@
   {
    "stem": "wo_gott_",
    "label": "wo_gott_",
-   "title": "wo_gott_",
+   "title": "wo gott ",
    "band": "3 guitars + bass",
    "bars": 36,
    "tempo": 60,

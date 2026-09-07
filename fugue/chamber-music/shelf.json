@@ -6,7 +6,7 @@
   {
    "stem": "BWV_1001",
    "label": "BWV 1001",
-   "title": "BWV 1001 - S .#",
+   "title": "BWV 1001",
    "band": "3 guitars",
    "bars": 273,
    "tempo": 60,
@@ -19,7 +19,7 @@
   {
    "stem": "BWV_1002",
    "label": "BWV 1002",
-   "title": "BWV 1002 - S. #",
+   "title": "BWV 1002",
    "band": "1 guitar + bass",
    "bars": 424,
    "tempo": 90,
@@ -32,7 +32,7 @@
   {
    "stem": "BWV_1003",
    "label": "BWV 1003",
-   "title": "BWV 1003 - S. #",
+   "title": "BWV 1003",
    "band": "3 guitars + bass",
    "bars": 400,
    "tempo": 25,
@@ -45,7 +45,7 @@
   {
    "stem": "BWV_1004",
    "label": "BWV 1004",
-   "title": "BWV 1004 - S. #",
+   "title": "BWV 1004",
    "band": "1 guitar + bass",
    "bars": 418,
    "tempo": 120,
@@ -58,7 +58,7 @@
   {
    "stem": "BWV_1005",
    "label": "BWV 1005",
-   "title": "BWV 1005 - S .#",
+   "title": "BWV 1005",
    "band": "2 guitars + bass",
    "bars": 525,
    "tempo": 282,
@@ -71,7 +71,7 @@
   {
    "stem": "BWV_1006",
    "label": "BWV 1006",
-   "title": "BWV 1006 - S .#",
+   "title": "BWV 1006",
    "band": "1 guitar + bass",
    "bars": 396,
    "tempo": 90,
@@ -84,7 +84,7 @@
   {
    "stem": "BWV_1006a",
    "label": "BWV 1006a",
-   "title": "BWV_1006a",
+   "title": "BWV 1006a",
    "band": "3 guitars + bass",
    "bars": 1295,
    "tempo": 241,
@@ -97,7 +97,7 @@
   {
    "stem": "BWV_1007",
    "label": "BWV 1007",
-   "title": "J.S.Bach  Suite I für Violoncello  Seite #",
+   "title": "BWV 1007",
    "band": "1 guitar + bass",
    "bars": 221,
    "tempo": 98,
@@ -110,7 +110,7 @@
   {
    "stem": "BWV_1008",
    "label": "BWV 1008",
-   "title": "BWV 1008 - S. #",
+   "title": "BWV 1008",
    "band": "2 guitars",
    "bars": 278,
    "tempo": 80,
@@ -123,7 +123,7 @@
   {
    "stem": "BWV_1009",
    "label": "BWV 1009",
-   "title": "BWV 1009 - S. #",
+   "title": "BWV 1009",
    "band": "1 guitar + bass",
    "bars": 390,
    "tempo": 120,
@@ -136,7 +136,7 @@
   {
    "stem": "BWV_1010",
    "label": "BWV 1010",
-   "title": "BWV 1010 - S. #",
+   "title": "BWV 1010",
    "band": "1 guitar + bass",
    "bars": 339,
    "tempo": 120,
@@ -149,7 +149,7 @@
   {
    "stem": "BWV_1011",
    "label": "BWV 1011",
-   "title": "BWV 1011 - S. #",
+   "title": "BWV 1011",
    "band": "1 guitar + bass",
    "bars": 444,
    "tempo": 120,
@@ -162,7 +162,7 @@
   {
    "stem": "BWV_1012",
    "label": "BWV 1012",
-   "title": "BWV 1012 - S. #",
+   "title": "BWV 1012",
    "band": "2 guitars",
    "bars": 358,
    "tempo": 120,
@@ -175,7 +175,7 @@
   {
    "stem": "BWV_1013",
    "label": "BWV 1013",
-   "title": "BWV 1013 - S. #",
+   "title": "BWV 1013",
    "band": "1 guitar",
    "bars": 231,
    "tempo": 80,
@@ -188,7 +188,7 @@
   {
    "stem": "BWV_1014",
    "label": "BWV 1014",
-   "title": "BWV 1014 - S. #",
+   "title": "BWV 1014",
    "band": "4 guitars + bass",
    "bars": 271,
    "tempo": 60,
@@ -200,8 +200,8 @@
   },
   {
    "stem": "BWV_1014_Vl",
-   "label": "BWV 1014_Vl",
-   "title": "BWV 1014 - S. #",
+   "label": "BWV 1014",
+   "title": "BWV 1014, Vl",
    "band": "1 guitar + bass",
    "bars": 271,
    "tempo": 60,
@@ -214,7 +214,7 @@
   {
    "stem": "BWV_1015",
    "label": "BWV 1015",
-   "title": "BWV 1015 - S. #",
+   "title": "BWV 1015",
    "band": "2 guitars + bass",
    "bars": 307,
    "tempo": 40,
@@ -226,8 +226,8 @@
   },
   {
    "stem": "BWV_1015_Vl",
-   "label": "BWV 1015_Vl",
-   "title": "BWV 1015 - S. #",
+   "label": "BWV 1015",
+   "title": "BWV 1015, Vl",
    "band": "1 guitar",
    "bars": 307,
    "tempo": 40,
@@ -240,7 +240,7 @@
   {
    "stem": "BWV_1016",
    "label": "BWV 1016",
-   "title": "BWV 1016 - S. #",
+   "title": "BWV 1016",
    "band": "2 guitars + bass",
    "bars": 400,
    "tempo": 35,
@@ -252,8 +252,8 @@
   },
   {
    "stem": "BWV_1016_Vl",
-   "label": "BWV 1016_Vl",
-   "title": "BWV 1016 - S. #",
+   "label": "BWV 1016",
+   "title": "BWV 1016, Vl",
    "band": "2 guitars",
    "bars": 398,
    "tempo": 35,
@@ -266,7 +266,7 @@
   {
    "stem": "BWV_1017",
    "label": "BWV 1017",
-   "title": "BWV 1017 - S. #",
+   "title": "BWV 1017",
    "band": "2 guitars + bass",
    "bars": 325,
    "tempo": 45,
@@ -278,8 +278,8 @@
   },
   {
    "stem": "BWV_1017_Vl",
-   "label": "BWV 1017_Vl",
-   "title": "BWV 1017 - S. #",
+   "label": "BWV 1017",
+   "title": "BWV 1017, Vl",
    "band": "1 guitar",
    "bars": 326,
    "tempo": 45,
@@ -292,7 +292,7 @@
   {
    "stem": "BWV_1018",
    "label": "BWV 1018",
-   "title": "BWV 1018 - S. #",
+   "title": "BWV 1018",
    "band": "3 guitars + bass",
    "bars": 353,
    "tempo": 108,
@@ -304,8 +304,8 @@
   },
   {
    "stem": "BWV_1018_Vl",
-   "label": "BWV 1018_Vl",
-   "title": "BWV 1018 - S. #",
+   "label": "BWV 1018",
+   "title": "BWV 1018, Vl",
    "band": "1 guitar + bass",
    "bars": 347,
    "tempo": 108,
@@ -318,7 +318,7 @@
   {
    "stem": "BWV_1018a",
    "label": "BWV 1018a",
-   "title": "BWV 1018a - S. #",
+   "title": "BWV 1018a",
    "band": "3 guitars + bass",
    "bars": 27,
    "tempo": 60,
@@ -330,8 +330,8 @@
   },
   {
    "stem": "BWV_1018a_Vl",
-   "label": "BWV 1018a_Vl",
-   "title": "BWV 1018a - S. #",
+   "label": "BWV 1018a",
+   "title": "BWV 1018a, Vl",
    "band": "1 guitar + bass",
    "bars": 27,
    "tempo": 60,
@@ -344,7 +344,7 @@
   {
    "stem": "BWV_1019",
    "label": "BWV 1019",
-   "title": "BWV 1019 - S. #",
+   "title": "BWV 1019",
    "band": "2 guitars + bass",
    "bars": 318,
    "tempo": 57,
@@ -356,8 +356,8 @@
   },
   {
    "stem": "BWV_1019_vl",
-   "label": "BWV 1019_vl",
-   "title": "BWV 1019 - S. #",
+   "label": "BWV 1019",
+   "title": "BWV 1019, vl",
    "band": "1 guitar",
    "bars": 254,
    "tempo": 57,
@@ -370,7 +370,7 @@
   {
    "stem": "BWV_1019a",
    "label": "BWV 1019a",
-   "title": "BWV 1019a - S. #",
+   "title": "BWV 1019a",
    "band": "2 guitars + bass",
    "bars": 105,
    "tempo": 60,
@@ -382,8 +382,8 @@
   },
   {
    "stem": "BWV_1019a_Vl",
-   "label": "BWV 1019a_Vl",
-   "title": "BWV 1019a - S. #",
+   "label": "BWV 1019a",
+   "title": "BWV 1019a, Vl",
    "band": "1 guitar",
    "bars": 106,
    "tempo": 60,
@@ -396,7 +396,7 @@
   {
    "stem": "BWV_1020",
    "label": "BWV 1020",
-   "title": "BWV 1020 - S. #",
+   "title": "BWV 1020",
    "band": "3 guitars + bass",
    "bars": 295,
    "tempo": 100,
@@ -408,8 +408,8 @@
   },
   {
    "stem": "BWV_1020_Vl",
-   "label": "BWV 1020_Vl",
-   "title": "BWV 1020 - S. #",
+   "label": "BWV 1020",
+   "title": "BWV 1020, Vl",
    "band": "1 guitar",
    "bars": 295,
    "tempo": 100,
@@ -422,7 +422,7 @@
   {
    "stem": "BWV_1021",
    "label": "BWV 1021",
-   "title": "BWV 1021 - S. #",
+   "title": "BWV 1021",
    "band": "1 guitar + bass",
    "bars": 121,
    "tempo": 80,
@@ -434,8 +434,8 @@
   },
   {
    "stem": "BWV_1021_Vl",
-   "label": "BWV 1021_Vl",
-   "title": "BWV 1021 - S. #",
+   "label": "BWV 1021",
+   "title": "BWV 1021, Vl",
    "band": "1 guitar + bass",
    "bars": 121,
    "tempo": 80,
@@ -448,7 +448,7 @@
   {
    "stem": "BWV_1022",
    "label": "BWV 1022",
-   "title": "BWV 1022 - S. #",
+   "title": "BWV 1022",
    "band": "2 guitars + bass",
    "bars": 202,
    "tempo": 60,
@@ -460,8 +460,8 @@
   },
   {
    "stem": "BWV_1022_Vl",
-   "label": "BWV 1022_Vl",
-   "title": "BWV 1022 - S. #",
+   "label": "BWV 1022",
+   "title": "BWV 1022, Vl",
    "band": "1 guitar",
    "bars": 202,
    "tempo": 60,
@@ -474,7 +474,7 @@
   {
    "stem": "BWV_1023",
    "label": "BWV 1023",
-   "title": "BWV 1023 - S. #",
+   "title": "BWV 1023",
    "band": "3 guitars + bass",
    "bars": 161,
    "tempo": 120,
@@ -486,8 +486,8 @@
   },
   {
    "stem": "BWV_1023_Vl",
-   "label": "BWV 1023_Vl",
-   "title": "BWV 1023 - S. #",
+   "label": "BWV 1023",
+   "title": "BWV 1023, Vl",
    "band": "1 guitar + bass",
    "bars": 163,
    "tempo": 120,
@@ -500,7 +500,7 @@
   {
    "stem": "BWV_1024",
    "label": "BWV 1024",
-   "title": "BWV 1024 - S. #",
+   "title": "BWV 1024",
    "band": "2 guitars + bass",
    "bars": 435,
    "tempo": 60,
@@ -512,8 +512,8 @@
   },
   {
    "stem": "BWV_1024_Vl",
-   "label": "BWV 1024_Vl",
-   "title": "BWV 1024 - S. #",
+   "label": "BWV 1024",
+   "title": "BWV 1024, Vl",
    "band": "1 guitar + bass",
    "bars": 435,
    "tempo": 60,
@@ -526,7 +526,7 @@
   {
    "stem": "BWV_1025",
    "label": "BWV 1025",
-   "title": "BWV 1025 - S. #",
+   "title": "BWV 1025",
    "band": "2 guitars + bass",
    "bars": 654,
    "tempo": 100,
@@ -538,8 +538,8 @@
   },
   {
    "stem": "BWV_1025_Vl",
-   "label": "BWV 1025_Vl",
-   "title": "BWV 1025 - S. #",
+   "label": "BWV 1025",
+   "title": "BWV 1025, Vl",
    "band": "1 guitar + bass",
    "bars": 654,
    "tempo": 100,
@@ -552,7 +552,7 @@
   {
    "stem": "BWV_1026",
    "label": "BWV 1026",
-   "title": "BWV 1026 - S. #",
+   "title": "BWV 1026",
    "band": "2 guitars + bass",
    "bars": 181,
    "tempo": 120,
@@ -564,8 +564,8 @@
   },
   {
    "stem": "BWV_1026_Vl",
-   "label": "BWV 1026_Vl",
-   "title": "BWV 1026 - S. #",
+   "label": "BWV 1026",
+   "title": "BWV 1026, Vl",
    "band": "1 guitar + bass",
    "bars": 181,
    "tempo": 120,
@@ -578,7 +578,7 @@
   {
    "stem": "BWV_1027",
    "label": "BWV 1027",
-   "title": "BWV 1027 - S. #",
+   "title": "BWV 1027",
    "band": "2 guitars + bass",
    "bars": 302,
    "tempo": 50,
@@ -590,8 +590,8 @@
   },
   {
    "stem": "BWV_1027_VdG",
-   "label": "BWV 1027_VdG",
-   "title": "BWV 1027 - S. #",
+   "label": "BWV 1027",
+   "title": "BWV 1027, VdG",
    "band": "1 guitar",
    "bars": 303,
    "tempo": 50,
@@ -604,7 +604,7 @@
   {
    "stem": "BWV_1027a",
    "label": "BWV 1027a",
-   "title": "BWV 1027a- S. #",
+   "title": "BWV 1027a",
    "band": "2 guitars + bass",
    "bars": 132,
    "tempo": 160,
@@ -617,7 +617,7 @@
   {
    "stem": "BWV_1028",
    "label": "BWV 1028",
-   "title": "BWV 1028 - S. #",
+   "title": "BWV 1028",
    "band": "2 guitars + bass",
    "bars": 262,
    "tempo": 50,
@@ -629,8 +629,8 @@
   },
   {
    "stem": "BWV_1028_VdG",
-   "label": "BWV 1028_VdG",
-   "title": "BWV 1028 - S. #",
+   "label": "BWV 1028",
+   "title": "BWV 1028, VdG",
    "band": "1 guitar",
    "bars": 263,
    "tempo": 50,
@@ -643,7 +643,7 @@
   {
    "stem": "BWV_1029",
    "label": "BWV 1029",
-   "title": "BWV 1029 - S. #",
+   "title": "BWV 1029",
    "band": "2 guitars + bass",
    "bars": 254,
    "tempo": 89,
@@ -655,8 +655,8 @@
   },
   {
    "stem": "BWV_1029_VdG",
-   "label": "BWV 1029_VdG",
-   "title": "BWV 1029 - S. #",
+   "label": "BWV 1029",
+   "title": "BWV 1029, VdG",
    "band": "1 guitar",
    "bars": 254,
    "tempo": 89,
@@ -669,7 +669,7 @@
   {
    "stem": "BWV_1030",
    "label": "BWV 1030",
-   "title": "BWV 1030 - S. #",
+   "title": "BWV 1030",
    "band": "3 guitars + bass",
    "bars": 287,
    "tempo": 60,
@@ -681,8 +681,8 @@
   },
   {
    "stem": "BWV_1030_Fl",
-   "label": "BWV 1030_Fl",
-   "title": "BWV 1030 - S. #",
+   "label": "BWV 1030",
+   "title": "BWV 1030, Fl",
    "band": "1 guitar",
    "bars": 288,
    "tempo": 60,
@@ -695,7 +695,7 @@
   {
    "stem": "BWV_1031",
    "label": "BWV 1031",
-   "title": "BWV 1031 - S. #",
+   "title": "BWV 1031",
    "band": "2 guitars + bass",
    "bars": 246,
    "tempo": 80,
@@ -707,8 +707,8 @@
   },
   {
    "stem": "BWV_1031_2_Orgel",
-   "label": "BWV 1031_2_Orgel",
-   "title": "BWV 1031 - S. #",
+   "label": "BWV 1031",
+   "title": "BWV 1031, Orgel, no. 2",
    "band": "2 guitars + bass",
    "bars": 33,
    "tempo": 50,
@@ -720,8 +720,8 @@
   },
   {
    "stem": "BWV_1031_Fl",
-   "label": "BWV 1031_Fl",
-   "title": "BWV 1031 - S. #",
+   "label": "BWV 1031",
+   "title": "BWV 1031, Fl",
    "band": "1 guitar",
    "bars": 246,
    "tempo": 80,
@@ -734,7 +734,7 @@
   {
    "stem": "BWV_1032",
    "label": "BWV 1032",
-   "title": "BWV 1032 - S. #",
+   "title": "BWV 1032",
    "band": "3 guitars + bass",
    "bars": 357,
    "tempo": 100,
@@ -746,8 +746,8 @@
   },
   {
    "stem": "BWV_1032_Fl",
-   "label": "BWV 1032_Fl",
-   "title": "BWV 1032 - S. #",
+   "label": "BWV 1032",
+   "title": "BWV 1032, Fl",
    "band": "1 guitar",
    "bars": 357,
    "tempo": 100,
@@ -772,7 +772,7 @@
   },
   {
    "stem": "BWV_1033_Fl",
-   "label": "BWV 1033_Fl",
+   "label": "BWV 1033",
    "title": "- # -",
    "band": "1 guitar",
    "bars": 133,
@@ -798,7 +798,7 @@
   },
   {
    "stem": "BWV_1034_Fl",
-   "label": "BWV 1034_Fl",
+   "label": "BWV 1034",
    "title": "- # -",
    "band": "1 guitar",
    "bars": 245,
@@ -824,7 +824,7 @@
   },
   {
    "stem": "BWV_1035_Fl",
-   "label": "BWV 1035_Fl",
+   "label": "BWV 1035",
    "title": "- # -",
    "band": "1 guitar",
    "bars": 188,
@@ -838,7 +838,7 @@
   {
    "stem": "BWV_1036",
    "label": "BWV 1036",
-   "title": "BWV 1036 - S. #",
+   "title": "BWV 1036",
    "band": "2 guitars + bass",
    "bars": 294,
    "tempo": 60,
@@ -851,7 +851,7 @@
   {
    "stem": "BWV_1037",
    "label": "BWV 1037",
-   "title": "BWV 1037 - S. #",
+   "title": "BWV 1037",
    "band": "3 guitars + bass",
    "bars": 281,
    "tempo": 55,
@@ -863,8 +863,8 @@
   },
   {
    "stem": "BWV_1037_o",
-   "label": "BWV 1037_o",
-   "title": "BWV 1037 - S. #",
+   "label": "BWV 1037",
+   "title": "BWV 1037, o",
    "band": "2 guitars + bass",
    "bars": 282,
    "tempo": 55,
@@ -877,7 +877,7 @@
   {
    "stem": "BWV_1038",
    "label": "BWV 1038",
-   "title": "BWV 1038 - S. #",
+   "title": "BWV 1038",
    "band": "3 guitars + bass",
    "bars": 138,
    "tempo": 45,
@@ -889,8 +889,8 @@
   },
   {
    "stem": "BWV_1038_o",
-   "label": "BWV 1038_o",
-   "title": "BWV 1038 - S. #",
+   "label": "BWV 1038",
+   "title": "BWV 1038, o",
    "band": "2 guitars + bass",
    "bars": 138,
    "tempo": 45,
@@ -903,7 +903,7 @@
   {
    "stem": "BWV_1039",
    "label": "BWV 1039",
-   "title": "BWV 1039 - S. #",
+   "title": "BWV 1039",
    "band": "5 guitars + bass",
    "bars": 302,
    "tempo": 100,
@@ -916,7 +916,7 @@
   {
    "stem": "BWV_1040",
    "label": "BWV 1040",
-   "title": "BWV_1040",
+   "title": "BWV 1040",
    "band": "2 guitars + bass",
    "bars": 27,
    "tempo": 90,

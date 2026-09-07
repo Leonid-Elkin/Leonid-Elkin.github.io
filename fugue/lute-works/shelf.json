@@ -6,7 +6,7 @@
   {
    "stem": "BWV_0995",
    "label": "BWV 995",
-   "title": "BWV_0995",
+   "title": "BWV 995",
    "band": "1 guitar + bass",
    "bars": 443,
    "tempo": 72,
@@ -18,8 +18,8 @@
   },
   {
    "stem": "BWV_0995_kl",
-   "label": "BWV 995_kl",
-   "title": "BWV 996- S. #",
+   "label": "BWV 995",
+   "title": "BWV 995, kl",
    "band": "2 guitars + bass",
    "bars": 450,
    "tempo": 60,
@@ -32,7 +32,7 @@
   {
    "stem": "BWV_0996",
    "label": "BWV 996",
-   "title": "BWV 996- S. #",
+   "title": "BWV 996",
    "band": "2 guitars + bass",
    "bars": 193,
    "tempo": 60,
@@ -44,8 +44,8 @@
   },
   {
    "stem": "BWV_0996_kl",
-   "label": "BWV 996_kl",
-   "title": "BWV 996- S. #",
+   "label": "BWV 996",
+   "title": "BWV 996, kl",
    "band": "4 guitars + bass",
    "bars": 190,
    "tempo": 84,
@@ -58,7 +58,7 @@
   {
    "stem": "BWV_0997",
    "label": "BWV 997",
-   "title": "BWV 997- S. #",
+   "title": "BWV 997",
    "band": "2 guitars + bass",
    "bars": 347,
    "tempo": 80,
@@ -70,8 +70,8 @@
   },
   {
    "stem": "BWV_0997_kl",
-   "label": "BWV 997_kl",
-   "title": "BWV 997- S. #",
+   "label": "BWV 997",
+   "title": "BWV 997, kl",
    "band": "2 guitars + bass",
    "bars": 300,
    "tempo": 60,
@@ -84,7 +84,7 @@
   {
    "stem": "BWV_0998",
    "label": "BWV 998",
-   "title": "BWV 998- S. #",
+   "title": "BWV 998",
    "band": "2 guitars + bass",
    "bars": 221,
    "tempo": 219,
@@ -96,8 +96,8 @@
   },
   {
    "stem": "BWV_0998_kl",
-   "label": "BWV 998_kl",
-   "title": "BWV 998- S. #",
+   "label": "BWV 998",
+   "title": "BWV 998, kl",
    "band": "2 guitars + bass",
    "bars": 221,
    "tempo": 180,
@@ -110,7 +110,7 @@
   {
    "stem": "BWV_0999",
    "label": "BWV 999",
-   "title": "BWV 999 - S. #",
+   "title": "BWV 999",
    "band": "1 guitar + bass",
    "bars": 43,
    "tempo": 90,
@@ -122,8 +122,8 @@
   },
   {
    "stem": "BWV_0999_kl",
-   "label": "BWV 999_kl",
-   "title": "BWV 999 - S. #",
+   "label": "BWV 999",
+   "title": "BWV 999, kl",
    "band": "1 guitar + bass",
    "bars": 43,
    "tempo": 70,
@@ -136,7 +136,7 @@
   {
    "stem": "BWV_1000",
    "label": "BWV 1000",
-   "title": "BWV 1000 - S. #",
+   "title": "BWV 1000",
    "band": "3 guitars + bass",
    "bars": 96,
    "tempo": 90,
