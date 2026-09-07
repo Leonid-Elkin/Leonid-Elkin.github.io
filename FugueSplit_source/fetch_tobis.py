@@ -166,7 +166,7 @@ def save_engraving(url: str, stem: str, out_dir: str) -> str | None:
 
 
 def fetch(index_url: str, out_dir: str, pause: float,
-          workers: int = 4) -> tuple[int, int, list]:
+          workers: int = 4, only: str = "") -> tuple[int, int, list]:
     """Mirror a collection, one folder per section of the archive.
 
     The archive's own grouping -- inventions, the two books of the
@@ -186,6 +186,10 @@ def fetch(index_url: str, out_dir: str, pause: float,
         # "fantasien-und-fugen" is a section of both the organ works and
         # the keyboard works, and flattening would merge the two.
         rel = section[len(index_url):].strip("/")
+        # A collection too large to hold on disk at once is taken a
+        # section at a time: fetch, arrange, delete, move on.
+        if only and not rel.startswith(only):
+            continue
         name = rel or os.path.basename(out_dir)
         section_dir = os.path.join(out_dir, *rel.split("/")) if rel else out_dir
         os.makedirs(section_dir, exist_ok=True)
@@ -236,6 +240,8 @@ def main(argv: list[str] | None = None) -> int:
     ap.add_argument("--workers", type=int, default=2, metavar="N",
                     help="downloads in flight at once (default 4); this is "
                          "a small archive, so keep it small")
+    ap.add_argument("--only", default="", metavar="PREFIX",
+                    help="only sections whose path starts with this")
     ap.add_argument("--list", action="store_true",
                     help="count what each collection offers and stop")
     args = ap.parse_args(argv)
@@ -253,6 +259,8 @@ def main(argv: list[str] | None = None) -> int:
         if args.list:
             total = 0
             for section in sub_pages(index_url):
+                if args.only and not section[len(index_url):].strip("/").startswith(args.only):
+                    continue
                 n = len(downloads(section))
                 total += n
                 print(f"  {section.rstrip('/').rsplit('/', 1)[-1]:<60} {n}")
@@ -261,7 +269,7 @@ def main(argv: list[str] | None = None) -> int:
         out_dir = os.path.join(args.out, folder)
         print(f"{name} -> {out_dir}")
         got, skipped, failed = fetch(index_url, out_dir, args.pause,
-                                     args.workers)
+                                     args.workers, args.only)
         print(f"{name}: {got} fetched, {skipped} already had, "
               f"{len(failed)} failed")
         for line in failed[:10]:

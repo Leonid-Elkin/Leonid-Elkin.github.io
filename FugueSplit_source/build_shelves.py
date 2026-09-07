@@ -244,6 +244,21 @@ def build(shelf: str, midi_root: str) -> list[dict]:
             print(f"  {stem:<14} {report.bars:>4} bars  {kept:>5.1f}%  "
                   f"{records[-1]['band']}")
 
+    # Merge rather than replace. A collection too big to hold on disk at
+    # once is fetched, arranged and cleaned a section at a time, so a later
+    # run sees only part of its own sources; anything already arranged
+    # whose tab is still on the shelf stays on it.
+    meta_path = os.path.join(SITE, shelf, "shelf.json")
+    if os.path.exists(meta_path):
+        with open(meta_path, encoding="utf-8") as fh:
+            kept = json.load(fh).get("pieces", [])
+        fresh = {r["stem"] for r in records}
+        for old in kept:
+            if old["stem"] in fresh:
+                continue
+            if os.path.exists(os.path.join(gp_dir, old["stem"] + ".gp5")):
+                records.append(old)
+
     records.sort(key=lambda r: r["stem"])
     meta = {"shelf": shelf, "heading": heading, "span": span,
             "pieces": records}
