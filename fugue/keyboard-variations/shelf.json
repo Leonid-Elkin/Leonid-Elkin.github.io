@@ -14,7 +14,7 @@
    "written_notes": 16604,
    "read_as": "piano",
    "broken": 72,
-   "section": "arien-und-variationen"
+   "section": "klavier/arien-und-variationen"
   },
   {
    "stem": "BWV_0989",
@@ -27,7 +27,7 @@
    "written_notes": 3101,
    "read_as": "piano",
    "broken": 9,
-   "section": "arien-und-variationen"
+   "section": "klavier/arien-und-variationen"
   },
   {
    "stem": "BWV_0990",
@@ -40,7 +40,7 @@
    "written_notes": 5869,
    "read_as": "piano",
    "broken": 54,
-   "section": "arien-und-variationen"
+   "section": "klavier/arien-und-variationen"
   },
   {
    "stem": "BWV_0991",
@@ -53,7 +53,7 @@
    "written_notes": 305,
    "read_as": "piano",
    "broken": 0,
-   "section": "arien-und-variationen"
+   "section": "klavier/arien-und-variationen"
   },
   {
    "stem": "BWV_0992",
@@ -66,7 +66,7 @@
    "written_notes": 2732,
    "read_as": "piano",
    "broken": 24,
-   "section": "arien-und-variationen"
+   "section": "klavier/arien-und-variationen"
   },
   {
    "stem": "BWV_0993",
@@ -79,7 +79,7 @@
    "written_notes": 2949,
    "read_as": "piano",
    "broken": 29,
-   "section": "arien-und-variationen"
+   "section": "klavier/arien-und-variationen"
   },
   {
    "stem": "BWV_0994",
@@ -92,7 +92,7 @@
    "written_notes": 112,
    "read_as": "piano",
    "broken": 0,
-   "section": "arien-und-variationen"
+   "section": "klavier/arien-und-variationen"
   }
  ]
 }

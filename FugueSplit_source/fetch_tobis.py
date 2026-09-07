@@ -19,6 +19,7 @@ credit the source, keep it non-commercial, share it alike.
 from __future__ import annotations
 
 import argparse
+import concurrent.futures as cf
 import io
 import os
 import re
@@ -28,7 +29,7 @@ import urllib.error
 import urllib.request
 import zipfile
 
-BASE = "https://tobis-notenarchiv.de/wp/bach-archiv/instrumentalwerke/"
+BASE = "https://tobis-notenarchiv.de/wp/bach-archiv/"
 UA = "Mozilla/5.0 (compatible; FugueSplit source fetch)"
 HERE = os.path.dirname(os.path.abspath(__file__))
 
@@ -132,7 +133,8 @@ def save_engraving(blob: bytes, stem: str, out_dir: str) -> str | None:
     return path
 
 
-def fetch(index_url: str, out_dir: str, pause: float) -> tuple[int, int, list]:
+def fetch(index_url: str, out_dir: str, pause: float,
+          workers: int = 4) -> tuple[int, int, list]:
     """Mirror a collection, one folder per section of the archive.
 
     The archive's own grouping -- inventions, the two books of the
@@ -155,25 +157,39 @@ def fetch(index_url: str, out_dir: str, pause: float) -> tuple[int, int, list]:
         name = rel or os.path.basename(out_dir)
         section_dir = os.path.join(out_dir, *rel.split("/")) if rel else out_dir
         os.makedirs(section_dir, exist_ok=True)
-        for stem, urls in sorted(pieces.items()):
+        def one(item: tuple[str, dict[str, str]]) -> str | None:
+            """Fetch a single piece. Returns its stem, or None if skipped."""
+            stem, urls = item
             xml_path = os.path.join(section_dir, stem + ".xml")
             mid_path = os.path.join(section_dir, stem + ".mid")
             if os.path.exists(xml_path) and os.path.exists(mid_path):
-                skipped += 1
-                continue
-            try:
-                if "zip" in urls and not os.path.exists(xml_path):
-                    if save_engraving(get(urls["zip"]), stem, section_dir):
-                        time.sleep(pause)
-                if "mid" in urls and not os.path.exists(mid_path):
-                    with open(mid_path, "wb") as fh:
-                        fh.write(get(urls["mid"]))
-                    time.sleep(pause)
-            except RuntimeError as exc:
-                failed.append(str(exc))
-                continue
-            got += 1
-            print(f"  {name}/{stem}", flush=True)
+                return None
+            if "zip" in urls and not os.path.exists(xml_path):
+                save_engraving(get(urls["zip"]), stem, section_dir)
+                time.sleep(pause)
+            if "mid" in urls and not os.path.exists(mid_path):
+                with open(mid_path, "wb") as fh:
+                    fh.write(get(urls["mid"]))
+                time.sleep(pause)
+            return stem
+
+        # The archive is slow per request rather than short of bandwidth,
+        # so a few connections at once is the difference between two hours
+        # and ten. Kept deliberately small: this is somebody's hobby server.
+        with cf.ThreadPoolExecutor(max_workers=workers) as pool:
+            futures = {pool.submit(one, item): item[0]
+                       for item in sorted(pieces.items())}
+            for future in cf.as_completed(futures):
+                try:
+                    stem = future.result()
+                except (RuntimeError, OSError) as exc:
+                    failed.append(f"{futures[future]}: {exc}")
+                    continue
+                if stem is None:
+                    skipped += 1
+                else:
+                    got += 1
+                    print(f"  {name}/{stem}", flush=True)
     return got, skipped, failed
 
 
@@ -186,6 +202,9 @@ def main(argv: list[str] | None = None) -> int:
                     help="where the folders are made (default: midi/)")
     ap.add_argument("--pause", type=float, default=0.4, metavar="S",
                     help="seconds between requests; be kind to the archive")
+    ap.add_argument("--workers", type=int, default=4, metavar="N",
+                    help="downloads in flight at once (default 4); this is "
+                         "a small archive, so keep it small")
     ap.add_argument("--list", action="store_true",
                     help="count what each collection offers and stop")
     args = ap.parse_args(argv)
@@ -210,7 +229,8 @@ def main(argv: list[str] | None = None) -> int:
             continue
         out_dir = os.path.join(args.out, folder)
         print(f"{name} -> {out_dir}")
-        got, skipped, failed = fetch(index_url, out_dir, args.pause)
+        got, skipped, failed = fetch(index_url, out_dir, args.pause,
+                                     args.workers)
         print(f"{name}: {got} fetched, {skipped} already had, "
               f"{len(failed)} failed")
         for line in failed[:10]:

@@ -542,6 +542,72 @@ as ten fingers can hold.
 
 Every tab is credited to Leonid Elkin as arranger, with Bach as composer.
 
+## Arranging the whole archive
+
+The scores are not in this repository. They are somebody else's
+transcriptions, and every tab here is regenerable from them, so what is
+kept is the way to fetch them again:
+
+```
+python fetch_tobis.py klavier          # one collection
+python fetch_tobis.py --list vocal     # count it without downloading
+python fetch_tobis.py all              # the whole Bach archive
+```
+
+`fetch_tobis.py` mirrors [Tobis Notenarchiv](https://tobis-notenarchiv.de/)
+into `midi/`, walking the archive's own tree rather than assuming a shape:
+the lute works list their pieces on one page, the keyboard works two levels
+down, the cantatas three. It keeps each piece's full path, because
+`fantasien-und-fugen` is a section of both the organ works and the keyboard
+works and flattening would merge them. Each piece is offered as a `.zip`
+holding one MusicXML engraving and as a `.mid`; both are taken, since the
+engraving is the better score and carries no tempo, which the MIDI does.
+It is resumable — anything already downloaded is skipped.
+
+Then arrange a collection onto a shelf of the published page:
+
+```
+python build_shelves.py                       # every shelf
+python build_shelves.py well-tempered-clavier
+python build_index.py                         # write them into the page
+```
+
+`build_shelves.py` writes the tabs into `../fugue/<shelf>/gp/` and leaves a
+`shelf.json` beside them holding what the page shows — the band, the bar
+count, the tempo. `build_index.py` turns those into HTML inside one
+comment-delimited block of `../fugue/index.html`, so running it again
+replaces what it wrote rather than appending a second copy, and the
+hand-built organ shelves above it are never touched.
+
+Movements are not split. The archive publishes a prelude and its fugue as
+one score, and cutting them apart would mean inventing a bar line that
+nothing in the file marks.
+
+**The keyboard works**, which are what the piano reading above was for:
+248 pieces — both books of the Well-Tempered Clavier, the inventions and
+sinfonias, the English and French suites, the partitas, the toccatas, the
+little preludes, the concerto transcriptions. **504,151 source notes,
+497,148 written: 98.6% kept, and nothing failed to convert.**
+
+| shelf | pieces | notes kept |
+|---|---|---|
+| The Well-Tempered Clavier | 58 | 99.4% |
+| Inventions and sinfonias | 31 | 99.8% |
+| Keyboard fugues | 31 | 98.7% |
+| Suites and partitas | 31 | 98.9% |
+| Sonatas, duets and single pieces | 27 | 98.8% |
+| Toccatas and fantasias | 24 | 96.9% |
+| The little preludes | 21 | 99.4% |
+| Concertos after other masters | 18 | 98.0% |
+| Airs and variations | 7 | 98.8% |
+
+**Licence.** Tobis publishes under
+[CC BY-NC-SA 4.0](https://creativecommons.org/licenses/by-nc-sa/4.0/).
+Every tab here is a derivative of one of their engravings — the organ ones
+always were — so they all carry the same terms: credit the source
+(*Quelle: www.tobis-notenarchiv.de*), keep it non-commercial, share it
+alike. Bach's music is public domain; a modern engraving of it is not.
+
 ## Dropping the high parts an octave (`octave_down.py`)
 
 ```

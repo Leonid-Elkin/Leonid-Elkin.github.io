@@ -36,56 +36,96 @@ from keyboard_titles import label_for, title_for
 HERE = os.path.dirname(os.path.abspath(__file__))
 SITE = os.path.normpath(os.path.join(HERE, os.pardir, "fugue"))
 
-# shelf -> (heading, blurb, the archive sections it gathers)
-SHELVES: dict[str, tuple[str, str, list[str]]] = {
+# shelf -> (heading, blurb, root under midi/, sections under that root).
+# An empty section list takes everything under the root, however deeply the
+# archive nests it; naming sections splits one collection over more than one
+# shelf, which is what the keyboard works need.
+SHELVES: dict[str, tuple[str, str, str, list[str]]] = {
     "well-tempered-clavier": (
         "The Well-Tempered Clavier",
         "BWV 846–893",
+        "klavier",
         ["das-wohltemperierte-klavier-teil-1",
          "das-wohltemperierte-klavier-teil-2"],
     ),
     "inventions-and-sinfonias": (
-        "Inventions and sinfonias",
-        "BWV 772–801",
+        "Inventions and sinfonias", "BWV 772–801", "klavier",
         ["inventionen", "sinfonien"],
     ),
     "keyboard-suites": (
-        "Suites and partitas",
-        "BWV 806–831",
+        "Suites and partitas", "BWV 806–831", "klavier",
         ["englische-suiten", "franzoesische-suiten", "partiten",
          "diverse-suiten"],
     ),
     "toccatas-and-fantasias": (
-        "Toccatas and fantasias",
-        "BWV 894–923",
+        "Toccatas and fantasias", "BWV 894–923", "klavier",
         ["toccaten-fantasien-und-praeludien", "fantasien-und-fugen"],
     ),
     "keyboard-fugues": (
-        "Keyboard fugues",
-        "BWV 944–962",
+        "Keyboard fugues", "BWV 944–962", "klavier",
         ["fugen", "praeludien-und-fugen"],
     ),
     "little-preludes": (
-        "The little preludes",
-        "BWV 924–943",
+        "The little preludes", "BWV 924–943", "klavier",
         ["fuenf-kleine-praeludien", "sechs-kleine-praeludien",
          "neun-kleine-praeludien-aus-dem-klavierbuechlein-fuer-wilhelm-"
          "friedemann-bach"],
     ),
     "keyboard-variations": (
-        "Airs and variations",
-        "BWV 988–994",
+        "Airs and variations", "BWV 988–994", "klavier",
         ["arien-und-variationen"],
     ),
     "keyboard-concertos": (
-        "Concertos after other masters",
-        "BWV 972–987",
+        "Concertos after other masters", "BWV 972–987", "klavier",
         ["konzerte-nach-verschiedenen-meistern"],
     ),
     "keyboard-sonatas": (
-        "Sonatas, duets and single pieces",
-        "BWV 963–971",
+        "Sonatas, duets and single pieces", "BWV 963–971", "klavier",
         ["sonaten", "duette", "einzelwerke", "sonstige-einzelwerke"],
+    ),
+
+    # Everything that is not keyboard and not already on one of the five
+    # hand-built organ shelves. Each takes its whole collection.
+    "lute-works": (
+        "Lute works", "BWV 995–1000, 1006a", "lute", [],
+    ),
+    "chamber-music": (
+        "Chamber music", "BWV 1001–1040", "chamber", [],
+    ),
+    "concertos": (
+        "Concertos", "BWV 1041–1065", "concertos", [],
+    ),
+    "orchestral": (
+        "Overtures and sinfonias", "BWV 1066–1071", "orchestral", [],
+    ),
+    "musical-offering": (
+        "The Musical Offering", "BWV 1079", "musical-offering", [],
+    ),
+    "canons": (
+        "Canons", "BWV 1072–1078, 1086–1087", "canons", [],
+    ),
+    "cantatas": (
+        "Cantatas", "BWV 1–224", "vocal", ["bach-archiv-kantaten"],
+    ),
+    "passions-and-masses": (
+        "Passions, masses and oratorios", "BWV 225–249", "vocal",
+        ["passionen-und-oratorien", "messen-magnificat", "motetten"],
+    ),
+    "chorales-and-songs": (
+        "Four-part chorales and songs", "BWV 250–524", "vocal",
+        ["vierstimmige-choraele", "lieder-und-arien"],
+    ),
+    "appendix": (
+        "Appendix and doubtful works", "BWV Anh.", "appendix", [],
+    ),
+    "deest": (
+        "Works without a BWV number", "BWV deest", "deest", [],
+    ),
+    "additions": (
+        "Additions", "Ergänzungen", "additions", [],
+    ),
+    "manuscripts": (
+        "Notebooks, prints and manuscripts", "", "manuscripts", [],
     ),
 }
 
@@ -100,20 +140,42 @@ def band(report) -> str:
     return head + (" + bass" if has_bass else "")
 
 
-def build(shelf: str, src_root: str, pause_on_fail: bool = False) -> list[dict]:
-    heading, span, sections = SHELVES[shelf]
+def source_dirs(root: str, sections: list[str]) -> list[str]:
+    """Every folder holding scores, for the sections a shelf asked for.
+
+    The archive nests to different depths -- the lute works sit in one
+    folder, the cantatas three deep -- so each starting point is walked
+    rather than assumed to be a leaf.
+    """
+    starts = [os.path.join(root, s) for s in sections] if sections else [root]
+    found: list[str] = []
+    for start in starts:
+        if not os.path.isdir(start):
+            continue
+        for folder, _subdirs, files in os.walk(start):
+            if any(f.lower().endswith((".mid", ".midi", ".xml", ".musicxml",
+                                       ".mxl")) for f in files):
+                found.append(folder)
+    return sorted(found)
+
+
+def build(shelf: str, midi_root: str) -> list[dict]:
+    heading, span, root, sections = SHELVES[shelf]
     gp_dir = os.path.join(SITE, shelf, "gp")
     os.makedirs(gp_dir, exist_ok=True)
 
     records: list[dict] = []
-    for section in sections:
-        folder = os.path.join(src_root, section)
-        if not os.path.isdir(folder):
-            print(f"  (no {section})")
-            continue
+    for folder in source_dirs(os.path.join(midi_root, root), sections):
+        section = os.path.relpath(folder, midi_root).replace(os.sep, "/")
         for name in pick_sources(folder):
             stem = os.path.splitext(name)[0]
             src = os.path.join(folder, name)
+            # One shelf gathers several folders, and the archive reuses a
+            # name across them -- a movement called "Aria" under two
+            # cantatas. Keep the first and qualify the rest, so nothing is
+            # silently written over.
+            if any(r["stem"] == stem for r in records):
+                stem = f"{stem}__{os.path.basename(folder)}"
             dst = os.path.join(gp_dir, stem + ".gp5")
             settings = Settings(
                 bass=True,
@@ -164,7 +226,8 @@ def main(argv: list[str] | None = None) -> int:
 
     ap = argparse.ArgumentParser(description=__doc__.split("\n")[0])
     ap.add_argument("shelves", nargs="*", help="default: all of them")
-    ap.add_argument("--src", default=os.path.join(HERE, "midi", "klavier"))
+    ap.add_argument("--src", default=os.path.join(HERE, "midi"),
+                    help="where fetch_tobis.py put the collections")
     args = ap.parse_args(argv)
 
     wanted = args.shelves or list(SHELVES)

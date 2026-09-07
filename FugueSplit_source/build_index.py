@@ -41,6 +41,19 @@ ORDER = [
     "keyboard-variations",
     "keyboard-concertos",
     "keyboard-sonatas",
+    "lute-works",
+    "chamber-music",
+    "concertos",
+    "orchestral",
+    "musical-offering",
+    "canons",
+    "cantatas",
+    "passions-and-masses",
+    "chorales-and-songs",
+    "appendix",
+    "deest",
+    "additions",
+    "manuscripts",
 ]
 
 CREDIT = """                <p class="setup">Bach's music is public domain. The engravings these are read
