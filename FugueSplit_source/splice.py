@@ -45,6 +45,10 @@ def splice(torso, completion, at_tick: int | None = None, ppq: int = 384):
     """(notes, track names) for the torso up to `at_tick`, then the rest.
 
     `at_tick` is in the torso's own ticks and defaults to where it stops.
+
+    Returns `(lanes, names, dropped, chorded)`: the notes of each voice,
+    the track names, how many notes of the completion no voice could take,
+    and how many were kept as tones of the closing chord.
     """
     at_tick = torso.end_tick if at_tick is None else at_tick
     scale = lambda tick, source: round(tick * ppq / source.ppq)
@@ -70,7 +74,13 @@ def splice(torso, completion, at_tick: int | None = None, ppq: int = 384):
     theirs = voice_order(completion.notes)
     mapping = {track: index for index, track in enumerate(theirs[:len(voices)])}
     join = round(at_tick * completion.ppq / torso.ppq)
-    dropped = 0
+    # A fugue ends on a chord, not in four lines. Whatever is still
+    # sounding at the last tick belongs to it, and is stacked on a voice
+    # that is already holding one rather than thrown away -- a player
+    # holds two strings for the final bar, which is what a guitarist does
+    # anyway, and the piece ends with every note of its cadence.
+    closing = round(completion.end_tick * ppq / completion.ppq)
+    dropped = chorded = 0
     for note in sorted(completion.notes, key=lambda n: (n.start, -n.pitch)):
         if note.end <= join:
             continue
@@ -94,12 +104,18 @@ def splice(torso, completion, at_tick: int | None = None, ppq: int = 384):
                 lanes[index].append((start, end, note.pitch))
                 break
         else:
-            dropped += 1
+            if end >= closing:
+                lanes[nearest(note.pitch, centres)].append(
+                    (start, end, note.pitch)
+                )
+                chorded += 1
+            else:
+                dropped += 1
 
     names = [f"Voice {i + 1}" for i in range(len(lanes))]
     for lane in lanes:
         lane.sort()
-    return lanes, names, dropped
+    return lanes, names, dropped, chorded
 
 
 def _clash(lane, start, end) -> bool:
@@ -167,7 +183,7 @@ def main(argv: list[str]) -> int:
         starts = bar_starts(torso)
         at = starts[min(args.at_bar - 1, len(starts) - 1)]
 
-    lanes, names, dropped = splice(torso, completion, at)
+    lanes, names, dropped, chorded = splice(torso, completion, at)
     numerator, denominator = torso.time_sig_at(0)
     write_midi(lanes, names, args.out, 384, torso.tempo_at(0),
                numerator, denominator, torso.key)
@@ -179,6 +195,9 @@ def main(argv: list[str]) -> int:
           f"{at if at is not None else torso.end_tick} of the torso")
     for name, lane in zip(names, lanes):
         print(f"    {name}: {len(lane)} notes")
+    if chorded:
+        print(f"  {chorded} note{'s' if chorded > 1 else ''} of the closing "
+              f"chord stacked on a voice already holding one")
     if dropped:
         print(f"  {dropped} notes of the completion had no free voice to "
               f"take them")

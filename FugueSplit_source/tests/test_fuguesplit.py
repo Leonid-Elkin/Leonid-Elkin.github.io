@@ -1095,6 +1095,50 @@ def _make_continued_midi(path: str) -> None:
     mid.save(path)
 
 
+def _make_chorded_ending_midi(path: str) -> None:
+    """The canon again, ending on a chord of four notes over three voices.
+
+    What a real cadence does: Tovey ends Contrapunctus XIV on five notes
+    and the piece is written in four voices, so one of them has to hold
+    two.
+    """
+    mid = mido.MidiFile(ticks_per_beat=480)
+    meta = mido.MidiTrack()
+    meta.append(mido.MetaMessage("set_tempo", tempo=mido.bpm2tempo(96), time=0))
+    meta.append(mido.MetaMessage("time_signature", numerator=4, denominator=4,
+                                 time=0))
+    meta.append(mido.MetaMessage("key_signature", key="G", time=0))
+    mid.tracks.append(meta)
+
+    subject = [0, 2, 4, 5, 7, 5, 4, 2]
+    chord_on = 68 * 480          # a bar after the last voice has finished
+    # Two of the chord's notes are written in the top voice, which is how
+    # an engraving spells a chord the hands can reach but one line cannot.
+    for name, base, delay, chord in [("MANUAL", 72, 0, [79, 76]),
+                                     ("MANUAL", 64, 480, [67]),
+                                     ("PEDAL", 43, 960, [55])]:
+        track = mido.MidiTrack()
+        track.append(mido.MetaMessage("track_name", name=name, time=0))
+        prev = 0
+        for rep in range(8):
+            for i, step in enumerate(subject):
+                on = delay + (rep * 8 + i) * 480
+                track.append(mido.Message("note_on", note=base + step,
+                                          velocity=90, time=on - prev))
+                track.append(mido.Message("note_off", note=base + step,
+                                          time=460))
+                prev = on + 460
+        for pitch in chord:
+            track.append(mido.Message("note_on", note=pitch, velocity=90,
+                                      time=chord_on - prev))
+            prev = chord_on
+        for pitch in chord:
+            track.append(mido.Message("note_off", note=pitch,
+                                      time=1920 if pitch == chord[0] else 0))
+        mid.tracks.append(track)
+    mid.save(path)
+
+
 class TestContinuation(unittest.TestCase):
     """A completion has to start exactly where the torso starts."""
 
@@ -1198,7 +1242,7 @@ class TestSplice(unittest.TestCase):
         _make_continued_midi(whole_path)
         torso = midi_in.read_midi(torso_path)
         whole = midi_in.read_midi(whole_path)
-        lanes, names, dropped = splice_tool.splice(torso, whole)
+        lanes, names, dropped, _chorded = splice_tool.splice(torso, whole)
         return torso, whole, lanes, names, dropped, d, torso_path
 
     def test_the_torso_survives_the_join_intact(self):
@@ -1221,6 +1265,36 @@ class TestSplice(unittest.TestCase):
         end = torso.end_tick * 384 // torso.ppq
         later = [s for lane in lanes for s, _e, _p in lane if s >= end]
         self.assertTrue(later, "nothing was added after the torso")
+
+    def test_the_closing_chord_is_written_whole(self):
+        """A cadence with more notes in it than the piece has voices.
+
+        Everywhere else a note nobody can hold is dropped, because a line
+        no one plays is worse than no line. The last chord is the one
+        place that is wrong: it is not a line, it is the sound the piece
+        ends on, so a voice holds two of it rather than losing one.
+        """
+        import splice as splice_tool
+
+        with tempfile.TemporaryDirectory() as d:
+            torso_path = os.path.join(d, "torso.mid")
+            whole_path = os.path.join(d, "whole.mid")
+            _make_test_midi(torso_path)
+            _make_chorded_ending_midi(whole_path)
+            torso = midi_in.read_midi(torso_path)
+            whole = midi_in.read_midi(whole_path)
+            lanes, _names, dropped, chorded = splice_tool.splice(torso, whole)
+
+        self.assertEqual(dropped, 0)
+        self.assertEqual(chorded, 1, "the extra chord tone was not kept")
+        last = max(end for lane in lanes for _s, end, _p in lane)
+        sounding = {p for lane in lanes for s, e, p in lane if e == last}
+        self.assertEqual(len(sounding), 4, "the final chord lost a note")
+        overlaps = [(s, e) for lane in lanes
+                    for (s, e, _p), (later, _e2, _p2) in zip(lane, lane[1:])
+                    if e > later]
+        self.assertFalse([o for o in overlaps if o[1] != last],
+                         "voices overlap somewhere other than the last chord")
 
     def test_the_joined_file_reads_back_as_a_score(self):
         import splice as splice_tool

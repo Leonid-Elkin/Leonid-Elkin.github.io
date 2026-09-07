@@ -422,6 +422,13 @@ so the four lines carry through the join. A note that would collide with what
 its own voice is already holding goes to the nearest voice that is free, so
 the joined file stays as cleanly separated as the torso it continues.
 
+The last chord is the exception. A cadence is not four lines, it is the sound
+the piece ends on, and an edition writes as many notes into it as the hands
+can reach — Tovey's is five over four voices. So a note still sounding at the
+final tick is never dropped: it is stacked on the voice nearest it in
+register, one player holds two strings for the last bar, and the piece ends on
+every note of its own cadence.
+
 **The Art of Fugue, finished.** Contrapunctus XIV breaks off at bar 239;
 [Donald Tovey's 1931 completion](https://peterbillam.gitlab.io/pjb_arrangements/index.html)
 carries it to bar 317. Peter Billam's typesetting of it is free, and muscript
@@ -429,10 +436,17 @@ carries it to bar 317. Peter Billam's typesetting of it is free, and muscript
 so no page has to be recognised at all. Checked against Bach's own text with
 `fuguesplit.proof`, that edition agrees with the torso on **2611 of 2620
 notes**; the nine are editorial readings, mostly B flat against B natural.
-Spliced and arranged, the tab runs to 317 bars, **3851 notes, every one traced
-back to its source**, and its first 239 bars are the torso's tab exactly:
+Spliced and arranged, the tab runs to 317 bars, **3852 notes, every one traced
+back to its source** — closing on the whole of Tovey's five-note D major, with
+Guitar I holding the F sharp and the A of it — and its first 239 bars are the
+torso's tab exactly:
 2620 of 2620 notes on the same guitar, at the same instant, at the same pitch,
 ringing for the same length.
+
+Nineteen notes of the edition are not in it, all of them in bar 316: Tovey's
+penultimate bar swells to six sounding parts under the flourish, and four
+monophonic lines cannot hold six. Every other bar of the completion is there
+in full.
 
 ## Is it the right piece? (`fuguesplit.verify`)
 
@@ -491,7 +505,7 @@ Every tab is credited to Leonid Elkin as arranger, with Bach as composer.
 python -m unittest discover -s tests -v
 ```
 
-136 tests. The assignment solver is checked against brute-force optimality; the
+137 tests. The assignment solver is checked against brute-force optimality; the
 notation layer is checked exhaustively (every offset and length on a 32nd grid
 in both simple and compound metre reconstructs to exactly the right number of
 ticks); and end-to-end tests parse the generated `.gp5` back and assert every
@@ -502,7 +516,9 @@ and a tune with a bar taken out of it checks that `proof` reports the bar
 where two readings stop being in step; a bar padded to place a whole rest
 checks that the bar lines after it stay where they were engraved, and a
 spliced canon checks that the torso survives the join and no voice ends up
-holding two notes at once; the counterpoint scorer is checked against a
+holding two notes at once — except in a cadence with more notes in it than
+the piece has voices, where the last chord has to be written whole and
+nowhere else may overlap; the counterpoint scorer is checked against a
 triad, a cluster and a pair of parallel fifths, and the completion against
 Bach's four subjects, which it has to find in his text before it can use
 them. A thick
