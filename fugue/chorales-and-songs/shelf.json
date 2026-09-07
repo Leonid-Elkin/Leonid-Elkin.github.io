@@ -1,0 +1,72 @@
+{
+ "shelf": "chorales-and-songs",
+ "heading": "Four-part chorales and songs",
+ "span": "BWV 250–524",
+ "pieces": [
+  {
+   "stem": "BWV_0519",
+   "label": "BWV 519",
+   "title": "BWV_0519",
+   "band": "1 guitar + bass",
+   "bars": 12,
+   "tempo": 120,
+   "source_notes": 107,
+   "written_notes": 107,
+   "read_as": "organ",
+   "broken": 0,
+   "section": "vocal/lieder-arien-und-quodlibet/fuenf-geistliche-lieder"
+  },
+  {
+   "stem": "BWV_0520",
+   "label": "BWV 520",
+   "title": "BWV_0520",
+   "band": "1 guitar + bass",
+   "bars": 13,
+   "tempo": 120,
+   "source_notes": 77,
+   "written_notes": 77,
+   "read_as": "organ",
+   "broken": 0,
+   "section": "vocal/lieder-arien-und-quodlibet/fuenf-geistliche-lieder"
+  },
+  {
+   "stem": "BWV_0521",
+   "label": "BWV 521",
+   "title": "BWV_0521",
+   "band": "1 guitar",
+   "bars": 12,
+   "tempo": 120,
+   "source_notes": 55,
+   "written_notes": 55,
+   "read_as": "piano",
+   "broken": 0,
+   "section": "vocal/lieder-arien-und-quodlibet/fuenf-geistliche-lieder"
+  },
+  {
+   "stem": "BWV_0522",
+   "label": "BWV 522",
+   "title": "BWV_0522",
+   "band": "1 guitar",
+   "bars": 8,
+   "tempo": 120,
+   "source_notes": 44,
+   "written_notes": 44,
+   "read_as": "piano",
+   "broken": 0,
+   "section": "vocal/lieder-arien-und-quodlibet/fuenf-geistliche-lieder"
+  },
+  {
+   "stem": "BWV_0523",
+   "label": "BWV 523",
+   "title": "BWV_0523",
+   "band": "1 guitar",
+   "bars": 12,
+   "tempo": 120,
+   "source_notes": 44,
+   "written_notes": 44,
+   "read_as": "piano",
+   "broken": 0,
+   "section": "vocal/lieder-arien-und-quodlibet/fuenf-geistliche-lieder"
+  }
+ ]
+}

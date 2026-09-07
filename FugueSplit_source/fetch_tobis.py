@@ -188,7 +188,7 @@ def fetch(index_url: str, out_dir: str, pause: float,
         rel = section[len(index_url):].strip("/")
         # A collection too large to hold on disk at once is taken a
         # section at a time: fetch, arrange, delete, move on.
-        if only and not rel.startswith(only):
+        if only and only not in rel:
             continue
         name = rel or os.path.basename(out_dir)
         section_dir = os.path.join(out_dir, *rel.split("/")) if rel else out_dir
@@ -241,7 +241,7 @@ def main(argv: list[str] | None = None) -> int:
                     help="downloads in flight at once (default 4); this is "
                          "a small archive, so keep it small")
     ap.add_argument("--only", default="", metavar="PREFIX",
-                    help="only sections whose path starts with this")
+                    help="only sections whose path contains this")
     ap.add_argument("--list", action="store_true",
                     help="count what each collection offers and stop")
     args = ap.parse_args(argv)
@@ -259,7 +259,7 @@ def main(argv: list[str] | None = None) -> int:
         if args.list:
             total = 0
             for section in sub_pages(index_url):
-                if args.only and not section[len(index_url):].strip("/").startswith(args.only):
+                if args.only and args.only not in section[len(index_url):].strip("/"):
                     continue
                 n = len(downloads(section))
                 total += n
