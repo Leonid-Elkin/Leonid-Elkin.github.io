@@ -36,7 +36,19 @@ from keyboard_titles import best_title, label_for, title_for
 
 HERE = os.path.dirname(os.path.abspath(__file__))
 # One tree per composer under fuguesplit/, the folder this lives in.
-SITE = os.path.normpath(os.path.join(HERE, os.pardir, "bach"))
+ROOT = os.path.normpath(os.path.join(HERE, os.pardir))
+SITE = os.path.join(ROOT, "bach")
+
+# Anything not listed here is Bach, which is most of it.
+COMPOSER_OF = {"vivaldi-arias": "vivaldi"}
+
+
+def composer_of(shelf: str) -> str:
+    return COMPOSER_OF.get(shelf, "bach")
+
+
+def shelf_dir(shelf: str) -> str:
+    return os.path.join(ROOT, composer_of(shelf), shelf)
 
 # shelf -> (heading, blurb, root under midi/, sections under that root).
 # An empty section list takes everything under the root, however deeply the
@@ -132,6 +144,12 @@ SHELVES: dict[str, tuple[str, str, str, list[str]]] = {
     "organ-other": (
         "More organ works", "BWV 525–598", "organ-full", [],
     ),
+
+    # Not Bach. Mutopia holds four Vivaldi pieces and no more; there is no
+    # Vivaldi archive of Tobis's kind to draw on. See fetch_mutopia.py.
+    "vivaldi-arias": (
+        "Vivaldi — arias", "RV 690, RV 725", "vivaldi", [],
+    ),
 }
 
 # The five shelves already on the page were built by hand from the same
@@ -187,7 +205,7 @@ def source_dirs(root: str, sections: list[str]) -> list[str]:
 
 def build(shelf: str, midi_root: str) -> list[dict]:
     heading, span, root, sections = SHELVES[shelf]
-    gp_dir = os.path.join(SITE, shelf, "gp")
+    gp_dir = os.path.join(shelf_dir(shelf), "gp")
     os.makedirs(gp_dir, exist_ok=True)
 
     held = already_published(AVOID.get(shelf, []))
@@ -249,7 +267,7 @@ def build(shelf: str, midi_root: str) -> list[dict]:
     # once is fetched, arranged and cleaned a section at a time, so a later
     # run sees only part of its own sources; anything already arranged
     # whose tab is still on the shelf stays on it.
-    meta_path = os.path.join(SITE, shelf, "shelf.json")
+    meta_path = os.path.join(shelf_dir(shelf), "shelf.json")
     if os.path.exists(meta_path):
         with open(meta_path, encoding="utf-8") as fh:
             kept = json.load(fh).get("pieces", [])
@@ -261,9 +279,9 @@ def build(shelf: str, midi_root: str) -> list[dict]:
                 records.append(old)
 
     records.sort(key=lambda r: r["stem"])
-    meta = {"shelf": shelf, "heading": heading, "span": span,
-            "pieces": records}
-    with open(os.path.join(SITE, shelf, "shelf.json"), "w",
+    meta = {"shelf": shelf, "composer": composer_of(shelf),
+            "heading": heading, "span": span, "pieces": records}
+    with open(os.path.join(shelf_dir(shelf), "shelf.json"), "w",
               encoding="utf-8") as fh:
         json.dump(meta, fh, indent=1, ensure_ascii=False)
     return records

@@ -26,7 +26,8 @@ import os
 import sys
 
 HERE = os.path.dirname(os.path.abspath(__file__))
-SITE = os.path.normpath(os.path.join(HERE, os.pardir, "bach"))
+ROOT = os.path.normpath(os.path.join(HERE, os.pardir))
+SITE = os.path.join(ROOT, "bach")
 INDEX = os.path.normpath(os.path.join(HERE, os.pardir, "index.html"))
 
 BEGIN = "                <!-- shelves:begin (build_index.py) -->"
@@ -75,15 +76,16 @@ CREDIT = """                <p class="setup">Bach's music is public domain. The 
                     if you would like to run it over something of your own.</p>"""
 
 
-def piece_html(shelf: str, piece: dict) -> str:
-    gp = f"/fuguesplit/bach/{shelf}/gp/{piece['stem']}.gp5"
+def piece_html(shelf: str, piece: dict, composer: str = "bach") -> str:
+    gp = f"/fuguesplit/{composer}/{shelf}/gp/{piece['stem']}.gp5"
     # Some shelves also carry an octave-dropped reading, made by
     # octave_down.py and kept in 8ve/ beside the straight one. Link it
     # where it exists rather than leaving 356 files reachable from nowhere,
     # which is what the old parallel transposed/ folder amounted to.
-    low = os.path.join(SITE, shelf, "8ve", piece["stem"] + ".gp5")
+    base = os.path.join(ROOT, composer, shelf)
+    low = os.path.join(base, "8ve", piece["stem"] + ".gp5")
     octave = (f'\n                                <a class="get-gp" '
-              f'href="/fuguesplit/bach/{shelf}/8ve/{piece["stem"]}.gp5" '
+              f'href="/fuguesplit/{composer}/{shelf}/8ve/{piece["stem"]}.gp5" '
               f'title="the same arrangement with over-high parts dropped an '
               f'octave">8VE</a>') if os.path.exists(low) else ""
 
@@ -91,12 +93,12 @@ def piece_html(shelf: str, piece: dict) -> str:
     # predate this generator and must not be dropped by it.
     parts = []
     for pdf in sorted(glob.glob(os.path.join(
-            SITE, shelf, "pdf", glob.escape(piece["stem"]) + "-*.pdf"))):
+            base, "pdf", glob.escape(piece["stem"]) + "-*.pdf"))):
         suffix = os.path.splitext(os.path.basename(pdf))[0][len(piece["stem"]) + 1:]
         name = suffix.replace("guitar-", "").upper()
         parts.append(
             f'\n                                <a class="get-part" '
-            f'href="/fuguesplit/bach/{shelf}/pdf/{os.path.basename(pdf)}" '
+            f'href="/fuguesplit/{composer}/{shelf}/pdf/{os.path.basename(pdf)}" '
             f'title="{suffix.replace("-", " ")} &mdash; PDF">{name}</a>')
     meta = f"{piece['band']} &middot; {piece['bars']} bars"
     if piece.get("tempo"):
@@ -129,7 +131,8 @@ def shelf_html(meta: dict) -> str:
                     <span class="mono">{html.escape(meta['span'])} &middot; {count}</span>
                 </div>
                 <ul class="pieces">"""
-    body = "\n".join(piece_html(shelf, p) for p in pieces)
+    composer = meta.get("composer", "bach")
+    body = "\n".join(piece_html(shelf, p, composer) for p in pieces)
     return head + "\n" + body + "\n                </ul>\n"
 
 
@@ -139,9 +142,13 @@ def main(argv: list[str] | None = None) -> int:
     args = ap.parse_args(argv)
 
     metas = []
-    for path in sorted(glob.glob(os.path.join(SITE, "*", "shelf.json"))):
+    # One tree per composer: bach/<shelf>/, vivaldi/<shelf>/, ...
+    for path in sorted(glob.glob(os.path.join(ROOT, "*", "*", "shelf.json"))):
         with io.open(path, encoding="utf-8") as fh:
-            metas.append(json.load(fh))
+            meta = json.load(fh)
+        meta.setdefault("composer",
+                        os.path.basename(os.path.dirname(os.path.dirname(path))))
+        metas.append(meta)
     rank = {name: i for i, name in enumerate(ORDER)}
     metas.sort(key=lambda m: (rank.get(m["shelf"], 999), m["shelf"]))
     if not metas:

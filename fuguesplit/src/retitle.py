@@ -25,7 +25,8 @@ sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 from keyboard_titles import best_title, label_for
 
 HERE = os.path.dirname(os.path.abspath(__file__))
-SITE = os.path.normpath(os.path.join(HERE, os.pardir, "bach"))
+ROOT = os.path.normpath(os.path.join(HERE, os.pardir))
+SITE = ROOT
 
 
 def main(argv: list[str] | None = None) -> int:
@@ -33,7 +34,7 @@ def main(argv: list[str] | None = None) -> int:
     ap.add_argument("shelves", nargs="*", help="default: all of them")
     args = ap.parse_args(argv)
 
-    paths = sorted(glob.glob(os.path.join(SITE, "*", "shelf.json")))
+    paths = sorted(glob.glob(os.path.join(ROOT, "*", "*", "shelf.json")))
     if args.shelves:
         wanted = set(args.shelves)
         paths = [p for p in paths

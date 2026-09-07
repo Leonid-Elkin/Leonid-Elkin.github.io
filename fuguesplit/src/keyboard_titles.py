@@ -91,6 +91,16 @@ except ImportError:                     # pragma: no cover
 PLACEHOLDER = _re.compile(r"S(?:eite)?\.?\s*#|^\s*$|^BWV[_ ]?\d")
 
 
+# Mutopia names a Vivaldi file by catalogue number and incipit:
+# "rv690-DellAlmaSuperba".
+RV = _re.compile(r"^rv(\d+)-(.+)$", _re.I)
+
+
+def _spaced(run: str) -> str:
+    """"DellAlmaSuperba" -> "Dell Alma Superba"."""
+    return _re.sub(r"(?<=[a-z])(?=[A-Z])", " ", run).replace("_", " ").strip()
+
+
 def readable(stem: str) -> str:
     """A name for a piece the catalogue tables do not cover.
 
@@ -100,6 +110,9 @@ def readable(stem: str) -> str:
     instead of a filename. "BWV_1087_05" becomes "BWV 1087, no. 5";
     "BWV_0232_16", "BWV 232, no. 16".
     """
+    rv = RV.match(stem)
+    if rv:
+        return f"RV {int(rv.group(1))} — {_spaced(rv.group(2))}"
     if not stem.upper().startswith("BWV_"):
         return stem.replace("_", " ")
     parts = stem[4:].split("_")
@@ -147,6 +160,9 @@ def best_title(stem: str, from_score: str | None) -> str:
 
 def label_for(stem: str) -> str:
     """The catalogue number as the page shows it: BWV_0846 -> BWV 846."""
+    rv = RV.match(stem)
+    if rv:
+        return f"RV {int(rv.group(1))}"
     if not stem.upper().startswith("BWV_"):
         return stem
     parts = stem[4:].split("_")
