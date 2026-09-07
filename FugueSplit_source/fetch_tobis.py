@@ -21,6 +21,7 @@ from __future__ import annotations
 import argparse
 import concurrent.futures as cf
 import io
+import json
 import os
 import re
 import shutil
@@ -118,6 +119,36 @@ def downloads(section_url: str) -> dict[str, dict[str, str]]:
     return found
 
 
+def walk(index_url: str, out_dir: str) -> dict[str, dict[str, dict[str, str]]]:
+    """Every section of a collection and what it offers, cached on disk.
+
+    Walking the vocal works means fetching forty index pages before a note
+    of music is downloaded, and on a machine this short of memory that walk
+    is where the process tends to die -- so it would be paid again on every
+    retry and never get past it. The map is small and the archive changes
+    rarely, so it is written next to the scores and reused. Delete the file
+    (or pass --refresh) to walk again.
+    """
+    cache = os.path.join(os.path.dirname(out_dir),
+                         f".tobis-{os.path.basename(out_dir)}.json")
+    if os.path.exists(cache):
+        try:
+            with open(cache, encoding="utf-8") as fh:
+                return json.load(fh)
+        except (OSError, ValueError):
+            pass
+    found: dict[str, dict[str, dict[str, str]]] = {}
+    for section in sub_pages(index_url):
+        try:
+            found[section] = downloads(section)
+        except RuntimeError:
+            continue
+    os.makedirs(os.path.dirname(cache), exist_ok=True)
+    with open(cache, "w", encoding="utf-8") as fh:
+        json.dump(found, fh)
+    return found
+
+
 def download(url: str, path: str, tries: int = 3) -> None:
     """Stream a URL straight to disk.
 
@@ -176,12 +207,7 @@ def fetch(index_url: str, out_dir: str, pause: float,
     """
     got = skipped = 0
     failed = []
-    for section in sub_pages(index_url):
-        try:
-            pieces = downloads(section)
-        except RuntimeError as exc:
-            failed.append(str(exc))
-            continue
+    for section, pieces in walk(index_url, out_dir).items():
         # Mirror the archive's own path, not just the last segment:
         # "fantasien-und-fugen" is a section of both the organ works and
         # the keyboard works, and flattening would merge the two.
@@ -240,6 +266,8 @@ def main(argv: list[str] | None = None) -> int:
     ap.add_argument("--workers", type=int, default=2, metavar="N",
                     help="downloads in flight at once (default 4); this is "
                          "a small archive, so keep it small")
+    ap.add_argument("--refresh", action="store_true",
+                    help="re-walk the archive instead of using the cached map")
     ap.add_argument("--only", default="", metavar="PREFIX",
                     help="only sections whose path contains this")
     ap.add_argument("--list", action="store_true",
@@ -267,6 +295,10 @@ def main(argv: list[str] | None = None) -> int:
             print(f"{name}: {total} pieces\n")
             continue
         out_dir = os.path.join(args.out, folder)
+        if args.refresh:
+            cache = os.path.join(args.out, f".tobis-{folder}.json")
+            if os.path.exists(cache):
+                os.remove(cache)
         print(f"{name} -> {out_dir}")
         got, skipped, failed = fetch(index_url, out_dir, args.pause,
                                      args.workers, args.only)
