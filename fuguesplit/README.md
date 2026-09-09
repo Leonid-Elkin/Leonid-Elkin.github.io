@@ -381,6 +381,82 @@ the material and stops. But every note in it is Bach's, the joins are where
 he put them, and the arithmetic is checkable, which is the most an
 arranger's program can honestly claim.
 
+## Writing one from nothing (`fugue3.py`)
+
+```
+python fugue3.py -o fugue-in-e-minor.gp5
+```
+
+`complete.py` finishes somebody else's piece out of his own material. This
+writes a piece: an original three-voice fugue in E minor, thirty bars, for
+two guitars and a bass — and then hands it to the arranger like any other
+score, so it comes out as a tab with the rest.
+
+What is authored and what is derived is worth being exact about, because
+the split is the whole point.
+
+**Authored** — the subject, and the plan. Fourteen notes:
+
+```
+E4 B4 | A4 B4 C5 B4 | G4 A4 F#4 G4 | E4 F#4 D#4 E4
+```
+
+a leap to the dominant, a turn round the fifth, and a descent in rising
+seconds that falls a step each time; and then a page of structure saying
+which voice enters where and in which key.
+
+**Derived** — everything else.
+
+| | |
+|---|---|
+| answer | the subject at the fifth, in the dominant |
+| countersubject | *searched*: the best line the accompanying voice could play against the answer |
+| free voices | searched the same way, on a rhythm that moves where the others hold |
+| episodes | sequences on the subject's own tail; the layout is chosen by scoring the alternatives |
+
+The search is a Viterbi pass, the same shape as the fretting solver in
+stage 5: every diatonic pitch in the part's compass is a candidate at
+every slot, the emission cost is the counterpoint against whatever is
+already sounding — thirds and sixths on the strong beats, dissonance only
+in passing, three voices that do not make a chord — and the transition
+cost is the melodic interval, plus a fine for parallel fifths and octaves.
+
+That fine is worth a word. The interval between two voices is a
+*distance*, so it has to be measured with an absolute value; written as a
+signed remainder it calls a fifth below a fourth, and lets through every
+parallel fifth in which the moving voice is the lower one. Written that
+way the piece had three. Written properly it has none.
+
+The counterpoint is checked by `complete.py`'s scorer, the one written to
+judge a completion of Contrapunctus XIV:
+
+```
+Guitar I    155 notes   G3-D5    90% of the time   max fret 10
+Guitar II   151 notes   B2-G#4   87% of the time   max fret  4
+Bass        102 notes   G#1-D3   73% of the time   max fret  7
+
+0 parallels, 0 crossings, 0 notes out of range, one passing unison
+100% of full beats make a chord (Bach's Contrapunctus XIV: 74%)
+```
+
+**That last figure is a limitation, not a boast.** Scoring higher than
+Bach on a dissonance test means the music never risks a dissonance: there
+are no suspensions, no appoggiaturas, nothing held over a bar line to
+grind and resolve, because a search that is told dissonance is expensive
+will not buy any. Bach's 74% is where the other 26% lives. What comes out
+is clean, correct, and plainer than a person would write — which is the
+same honest claim `complete.py` makes, one step further along.
+
+The fugue is a fugue, though, and the tests check that it is: the subject
+is stated in all three parts, the countersubject comes back with it a
+fifth lower in bar 7 and again in the last entry, the middle entries go to
+the relative major and the subdominant, three entries a bar apart make a
+stretto at bar 22, and it closes over a dominant pedal on a Picardy third.
+
+Every part is monophonic, nothing goes above the 10th fret, and
+`fuguesplit.verify` traces all 408 written notes back to the note they
+came from.
+
 ## Reading it off the page (`omr.py`)
 
 When a piece exists only on paper, [Audiveris](https://audiveris.github.io)
@@ -479,6 +555,13 @@ so the four lines carry through the join. A note that would collide with what
 its own voice is already holding goes to the nearest voice that is free, so
 the joined file stays as cleanly separated as the torso it continues.
 
+The last chord is the exception. A cadence is not four lines, it is the sound
+the piece ends on, and an edition writes as many notes into it as the hands
+can reach — Tovey's is five over four voices. So a note still sounding at the
+final tick is never dropped: it is stacked on the voice nearest it in
+register, one player holds two strings for the last bar, and the piece ends on
+every note of its own cadence.
+
 **The Art of Fugue, finished.** Contrapunctus XIV breaks off at bar 239;
 [Donald Tovey's 1931 completion](https://peterbillam.gitlab.io/pjb_arrangements/index.html)
 carries it to bar 317. Peter Billam's typesetting of it is free, and muscript
@@ -486,10 +569,17 @@ carries it to bar 317. Peter Billam's typesetting of it is free, and muscript
 so no page has to be recognised at all. Checked against Bach's own text with
 `fuguesplit.proof`, that edition agrees with the torso on **2611 of 2620
 notes**; the nine are editorial readings, mostly B flat against B natural.
-Spliced and arranged, the tab runs to 317 bars, **3851 notes, every one traced
-back to its source**, and its first 239 bars are the torso's tab exactly:
+Spliced and arranged, the tab runs to 317 bars, **3852 notes, every one traced
+back to its source** — closing on the whole of Tovey's five-note D major, with
+Guitar I holding the F sharp and the A of it — and its first 239 bars are the
+torso's tab exactly:
 2620 of 2620 notes on the same guitar, at the same instant, at the same pitch,
 ringing for the same length.
+
+Nineteen notes of the edition are not in it, all of them in bar 316: Tovey's
+penultimate bar swells to six sounding parts under the flourish, and four
+monophonic lines cannot hold six. Every other bar of the completion is there
+in full.
 
 ## Is it the right piece? (`fuguesplit.verify`)
 
@@ -637,7 +727,7 @@ still keeps the hand in one place. The rewritten sections land in
 python -m unittest discover -s tests -v
 ```
 
-136 tests. The assignment solver is checked against brute-force optimality; the
+159 tests. The assignment solver is checked against brute-force optimality; the
 notation layer is checked exhaustively (every offset and length on a 32nd grid
 in both simple and compound metre reconstructs to exactly the right number of
 ticks); and end-to-end tests parse the generated `.gp5` back and assert every
@@ -648,7 +738,9 @@ and a tune with a bar taken out of it checks that `proof` reports the bar
 where two readings stop being in step; a bar padded to place a whole rest
 checks that the bar lines after it stay where they were engraved, and a
 spliced canon checks that the torso survives the join and no voice ends up
-holding two notes at once; the counterpoint scorer is checked against a
+holding two notes at once — except in a cadence with more notes in it than
+the piece has voices, where the last chord has to be written whole and
+nowhere else may overlap; the counterpoint scorer is checked against a
 triad, a cluster and a pair of parallel fifths, and the completion against
 Bach's four subjects, which it has to find in his text before it can use
 them. A thick
