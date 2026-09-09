@@ -73,10 +73,10 @@ ORDER = [
 
 CREDIT = """                <p class="setup">Bach's music is public domain. The engravings these are read
                     from come from <a href="https://tobis-notenarchiv.de/" target="_blank" rel="noopener">Tobis
-                    Notenarchiv</a> (Quelle: www.tobis-notenarchiv.de) and are published there under
+                    Notenarchiv</a> and are published there under
                     <a href="https://creativecommons.org/licenses/by-nc-sa/4.0/" target="_blank" rel="noopener">CC
                     BY-NC-SA 4.0</a>, so these arrangements carry the same licence: credit the source, keep it
-                    non-commercial, share it alike. The converter is in
+                    non-commercial, share it alike. Quelle: www.tobis-notenarchiv.de. The converter is in
                     <a href="https://github.com/Leonid-Elkin/Leonid-Elkin.github.io/tree/main/fuguesplit/src">fuguesplit/src</a>
                     if you would like to run it over something of your own.</p>"""
 
