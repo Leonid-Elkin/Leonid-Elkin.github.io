@@ -64,6 +64,11 @@ ORDER = [
     "deest",
     "additions",
     "manuscripts",
+    # Not Bach: another composer put through the same arranger, and then the
+    # one piece the program wrote rather than arranged. Both belong at the
+    # end, after the archive they are measured against.
+    "vivaldi-arias",
+    "original",
 ]
 
 CREDIT = """                <p class="setup">Bach's music is public domain. The engravings these are read

@@ -2025,5 +2025,154 @@ class TestBWV544(unittest.TestCase):
             self.assertEqual(report.bars, 88)
 
 
+class TestOriginalFugue(unittest.TestCase):
+    """The three-voice fugue this repository writes rather than arranges.
+
+    The music is searched, so it is not fixed note for note and the tests
+    do not pretend it is. What they check is what the search is supposed
+    to guarantee: that the fugue is a fugue -- subject, answer, the
+    countersubject recurring -- and that its counterpoint holds.
+    """
+
+    @classmethod
+    def setUpClass(cls):
+        import fugue3
+        cls.F = fugue3
+        cls.lines, cls.plan = fugue3.compose()
+
+    def test_a_key_names_every_pitch_it_can_sound(self):
+        """Degrees and pitches are the same thing read two ways.
+
+        Storing a searched line as degrees is what lets it be restated in
+        another key later, so the two readings have to agree exactly.
+        """
+        F = self.F
+        for mode in ("minor", "major"):
+            for degree in range(-14, 15):
+                for sharp in (0, 1):
+                    if sharp and (degree % 7 != 6 or mode != "minor"):
+                        continue
+                    pitch = F.pitch_of(64, degree, mode, sharp)
+                    again, alt = F.degree_of(pitch, 64, mode)
+                    self.assertEqual(F.pitch_of(64, again, mode, alt), pitch)
+
+    def test_the_answer_is_the_subject_at_the_fifth(self):
+        """A real answer: the same fourteen notes, seven semitones up."""
+        F = self.F
+        subject = F.state(F.SUBJECT, 0.0, 64, "minor")
+        answer = F.state(F.SUBJECT, 0.0, 71, "minor")
+        self.assertEqual([p + 7 for _s, _e, p in subject],
+                         [p for _s, _e, p in answer])
+
+    def test_a_parallel_fifth_is_caught_from_underneath(self):
+        """The interval is a distance, so it has no sign.
+
+        Measured as a signed remainder, a fifth below reads as a fourth,
+        and every parallel fifth in which the moving voice is the lower
+        one goes straight through the search.
+        """
+        F = self.F
+        over = F._parallels(55, 53, {0: 48}, {0: 46})     # moving voice above
+        under = F._parallels(48, 46, {0: 55}, {0: 53})    # ... and below
+        self.assertGreater(over, 0)
+        self.assertGreater(under, 0, "a fifth below is still a fifth")
+        self.assertEqual(F._parallels(55, 53, {0: 48}, {0: 49}), 0,
+                         "contrary motion is not a parallel")
+
+    def test_a_rhythm_fills_exactly_the_bars_it_is_given(self):
+        F = self.F
+        held = {0: [(0.0, 4.0, 64)]}
+        running = {0: F.state(F.SUBJECT, 0.0, 64, "minor")}
+        for fixed in (held, running, {}):
+            for start, end in ((0.0, 4.0), (2.5, 6.0), (1.0, 1.5)):
+                slots = F.complementary(fixed, start, end)
+                self.assertAlmostEqual(sum(length for _s, length in slots),
+                                       end - start)
+                self.assertAlmostEqual(slots[0][0], start)
+                for (a, la), (b, _lb) in zip(slots, slots[1:]):
+                    self.assertAlmostEqual(a + la, b)
+
+    def test_repeated_notes_are_joined_but_not_without_end(self):
+        F = self.F
+        joined = F.merge([(0.0, 0.5, 64), (0.5, 1.0, 64), (1.0, 1.5, 62)])
+        self.assertEqual(joined, [(0.0, 1.0, 64), (1.0, 1.5, 62)])
+        long = F.merge([(0.0, 1.5, 64), (1.5, 3.0, 64)], longest=2.0)
+        self.assertEqual(len(long), 2, "a note may not grow past the cap")
+
+    def test_every_part_is_one_note_at_a_time(self):
+        """The whole point of the band: no part is ever asked for a chord."""
+        for voice, notes in self.lines.items():
+            for (s1, e1, _p1), (s2, _e2, _p2) in zip(sorted(notes),
+                                                     sorted(notes)[1:]):
+                self.assertLessEqual(e1, s2 + 1e-9,
+                                     f"{self.F.PARTS[voice]} overlaps itself "
+                                     f"at bar {s2 / 4 + 1:.2f}")
+
+    def test_the_counterpoint_holds(self):
+        """No parallels, no crossings, nothing outside a part's compass."""
+        _total, faults = self.F.score(self.lines)
+        self.assertEqual(faults["parallels"], 0)
+        self.assertEqual(faults["crossing"], 0)
+        self.assertEqual(faults["range"], 0)
+        self.assertLessEqual(faults["collision"], 1,
+                             "two voices may touch in passing, not settle there")
+        self.assertEqual(faults["loose"], 0,
+                         "every beat with three voices should make a chord")
+
+    def test_the_subject_is_heard_in_every_voice(self):
+        """A fugue in which a part never states the theme is an accompaniment."""
+        F = self.F
+        shape = [d for _o, d, _l, _s in F.SUBJECT]
+        steps = [b - a for a, b in zip(shape, shape[1:])]
+        for voice, notes in self.lines.items():
+            pitches = [p for _s, _e, p in sorted(notes)]
+            found = False
+            for i in range(len(pitches) - len(F.SUBJECT) + 1):
+                run = pitches[i:i + len(F.SUBJECT)]
+                gaps = [b - a for a, b in zip(run, run[1:])]
+                # the same contour, up or down a scale, in either mode
+                if all((g > 0) == (t > 0) and abs(g - t) <= 1
+                       for g, t in zip(gaps, [s * 2 for s in steps])):
+                    found = True
+                    break
+            self.assertTrue(found,
+                            f"{F.PARTS[voice]} never states the subject")
+
+    def test_the_episodes_are_not_all_the_same(self):
+        """Left to itself the search writes the cleanest episode every time.
+
+        The cleanest one is the same one, four times over, so the layouts
+        already used are struck off -- and the point of that is that what
+        comes out is four different episodes.
+        """
+        layouts = {told for _bar, told in self.plan if "leads" in told}
+        self.assertGreaterEqual(len(layouts), 3,
+                                f"only {len(layouts)} distinct episodes")
+
+    def test_it_ends_on_a_major_tonic(self):
+        """The Picardy third: a fugue in the minor closes in the major."""
+        last = max(e for notes in self.lines.values() for _s, e, _p in notes)
+        closing = {p % 12 for notes in self.lines.values()
+                   for s, _e, p in notes if s >= last - 4.0}
+        self.assertEqual(closing, {4, 8, 11}, "E, G sharp and B")
+
+    def test_the_tab_is_the_fugue(self):
+        """Written out and read back off disk, note for note."""
+        with tempfile.TemporaryDirectory() as d:
+            midi = os.path.join(d, "fugue.mid")
+            tab = os.path.join(d, "fugue.gp5")
+            self.F.write_midi(self.lines, midi)
+            report = convert(midi, tab, Settings(guitars=2, bass=True,
+                                                 condense_parts=False))
+            audit = verify.verify(report, tab)
+            self.assertTrue(audit.ok, "; ".join(str(p) for p in audit.problems))
+            self.assertEqual(audit.traced, audit.written_notes)
+            self.assertEqual(audit.missing, [])
+            self.assertEqual(len(report.parts), 3, "two guitars and a bass")
+            for part in report.parts:
+                self.assertLessEqual(part.max_fret, 12,
+                                     f"{part.name} is playing too high up")
+
+
 if __name__ == "__main__":
     unittest.main(verbosity=2)
