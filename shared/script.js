@@ -105,11 +105,11 @@ const projects = [
     cat: "software",
     status: "live",
     caption:
-      "Turns an organ fugue into a band. A fugue is already written as independent melodic lines, so instead of hacking chords apart it works out which line is which and hands each one to a different player - one voice per instrument, the pedal line on the bass, strictly one note at a time. 72 movements of Bach are arranged and published: 303 parts, one PDF per player, notation over tablature. Every voice stays on the same instrument for the whole piece, a line is folded only by whole octaves and never by anything else, and it will not write a double-stop no hand could hold. Prelude and fugue are separated automatically, by the metre change between them or by the pedal falling silent as the subject enters.",
+      "Turns an organ fugue into a band. A fugue is already written as independent melodic lines, so instead of hacking chords apart it works out which line is which and hands each one to a different player - one voice per instrument, the pedal line on the bass, strictly one note at a time. 3,445 movements of Bach are arranged and published as Guitar Pro files, and the 73 organ movements as printable parts besides - 331 PDFs, one per player, notation over tablature. Four Vivaldi arias sit at the end, and after them a fugue the program wrote itself rather than arranged. Every voice stays on the same instrument for the whole piece, a line is folded only by whole octaves and never by anything else, and it will not write a double-stop no hand could hold. Prelude and fugue are separated automatically, by the metre change between them or by the pedal falling silent as the subject enters.",
     tags: ["Python", "PyGuitarPro", "mido", "MuseScore"],
     links: [
-      { name: "the tabs", url: "/fugue/" },
-      { name: "source", url: "https://github.com/Leonid-Elkin/Leonid-Elkin.github.io/tree/main/FugueSplit_source" },
+      { name: "the tabs", url: "/fuguesplit/" },
+      { name: "source", url: "https://github.com/Leonid-Elkin/Leonid-Elkin.github.io/tree/main/fuguesplit/src" },
     ],
   },
   {
@@ -231,7 +231,6 @@ const projects = [
     tags: ["Raspberry Pi", "RF", "antenna"],
     links: [
       { name: "source", url: "https://github.com/Leonid-Elkin/Yagi-rifle-code" },
-      { name: "write-up", url: "", pending: true },
     ],
   },
   /* ---------- research ---------- */

@@ -1,0 +1,14 @@
+__pycache__/
+*.pyc
+
+# Generated artefacts. The MIDI sources are other people's transcriptions,
+# and the tabs are regenerable from them (fetch_tobis.py, fetch_mutopia.py)
+# -- the published copies live one level up, under ../bach and ../vivaldi.
+out/
+out-art-of-fugue/
+pdf/
+midi/
+audio/
+
+# batch logs
+_*.log

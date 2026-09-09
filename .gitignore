@@ -3,3 +3,10 @@
 .claude/
 .cursor/
 .impeccable/
+
+# stray bytecode, wherever a script gets run
+__pycache__/
+*.pyc
+
+# batch logs from fetch_tobis / build_shelves
+FugueSplit_source/_*.log
