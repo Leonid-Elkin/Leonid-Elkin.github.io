@@ -15,7 +15,13 @@
     "FugueSplit": "/previews/fuguesplit.jpg",
     "Sheet2Tab": "/previews/sheet2tab.jpg",
     "Chess Vision Bot": "/previews/chess-vision-bot.jpg",
-    "YT Grab": "/previews/yt-grab.jpg",
+    /* previews/yt-grab.jpg is not YT Grab - it is a Team Fortress 2
+       screenshot, filed here by mistake, and it was being served as the
+       card, the case hero and the og:image while the caption underneath
+       described the Download tab. Unmapped until a real screenshot of the
+       app exists, which gets the hatched placeholder instead: the rule at
+       the top of this file is that the placeholder is the honest answer,
+       and a picture of the wrong thing is worse than no picture. */
     "MoveGrade": "/previews/movegrade.jpg",
     "Advent of Code 2025": "/previews/advent-of-code-2025.jpg",
     "Durak": "/previews/durak.jpg",

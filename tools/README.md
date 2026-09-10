@@ -1,6 +1,6 @@
 # tools/
 
-Two scripts. Neither is part of the site — GitHub Pages serves files and runs
+Two scripts. Neither is part of the site – GitHub Pages serves files and runs
 nothing. Standard library Python, nothing to install.
 
 ## Adding a solution
@@ -22,7 +22,7 @@ LeetCode/1440/data.txt      ...that file, offered as a download beside the code
 ## build_solutions.py
 
 Walks both folders and writes `data/euler-solutions.js` and
-`data/leetcode-solutions.js` — the two files the pages load. Run it by hand if
+`data/leetcode-solutions.js` – the two files the pages load. Run it by hand if
 you want to see the result before pushing:
 
 ```sh
@@ -51,7 +51,7 @@ a title:
 
 | file | contents |
 | --- | --- |
-| `lc_titles.json` | `{"1": ["Two Sum", "two-sum", 1], ...}` — title, slug, difficulty |
+| `lc_titles.json` | `{"1": ["Two Sum", "two-sum", 1], ...}` – title, slug, difficulty |
 | `pe_titles.json` | `{"1": "Multiples of 3 or 5", ...}` |
 
 ```sh
@@ -59,7 +59,7 @@ python refresh_titles.py            # both
 python refresh_titles.py euler      # one request, the whole index
 ```
 
-That is deliberately all it collects. **Statements are not stored** — both
+That is deliberately all it collects. **Statements are not stored** – both
 pages link out to projecteuler.net and leetcode.com instead. Embedding them
 meant 13 MB of scraped HTML in the repo that went stale the moment either site
 edited a problem, and the link is both smaller and always right.

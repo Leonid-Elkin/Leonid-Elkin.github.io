@@ -1,6 +1,6 @@
 # LeetCode
 
-Drop a solution in here and it appears on the site. Nothing else to do — a
+Drop a solution in here and it appears on the site. Nothing else to do – a
 push that touches this folder runs `.github/workflows/solutions.yml`, which
 rebuilds `data/leetcode-solutions.js` and commits it back.
 
@@ -27,7 +27,7 @@ the problem number, so `1.py` is all it takes to get "1. Two Sum · Easy".
 ## Languages it knows
 
 Python, JavaScript, TypeScript, C++, C, Java, C#, Go, Rust, Ruby, Kotlin,
-Swift, SQL, Shell. Python and JavaScript get a **run** button on the page —
+Swift, SQL, Shell. Python and JavaScript get a **run** button on the page –
 they execute in the reader's browser. The rest are shown and coloured but not
 run, because a browser has no compiler for them.
 

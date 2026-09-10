@@ -1,0 +1,98 @@
+{
+ "shelf": "keyboard-variations",
+ "heading": "Airs and variations",
+ "span": "BWV 988–994",
+ "pieces": [
+  {
+   "stem": "BWV_0988",
+   "label": "BWV 988",
+   "title": "Goldberg Variations",
+   "band": "3 guitars + bass",
+   "bars": 959,
+   "tempo": 72,
+   "source_notes": 16816,
+   "written_notes": 16604,
+   "read_as": "piano",
+   "broken": 72,
+   "section": "klavier/arien-und-variationen"
+  },
+  {
+   "stem": "BWV_0989",
+   "label": "BWV 989",
+   "title": "Aria variata alla maniera italiana in A minor",
+   "band": "3 guitars + bass",
+   "bars": 152,
+   "tempo": 80,
+   "source_notes": 3115,
+   "written_notes": 3101,
+   "read_as": "piano",
+   "broken": 9,
+   "section": "klavier/arien-und-variationen"
+  },
+  {
+   "stem": "BWV_0990",
+   "label": "BWV 990",
+   "title": "Sarabande con partite in C major",
+   "band": "4 guitars + bass",
+   "bars": 366,
+   "tempo": 120,
+   "source_notes": 5915,
+   "written_notes": 5869,
+   "read_as": "piano",
+   "broken": 54,
+   "section": "klavier/arien-und-variationen"
+  },
+  {
+   "stem": "BWV_0991",
+   "label": "BWV 991",
+   "title": "Air with variations in C minor",
+   "band": "1 guitar + bass",
+   "bars": 45,
+   "tempo": 60,
+   "source_notes": 305,
+   "written_notes": 305,
+   "read_as": "piano",
+   "broken": 0,
+   "section": "klavier/arien-und-variationen"
+  },
+  {
+   "stem": "BWV_0992",
+   "label": "BWV 992",
+   "title": "Capriccio on the departure of a beloved brother",
+   "band": "3 guitars + bass",
+   "bars": 166,
+   "tempo": 90,
+   "source_notes": 2801,
+   "written_notes": 2732,
+   "read_as": "piano",
+   "broken": 24,
+   "section": "klavier/arien-und-variationen"
+  },
+  {
+   "stem": "BWV_0993",
+   "label": "BWV 993",
+   "title": "Capriccio in E major",
+   "band": "4 guitars + bass",
+   "bars": 126,
+   "tempo": 90,
+   "source_notes": 2987,
+   "written_notes": 2949,
+   "read_as": "piano",
+   "broken": 29,
+   "section": "klavier/arien-und-variationen"
+  },
+  {
+   "stem": "BWV_0994",
+   "label": "BWV 994",
+   "title": "Applicatio in C major",
+   "band": "3 guitars + bass",
+   "bars": 8,
+   "tempo": 60,
+   "source_notes": 113,
+   "written_notes": 112,
+   "read_as": "piano",
+   "broken": 0,
+   "section": "klavier/arien-und-variationen"
+  }
+ ]
+}

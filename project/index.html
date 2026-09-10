@@ -27,7 +27,7 @@
                 <li><a href="/projects/" aria-current="page">Projects</a></li>
                 <li><a href="/research/">Research</a></li>
                 <li><a href="/practice/">Practice</a></li>
-                <li><a href="/fugue/">Fugue</a></li>
+                <li><a href="/fuguesplit/">Fugue</a></li>
                 <li><a href="/about/">About</a></li>
                 <li><a href="/live/">Live</a></li>
                 <li><a href="#contact">Contact</a></li>
@@ -51,7 +51,7 @@
         <section class="section">
             <div class="wrap">
                 <div class="section-head">
-                    <span class="idx">01 &mdash;</span>
+                    <span class="idx">01 &ndash;</span>
                     <h1 class="display overprint" data-text="Drone Strike Map">Drone Strike Map</h1>
                     <a class="mono" href="/projects/">&larr; all projects</a>
                 </div>
@@ -67,7 +67,7 @@
                             problem</h2>
                         <p>Strike reporting is scattered across dozens of outlets, in different languages, with
                             different counting rules, and none of it stays findable a week later. There was no
-                            single place where a day's claims sat next to their sources &mdash; only aggregates
+                            single place where a day's claims sat next to their sources. There were only aggregates
                             with the sourcing stripped out.</p>
 
                         <h2 class="display"
@@ -76,13 +76,30 @@
                             claim, and a Leaflet map that walks the days. It runs under systemd on its own server
                             and serves a public JSON API as well as the site. The core decision: never merge
                             claims. Two outlets giving two figures for the same strike stay two rows, each with
-                            its byline &mdash; the map reports reporting, it does not adjudicate it.</p>
+                            its byline. The map reports reporting, it does not adjudicate it.</p>
 
                         <h2 class="display"
                             style="font-size: clamp(1.2rem, 2.2vw, 1.6rem); margin: 22px 0 8px;">What went wrong</h2>
-                        <p class="placeholder">[ Yours to write &mdash; the scraper that silently broke, the outlet
-                            that changed its markup, the dedup rule that was wrong for a month. This is the section
-                            an interviewer actually reads. ]</p>
+                        <p>Three problems, and none of them was fixed by scraping harder.</p>
+
+                        <p><b>The two sides do not publish the same kind of number.</b> Ukraine publishes
+                            launches. Moscow publishes interceptions, often for a whole theatre and several
+                            nights at once. No arithmetic turns one into the other. Where a Russian figure could
+                            not be untangled into single nights it stays a range instead of a number. That is a
+                            data problem wearing the costume of a display problem, and the only honest answer was
+                            to stop claiming a precision the sources do not have.</p>
+
+                        <p><b>Feeds go quiet without saying so.</b> Fifty-one are read and forty-eight answered
+                            on the last check. A feed that stops answering does not announce it, and the danger
+                            is that the record goes on looking complete while one source silently contributes
+                            nothing. A feed is marked silent when it fails to answer. Nothing already stored
+                            changes; the record simply stops growing from that feed until it comes back.</p>
+
+                        <p><b>An empty map reads as peace.</b> The smaller and more local an event, the likelier
+                            it arrives late or not at all, so blank space means nothing was read there rather
+                            than nothing happened there. A day with no tally is the same trap: nobody published
+                            one, which is not the same as nothing having flown. Both now say so on the page, and
+                            the record never fills a gap with an estimate.</p>
 
                         <h2 class="display"
                             style="font-size: clamp(1.2rem, 2.2vw, 1.6rem); margin: 22px 0 8px;">Result</h2>
@@ -93,7 +110,7 @@
                     </div>
 
                     <dl class="fact-list">
-                        <div><dt class="k">Role</dt><dd>Solo &mdash; everything</dd></div>
+                        <div><dt class="k">Role</dt><dd>Solo, everything</dd></div>
                         <div><dt class="k">Status</dt><dd><span class="status live">live</span></dd></div>
                         <div><dt class="k">Stack</dt><dd>Python, SQLite, systemd, Leaflet</dd></div>
                         <div><dt class="k">Map</dt><dd><a href="https://dronestrikemap.com/" target="_blank"
@@ -114,7 +131,7 @@
                 <li><a href="https://github.com/Leonid-Elkin" target="_blank" rel="noopener">GitHub</a></li>
                 <li><a href="https://elkyy.itch.io/" target="_blank" rel="noopener">itch.io</a></li>
             </ul>
-            <span class="colophon">Set in Archivo, Inter Tight and JetBrains Mono. Black stock, one red &mdash; and one visitor in blue. Static HTML, no build step.</span>
+            <span class="colophon">Set in Archivo, Inter Tight and JetBrains Mono. Black stock, one red, and one visitor in blue. Static HTML, no build step.</span>
         </div>
     </footer>
     <script src="/shared/extras.js?v=2"></script>

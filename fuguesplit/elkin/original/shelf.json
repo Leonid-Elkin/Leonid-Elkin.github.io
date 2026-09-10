@@ -1,0 +1,21 @@
+{
+ "shelf": "original",
+ "composer": "elkin",
+ "heading": "Elkin: written, not arranged",
+ "span": "one fugue, three voices",
+ "pieces": [
+  {
+   "stem": "fugue-in-e-minor",
+   "label": "2026",
+   "title": "Fugue in E minor",
+   "band": "2 guitars + bass",
+   "bars": 30,
+   "tempo": 92,
+   "source_notes": 408,
+   "written_notes": 408,
+   "read_as": "composed",
+   "broken": 0,
+   "section": "written by fugue3.py"
+  }
+ ]
+}

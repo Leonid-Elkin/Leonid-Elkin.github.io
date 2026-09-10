@@ -510,7 +510,7 @@ window.addEventListener("DOMContentLoaded", async () => {
     const top = (data.commits || [])[0];
     if (lc && top) {
       const n = (top.files || []).length;
-      lc.textContent = "Last change " + relativeDate(top.date) + " — " + (n ? n + (n === 1 ? " file" : " files") + " in " : "") + top.repo;
+      lc.textContent = "Last change " + relativeDate(top.date) + ": " + (n ? n + (n === 1 ? " file" : " files") + " in " : "") + top.repo;
     }
   };
 
