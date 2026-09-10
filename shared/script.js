@@ -283,7 +283,7 @@ const projects = [
  */
 const roles = [
   {
-    title: "CanSat 2025 — payload & radio",
+    title: "CanSat 2025: payload & radio",
     org: "Tonbridge School",
     place: "Team of seven",
     from: "2024",
@@ -292,7 +292,7 @@ const roles = [
     bullets: [
       "Built a can-sized satellite for the CanSat competition with six others, through to a full critical design report.",
       "Worked the telemetry and RF side; the 14.5 dBi Yagi-Uda antenna project grew directly out of this.",
-      "[ Add the result — where it placed, what flew, what failed on the day. ]",
+      "[ Add the result – where it placed, what flew, what failed on the day. ]",
     ],
   },
   {
@@ -302,7 +302,7 @@ const roles = [
     from: "2024",
     to: "Apr 2025",
     bullets: [
-      "Wrote multilayer perceptrons from scratch in NumPy — no framework — and published the library on PyPI as elkwork.",
+      "Wrote multilayer perceptrons from scratch in NumPy, with no framework, and published the library on PyPI as elkwork.",
       "Trained at a range of model sizes to measure how test loss falls with parameter count; reached 98.52% on MNIST and 93.35% on FashionMNIST.",
     ],
   },
@@ -413,7 +413,7 @@ function linkEl(link) {
     const why = link.why || "not published yet";
     wrap.appendChild(el("span", "soon", "soon"));
     wrap.title = why;
-    wrap.appendChild(el("span", "why", " — " + why));
+    wrap.appendChild(el("span", "why", " – " + why));
     return wrap;
   }
   a.href = link.url;
@@ -533,7 +533,7 @@ function projectCard(p, i, opts = {}) {
       cover.target = "_blank";
       cover.rel = "noopener";
     }
-    cover.setAttribute("aria-label", p.title + " — " + first.name);
+    cover.setAttribute("aria-label", p.title + ": " + first.name);
     card.appendChild(cover);
     card.classList.add("has-cover");
   }
@@ -629,7 +629,7 @@ function initRoles() {
     org.append(r.org, " · ", r.place);
     who.appendChild(org);
     head.appendChild(who);
-    head.appendChild(el("span", "role-when mono", r.from + " — " + r.to));
+    head.appendChild(el("span", "role-when mono", r.from + " – " + r.to));
     item.appendChild(head);
 
     const ul = el("ul", "bullets");

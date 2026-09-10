@@ -104,7 +104,7 @@ def piece_html(shelf: str, piece: dict, composer: str = "bach") -> str:
         parts.append(
             f'\n                                <a class="get-part" '
             f'href="/fuguesplit/{composer}/{shelf}/pdf/{os.path.basename(pdf)}" '
-            f'title="{suffix.replace("-", " ")} &mdash; PDF">{name}</a>')
+            f'title="{suffix.replace("-", " ")}, PDF">{name}</a>')
     meta = f"{piece['band']} &middot; {piece['bars']} bars"
     if piece.get("tempo"):
         meta += f" &middot; {piece['tempo']} bpm"

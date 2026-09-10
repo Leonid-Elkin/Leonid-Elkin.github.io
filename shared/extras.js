@@ -18,7 +18,7 @@
 
   try {
     console.log(
-      "%c ■ %c LEONID ELKIN — you found the service hatch.",
+      "%c ■ %c LEONID ELKIN: you found the service hatch.",
       "background:#ff2d16;color:#ff2d16;font-size:18px;",
       "color:#f2f0ec;background:#0a0a0a;font-family:monospace;font-size:12px;padding:4px 8px;"
     );
@@ -77,7 +77,7 @@
       const on = document.documentElement.classList.toggle("misprint");
       try {
         console.log(
-          "%c" + (on ? "REGISTRATION LOST — the plates have drifted." : "Registration restored."),
+          "%c" + (on ? "REGISTRATION LOST: the plates have drifted." : "Registration restored."),
           "color:" + (on ? "#ff2d16" : "#6e6b67") + ";font-family:monospace;font-size:12px;"
         );
       } catch (err) { /* fine */ }

@@ -112,7 +112,7 @@ def readable(stem: str) -> str:
     """
     rv = RV.match(stem)
     if rv:
-        return f"RV {int(rv.group(1))} — {_spaced(rv.group(2))}"
+        return f"RV {int(rv.group(1))}: {_spaced(rv.group(2))}"
     if not stem.upper().startswith("BWV_"):
         return stem.replace("_", " ")
     parts = stem[4:].split("_")

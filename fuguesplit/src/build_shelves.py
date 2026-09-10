@@ -148,7 +148,7 @@ SHELVES: dict[str, tuple[str, str, str, list[str]]] = {
     # Not Bach. Mutopia holds four Vivaldi pieces and no more; there is no
     # Vivaldi archive of Tobis's kind to draw on. See fetch_mutopia.py.
     "vivaldi-arias": (
-        "Vivaldi — arias", "RV 690, RV 725", "vivaldi", [],
+        "Vivaldi: arias", "RV 690, RV 725", "vivaldi", [],
     ),
 }
 

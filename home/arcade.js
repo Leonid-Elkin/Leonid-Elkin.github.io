@@ -57,7 +57,7 @@
 
     function drawHud() {
       const s = Math.ceil(timeLeft());
-      const acc = clicks ? Math.round((hits / clicks) * 100) + "%" : "—";
+      const acc = clicks ? Math.round((hits / clicks) * 100) + "%" : "–";
       hud.textContent =
         "RANGE OPEN · 0:" + String(s).padStart(2, "0") + " · HITS " + hits + " · ACC " + acc;
     }

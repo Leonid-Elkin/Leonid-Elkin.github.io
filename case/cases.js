@@ -216,7 +216,7 @@ const CASES = {
   const c = CASES[slug] || { sections: [], facts: [] };
 
   document.title = p.title + " · Leonid Elkin";
-  document.getElementById("case-idx").textContent = String(i + 1).padStart(2, "0") + " —";
+  document.getElementById("case-idx").textContent = String(i + 1).padStart(2, "0") + " –";
   const h = document.getElementById("case-title");
   h.textContent = p.title;
   h.dataset.text = p.title;
